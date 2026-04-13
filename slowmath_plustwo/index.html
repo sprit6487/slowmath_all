@@ -811,7 +811,7 @@ function socialLogin(provider) {
 }
 function logout() {
     localStorage.removeItem('slowmath_plustwo_login');
-    showView('login-view');
+    showView('start-view');
 }
 function goHome() {
     if (delayTimer) { clearInterval(delayTimer); delayTimer = null; }
@@ -1252,7 +1252,9 @@ setTimeout(function() {
 (function() {
   var _SM_KEY = 'slowmath_plustwo_login';
   function _updateShareVis() {
-    document.body.classList.toggle('sm-loggedin', !!localStorage.getItem(_SM_KEY));
+    var loggedIn = !!localStorage.getItem(_SM_KEY);
+    var days = parseInt(localStorage.getItem('slowmath_share_days') || '0');
+    document.body.classList.toggle('sm-loggedin', loggedIn && days < 5);
   }
   _updateShareVis();
   ['socialLogin','socialLogout','goLogin'].forEach(function(fn) {
