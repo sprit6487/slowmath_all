@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">느린아이 점잇기</string>
+    <string name="title_activity_main">느린아이 점잇기</string>
+    <string name="package_name">com.slowmath.dot2dot</string>
+    <string name="custom_url_scheme">com.slowmath.dot2dot</string>
+</resources>

@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>느린아이 숫자 쓰기</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Noto Sans KR', sans-serif; margin: 0; padding: 0; background: #F5F1EB; min-height: 100dvh; display: flex; justify-content: center; align-items: flex-start; user-select: none; }
+        .app { width: 100%; max-width: 480px; min-height: 100dvh; background: white; padding: 24px 20px; padding-top: max(24px, env(safe-area-inset-top)); padding-bottom: max(24px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; }
+        @media (min-width: 768px) { body { align-items: center; padding: 32px; } .app { max-width: 560px; min-height: auto; border-radius: 32px; box-shadow: 0 8px 48px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04); padding: 44px 40px; } }
+        .hidden { display: none !important; }
+
+        /* ── Login View ── */
+        .login-view {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          flex: 1;
+          min-height: 100dvh;
+          padding: 40px 20px;
+        }
+
+        .login-logo-area {
+          text-align: center;
+          margin-bottom: 48px;
+        }
+
+        .login-logo-area svg {
+          display: block;
+          margin: 0 auto;
+        }
+
+        .login-logo-area h1 {
+          font-size: clamp(1.8rem, 6vw, 2.25rem);
+          font-weight: 900;
+          letter-spacing: -0.025em;
+          margin-top: 8px;
+          white-space: nowrap;
+        }
+
+        .login-subtitle {
+          color: #B8AD9E;
+          font-size: 0.9375rem;
+          margin-top: 2px;
+        }
+
+          @keyframes floatBubble {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+.login-trial {
+    position: relative;
+    background: #FFF8F0;
+    border: 1.5px solid #EDD080;
+    border-radius: 14px;
+    padding: 9px 16px;
+    font-size: 0.78rem;
+    color: #7B6545;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+    line-height: 1.4;
+    box-shadow: 0 4px 14px rgba(220,160,50,.18);
+    animation: floatBubble 2.8s ease-in-out infinite;
+    align-self: center;
+}
+.login-trial::before {
+    content: '';
+    position: absolute;
+    bottom: -9px; left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top: 8px solid #EDD080;
+    border-bottom: 0;
+}
+.login-trial::after {
+    content: '';
+    position: absolute;
+    bottom: -7px; left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top: 7px solid #FFF8F0;
+    border-bottom: 0;
+    z-index: 1;
+}
+  /* ===== Share Bubble ===== */
+  .share-bubble {
+    position: absolute;
+    right: 0;
+    background: #FFF8F0;
+    border: 1.5px solid #EDD080;
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 0.55rem;
+    color: #7B6545;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(220,160,50,.18);
+    z-index: 20;
+    animation: floatBubble 2.8s ease-in-out infinite;
+    line-height: 1.5;
+    text-align: right;
+    max-width: 200px;
+    white-space: nowrap;
+  }
+  .share-bubble::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 10px;
+    border: 4px solid transparent;
+    border-bottom: 7px solid #EDD080;
+    border-top: 0;
+  }
+  .share-bubble::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 11px;
+    border: 3px solid transparent;
+    border-bottom: 6px solid #FFF8F0;
+    border-top: 0;
+    z-index: 1;
+  }
+@media (max-width:768px){.share-bubble{font-size:0.60rem;max-width:170px;padding:7px 10px;}}
+@media (max-width:480px){.share-bubble{font-size:0.62rem;max-width:165px;padding:7px 9px;}}
+
+  .login-buttons {
+          width: 100%;
+          max-width: 270px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .login-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+          padding: 16px 20px;
+          border-radius: 14px;
+          font-size: 1rem;
+          font-weight: 700;
+          font-family: inherit;
+          line-height: 1.2;
+          border: none;
+          cursor: pointer;
+          transition: transform 0.1s;
+        }
+        .login-btn:active { transform: scale(0.97); }
+        .login-btn svg { flex-shrink: 0; }
+        .login-btn.kakao { background: #FEE500; color: #191919; }
+        .login-btn.naver { background: #03C75A; color: #FFFFFF; }
+        .login-btn.google { background: #FFFFFF; color: #444444; border: 1.5px solid #DADCE0; }
+        .login-btn.facebook { background: #1877F2; color: #FFFFFF; }
+
+        /* ── Home View ── */
+        .app-header { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px; position: relative; width: 100%; }
+        .app-header svg.turtle-logo { width: 90px; height: 75px; }
+        .app-header h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.025em; margin: 8px 0 0; line-height: 1.2; }
+        .brand-sub{font-size:.8rem;color:#B8AD9E;margin-top:6px;margin-bottom:0;font-weight:500;}
+        .title-blue { color: #6BADE8; }
+        .title-orange { color: #F0A050; }
+        .setting-divider { border-top: 1.5px solid #F0ECE6; padding-top: 18px; margin-top: 18px; }
+        .setting-header { display: flex; align-items: center; justify-content: space-between; }
+        .setting-title { font-size: 0.875rem; font-weight: 600; color: #4A4035; }
+        .setting-title .badge { font-size: 0.7rem; font-weight: 400; color: #B8AD9E; margin-left: 6px; }
+        .toggle-track {
+            width: 48px; height: 28px; border-radius: 99px; position: relative;
+            background: #E0DAD0; border: none; cursor: pointer; flex-shrink: 0; transition: background 0.2s;
+        }
+        .toggle-track.on { background: #5BC886; }
+        .toggle-knob {
+            width: 22px; height: 22px; border-radius: 50%; background: #fff;
+            position: absolute; top: 3px; left: 3px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12); transition: transform 0.2s;
+        }
+        .toggle-track.on .toggle-knob { transform: translateX(20px); }
+        .logout-wrap { margin-top: auto; padding-top: 24px; text-align: center; }
+        .logout-btn { background: none; border: 1.5px solid #E8E2DA; border-radius: 8px; padding: 8px 24px; font-size: 0.8rem; font-weight: 600; color: #B8AD9E; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: background 0.15s; }
+        .logout-btn:hover { background: #F5F1EB; }
+
+        .sec-label { font-size: .875rem; font-weight: 700; color: #B8AD9E; margin: 0 0 10px; }
+
+        /* ── Mode Selection ── */
+        .mode-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 18px; }
+        .mode-card { border: 2.5px solid #E8E2DA; border-radius: 20px; padding: 16px 8px 14px; background: white; cursor: pointer; text-align: center; transition: all .15s; }
+        .mode-card:active { transform: scale(.95); }
+        .mode-card.sel { border-color: #F0A050; background: #FFF8F0; }
+        .mode-card .m-icon { height: 54px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; font-size: 1.8rem; }
+        .mode-card .m-name { font-size: .85rem; font-weight: 700; color: #4A4035; }
+
+        /* ── Range Options ── */
+        .range-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 10px; }
+        .range-btn { border: 2.5px solid #E8E2DA; border-radius: 12px; padding: 10px 4px; background: white; cursor: pointer; text-align: center; transition: all .15s; font-size: .85rem; font-weight: 700; color: #4A4035; font-family: 'Noto Sans KR', sans-serif; }
+        .range-btn:active { transform: scale(.95); }
+        .range-btn.sel { border-color: #6BADE8; background: #EEF6FD; color: #6BADE8; }
+
+        /* ── Number Grid ── */
+        .num-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 18px; }
+        .num-card { border: 2.5px solid #E8E2DA; border-radius: 14px; padding: 12px 4px; background: white; cursor: pointer; text-align: center; transition: all .15s; font-size: 1.5rem; font-weight: 900; color: #4A4035; }
+        .num-card:active { transform: scale(.95); }
+        .num-card.sel { border-color: #6BADE8; background: #EEF6FD; color: #6BADE8; }
+
+        /* ── Difficulty ── */
+
+        .start-btn { width: 100%; padding: 16px 0; border-radius: 16px; border: none; margin-top: 18px; background: #4A4035; color: white; font-family: 'Noto Sans KR', sans-serif; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(74,64,53,0.15); transition: transform .1s, box-shadow .1s; }
+        .start-btn:active { transform: scale(.97); box-shadow: none; }
+
+        /* ── Game View ── */
+        .game-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+        .btn-home { width: 36px; height: 36px; border-radius: 10px; border: 2px solid #E8E2DA; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; color: #8C8070; flex-shrink: 0; }
+        .btn-home:active { background: #F5F1EB; }
+        .nav-title { flex: 1; font-size: 1rem; font-weight: 700; color: #4A4035; }
+
+        .canvas-wrap { border: 2.5px solid #E8E2DA; border-radius: 20px; overflow: hidden; margin-bottom: 14px; background: #FAFAF8; position: relative; }
+        canvas { display: block; touch-action: none; }
+
+        .instr { text-align: center; font-size: .875rem; font-weight: 600; color: #B8AD9E; margin-bottom: 12px; min-height: 22px; }
+        .action-btns { display: flex; gap: 10px; width: 100%; max-width: 320px; margin: 0 auto; }
+        .btn-retry { flex: 1; padding: 13px 0; border-radius: 12px; border: 2.5px solid #E8E2DA; background: white; font-family: 'Noto Sans KR', sans-serif; font-size: .9rem; font-weight: 700; color: #8C8070; cursor: pointer; transition: transform .1s; }
+        .btn-retry:active { transform: scale(.97); }
+        .btn-change { flex: 1.2; padding: 13px 0; border-radius: 12px; border: none; background: #F0A050; font-family: 'Noto Sans KR', sans-serif; font-size: .9rem; font-weight: 700; color: white; cursor: pointer; transition: transform .1s; box-shadow: 0 2px 8px rgba(240,144,30,.3); }
+        .btn-change:active { transform: scale(.97); box-shadow: none; }
+        .res-btns { display: flex; gap: 10px; width: 100%; margin-top: 8px; max-width: 320px; }
+
+        /* ── Progress ── */
+        .progress-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+        .progress-dots { display: flex; gap: 4px; flex: 1; }
+        .progress-dot { flex: 1; height: 6px; border-radius: 3px; background: #E8E2DA; transition: background .2s; }
+        .progress-dot.done { background: #5BC886; }
+        .progress-dot.current { background: #F0A050; }
+        .progress-label { font-size: .75rem; font-weight: 700; color: #8C8070; white-space: nowrap; }
+
+        /* ── Result View ── */
+        .result-header { text-align: center; margin-bottom: 20px; }
+        .result-header .complete-emoji { font-size: 56px; display: block; margin-bottom: 6px; }
+        .result-header h2 { font-size: 1.25rem; font-weight: 900; color: #4A4035; margin: 0 0 4px; }
+        .result-header p { font-size: .85rem; color: #B8AD9E; margin: 0; }
+        .next-btn { margin-top: 8px; padding: 14px 36px; border: none; border-radius: 12px; background: #6BADE8; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform 0.12s; }
+        .next-btn:active { transform: scale(0.96); }
+        .result-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 24px; }
+        .result-cell { border: 2px solid #E8E2DA; border-radius: 12px; overflow: hidden; background: #FAFAF8; position: relative; }
+        .result-cell img { width: 100%; display: block; }
+        .result-cell .result-label { position: absolute; top: 4px; left: 6px; font-size: .65rem; font-weight: 700; color: #B8AD9E; }
+        .result-actions { display: flex; gap: 10px; max-width: 320px; margin: 0 auto; }
+        .result-actions button { flex: 1; padding: 13px 0; border-radius: 12px; font-family: 'Noto Sans KR', sans-serif; font-size: .9rem; font-weight: 700; cursor: pointer; transition: transform .1s; }
+        .result-actions button:active { transform: scale(.97); }
+        .btn-home { border: 2.5px solid #E8E2DA; background: white; color: #8C8070; }
+        .btn-again { border: none; background: #F0A050; color: white; box-shadow: 0 2px 8px rgba(240,144,30,.3); }
+
+        @keyframes popIn { 0%{transform:scale(.7);opacity:0} 60%{transform:scale(1.12);opacity:1} 100%{transform:scale(1);opacity:1} }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        .pop-in { animation: popIn .35s ease-out; }
+        .fade-up { animation: fadeUp .3s ease-out; }
+
+        /* ── Encouragement Message ── */
+        .encourage-msg {
+            background: #FFF8F0;
+            border: 2px solid #F5DFA0;
+            border-radius: 16px;
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #7B6545;
+            line-height: 1.8;
+            animation: fadeUp .4s ease-out;
+        }
+        /* ── Writing Feedback ── */
+        .writing-feedback {
+            background: #F0F6FF;
+            border: 2px solid #BDD5F5;
+            border-radius: 16px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            text-align: left;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #3A5A8C;
+            line-height: 1.7;
+            animation: fadeUp .5s ease-out;
+        }
+        .writing-feedback .feedback-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #6A8FBF;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+    
+    /* ── Splash Screen ── */
+    .splash-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: #FFFFFF;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+    }
+    .splash-overlay.fade-out { opacity: 0; pointer-events: none; }
+    .splash-logo { animation: splashFloat 2.4s ease-in-out infinite; margin-bottom: 24px; }
+    .splash-title { font-size: 2rem; font-weight: 900; letter-spacing: -0.025em; margin-bottom: 8px; }
+    .splash-subtitle { color: #B8B0A8; font-size: 0.9375rem; font-weight: 500; }
+    @keyframes splashFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @media (max-width:380px) { .splash-title{font-size:1.5rem} }
+    @media (min-width:768px) { .splash-logo svg{width:160px;height:134px} .splash-title{font-size:2.5rem} .splash-subtitle{font-size:1.0625rem} }
+
+/* Hide share button/bubble when not logged in */
+body:not(.sm-loggedin) [title="공유하기"],
+body:not(.sm-loggedin) #share-bubble { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ══════ Splash Screen ══════ -->
+<div id="splash" class="splash-overlay">
+    <div class="splash-logo">
+        <svg viewBox="0 0 120 100" width="140" height="117" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+            <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+            <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+            <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+            <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+            <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+            <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+            <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+            <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+            <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+            <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+            <circle cx="101" cy="33" r="1" fill="white"/>
+            <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+            <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <h1 class="splash-title">
+        <span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">숫자 쓰기</span>
+    </h1>
+    <p class="splash-subtitle">숫자를 따라 써보세요!</p>
+</div>
+<script>
+setTimeout(function() {
+    var splash = document.getElementById("splash");
+    if (splash) { splash.classList.add("fade-out"); setTimeout(function() { splash.remove(); }, 500); }
+}, 3000);
+</script>
+
+    <div class="app">
+    <!-- ══════════════ 로그인 화면 ══════════════ -->
+    <div id="login-view" class="login-view">
+        <div class="login-logo-area">
+            <svg viewBox="0 0 120 100" width="120" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+                <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+                <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+                <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+                <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+                <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+                <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity="0.35" transform="rotate(-15 42 26)"/>
+                <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity="0.2"/>
+                <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+                <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+                <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+                <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+                <circle cx="101" cy="33" r="1" fill="white"/>
+                <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity="0.4"/>
+                <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">숫자 쓰기</span></h1>
+            <p class="login-subtitle">숫자를 따라 써보세요!</p>
+        </div>
+          <p class="login-trial">가입하시고 하루 동안 모든 기능을<br>무료로 체험해보세요</p>
+<div class="login-buttons">
+            <button class="login-btn kakao" onclick="socialLogin('kakao')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 1C4.477 1 0 4.477 0 8.667c0 2.7 1.753 5.072 4.393 6.413-.192.717-.694 2.6-.794 3.004-.124.497.182.49.383.356.158-.105 2.51-1.708 3.525-2.398.8.118 1.628.18 2.493.18 5.523 0 10-3.477 10-7.555C20 4.477 15.523 1 10 1z" fill="#191919"/></svg>
+                카카오로 시작하기
+            </button>
+            <button class="login-btn naver" onclick="socialLogin('naver')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M13.57 10.684L6.066 0H0v20h6.43V9.316L13.934 20H20V0h-6.43v10.684z" fill="white"/></svg>
+                네이버로 시작하기
+            </button>
+            <button class="login-btn google" onclick="socialLogin('google')">
+                <svg width="20" height="20" viewBox="0 0 48 48"><path d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" fill="#FFC107"/><path d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" fill="#FF3D00"/><path d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" fill="#4CAF50"/><path d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.001-.001 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" fill="#1976D2"/></svg>
+                Google로 시작하기
+            </button>
+            <button class="login-btn facebook" onclick="socialLogin('facebook')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" fill="white"/></svg>
+                Facebook으로 시작하기
+            </button>
+        </div>
+    </div>
+
+        <!-- Home View -->
+        <div id="home-view" class="hidden" style="position:relative;">
+          <button onclick="shareApp()" style="position:absolute; top:0; right:0; background:white; border:2px solid #E8E2DA; border-radius:10px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#8C8070; z-index:10;" title="공유하기">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13"/>
+            </svg>
+          </button>
+          <div id="share-bubble" class="share-bubble" style="top:44px;">지금 지인에게 공유하시면<br>하루 무료 이용권을 드려요</div>
+          <div id="share-toast" style="display:block;position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#3A7D44;color:white;padding:12px 20px;border-radius:14px;font-size:0.85rem;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.25);transition:opacity 0.4s;opacity:0;pointer-events:none;white-space:nowrap;"></div>
+            <div class="app-header">
+                <svg class="turtle-logo" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+                    <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+                    <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+                    <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+                    <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+                    <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+                    <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+                    <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+                    <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+                    <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+                    <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+                    <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+                    <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+                    <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+                    <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+                    <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+                    <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+                    <circle cx="101" cy="33" r="1" fill="white"/>
+                    <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+                    <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <h1><span class="title-blue">느린</span><span class="title-orange">아이</span> 숫자 쓰기</h1>
+                <p class="brand-sub">숫자를 따라 써보세요!</p>
+            </div>
+
+            <label class="sec-label">모드</label>
+            <div class="mode-grid" id="mode-grid">
+                <div class="mode-card sel" data-mode="guide">
+                    <div class="m-icon"><svg width="54" height="54" viewBox="0 0 54 54">
+                        <!-- green corridor around "3" shape -->
+                        <path d="M14 11 C20 5 30 5 37 8 C42 11 43 18 40 23 C38 26 33 28 27 28 C33 28 39 31 41 35 C43 40 41 46 36 49 C30 52 20 51 14 47" stroke="rgba(91,200,134,.45)" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14 11 C20 5 30 5 37 8 C42 11 43 18 40 23 C38 26 33 28 27 28 C33 28 39 31 41 35 C43 40 41 46 36 49 C30 52 20 51 14 47" stroke="rgba(91,200,134,.12)" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14 11 C20 5 30 5 37 8 C42 11 43 18 40 23 C38 26 33 28 27 28 C33 28 39 31 41 35 C43 40 41 46 36 49 C30 52 20 51 14 47" stroke="rgba(100,85,70,.18)" stroke-width="1.5" fill="none" stroke-dasharray="4 4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <polygon points="35,7 31,5 33,10" fill="rgba(91,200,134,.7)"/>
+                        <polygon points="36,48 33,44 31,49" fill="rgba(91,200,134,.7)"/>
+                    </svg></div>
+                    <div class="m-name">가이드 영역</div>
+                </div>
+                <div class="mode-card" data-mode="dotted">
+                    <div class="m-icon"><svg width="54" height="54" viewBox="0 0 54 54">
+                        <path d="M14 11 C20 5 30 5 37 8 C42 11 43 18 40 23 C38 26 33 28 27 28 C33 28 39 31 41 35 C43 40 41 46 36 49 C30 52 20 51 14 47" stroke="rgba(74,64,53,.35)" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 7"/>
+                        <polygon points="35,7 31,5 33,10" fill="rgba(240,144,30,.6)"/>
+                        <polygon points="36,48 33,44 31,49" fill="rgba(240,144,30,.6)"/>
+                    </svg></div>
+                    <div class="m-name">점선 따라쓰기</div>
+                </div>
+                <div class="mode-card" data-mode="free">
+                    <div class="m-icon"><svg width="54" height="54" viewBox="0 0 54 54">
+                        <!-- 3 shape drawn partway -->
+                        <path d="M14 11 C20 5 30 5 37 8 C42 11 43 18 40 23 C38 26 33 28 27 28 C33 28 39 31 41 35" stroke="#5BC886" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <!-- pencil tip at stroke end (41,35), angled along writing direction -->
+                        <g transform="translate(41 35) rotate(70)">
+                            <rect x="-1.8" y="0" width="3.6" height="14" rx=".8" fill="#F0A050"/>
+                            <polygon points="-1.8,0 1.8,0 0,-4" fill="#4A4035"/>
+                            <rect x="-1.8" y="11" width="3.6" height="3" rx=".8" fill="#E8E2DA"/>
+                        </g>
+                    </svg></div>
+                    <div class="m-name">자유쓰기</div>
+                </div>
+            </div>
+
+            <label class="sec-label">숫자 하나 연습</label>
+            <div class="num-grid" id="num-grid"></div>
+
+            <label class="sec-label">범위 연습</label>
+            <div class="range-grid" id="range-grid">
+                <button class="range-btn" data-range="0-4" onclick="selectRange(0,4)">0 ~ 4</button>
+                <button class="range-btn" data-range="5-9" onclick="selectRange(5,9)">5 ~ 9</button>
+                <button class="range-btn sel" data-range="0-9" onclick="selectRange(0,9)">0 ~ 9</button>
+            </div>
+
+            <button class="start-btn" id="start-btn">시작하기</button>
+
+            <div class="setting-divider">
+                <div class="setting-header">
+                    <p class="setting-title">음성 안내</p>
+                    <button class="toggle-track" id="tts-toggle" onclick="toggleTTS()" role="switch">
+                        <span class="toggle-knob"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="logout-wrap">
+                <button class="logout-btn" id="logout-btn" style="display:none">로그아웃</button>
+            </div>
+        </div>
+
+        <!-- Game View -->
+        <div id="game-view" class="hidden">
+            <div class="game-nav">
+                <button class="btn-home" id="btn-back" title="홈">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-8 9 8M5 11v9a1 1 0 001 1h3m8 0h3a1 1 0 001-1v-9"/></svg>
+                </button>
+                <div class="nav-title" id="nav-title">숫자 1</div>
+            </div>
+
+            <div class="progress-bar" id="progress-bar">
+                <div class="progress-dots" id="progress-dots"></div>
+                <div class="progress-label" id="progress-label">1/10</div>
+            </div>
+
+            <div class="canvas-wrap" id="canvas-wrap">
+                <canvas id="gc"></canvas>
+            </div>
+
+            <div class="instr" id="instr"></div>
+            <div class="action-btns">
+                <button class="btn-retry" onclick="retry()">다시 쓰기</button>
+                <button class="btn-change" onclick="nextTurn()">다음</button>
+            </div>
+        </div>
+
+        <!-- Result View -->
+        <div id="result-view" class="hidden">
+            <div class="result-header">
+                <span class="complete-emoji">🏆</span>
+                <h2 id="result-title">연습 완료!</h2>
+                <p id="result-subtitle">10개의 숫자를 모두 써봤어요</p>
+            </div>
+            <div class="result-grid" id="result-grid"></div>
+
+            <div class="writing-feedback" id="writing-feedback"></div>
+
+            <div class="result-actions">
+                <button class="next-btn" onclick="startAgain()">다시 하기</button>
+                <button class="next-btn" onclick="goHome()" style="background:#EDE8E0;color:#8C8070;">홈으로</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// TTS
+// ══════════════════════════════════════════════════════════════
+const TTS_KEY = 'slowmath_numberdraw_tts';
+let ttsEnabled = (() => { try { return JSON.parse(localStorage.getItem(TTS_KEY)) ?? true; } catch { return true; } })();
+function toggleTTS() {
+    ttsEnabled = !ttsEnabled;
+    localStorage.setItem(TTS_KEY, JSON.stringify(ttsEnabled));
+    document.getElementById('tts-toggle').classList.toggle('on', ttsEnabled);
+}
+function speak(text) {
+    if (!ttsEnabled || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ko-KR'; u.rate = 0.9;
+    setTimeout(() => window.speechSynthesis.speak(u), 50);
+}
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('tts-toggle').classList.toggle('on', ttsEnabled);
+});
+
+// ══════════════════════════════════════════════════════════════
+// State
+// ══════════════════════════════════════════════════════════════
+let TOTAL_TURNS = 10;
+const G = {
+    mode: 'guide',   // guide | dotted | free
+    nums: [0,1,2,3,4,5,6,7,8,9], // selected numbers (single-select via range)
+    numIdx: 0,        // current index in nums array
+    num: 0,           // current number being drawn
+    drawing: false,
+    pts: [],
+    strokes: [],
+    turn: 0,          // current turn (0-based)
+    history: [],      // [{num, dataURL}] saved results
+};
+
+const MODE_LBL = { guide: '가이드 영역', dotted: '점선 따라쓰기', free: '자유쓰기' };
+const GUIDE_TOL = 32; // guide corridor tolerance (normal difficulty)
+
+// ══════════════════════════════════════════════════════════════
+// Number stroke definitions (normalized 0-1 coordinate system)
+// Each number has an array of strokes, each stroke is an array of points
+// ══════════════════════════════════════════════════════════════
+const NUM_STROKES = {
+    0: [
+        // Oval shape (counter-clockwise from top)
+        [
+            {x:0.5,y:0.1},
+            {x:0.38,y:0.1},{x:0.28,y:0.16},{x:0.22,y:0.26},
+            {x:0.18,y:0.38},{x:0.18,y:0.5},{x:0.18,y:0.62},
+            {x:0.22,y:0.74},{x:0.28,y:0.84},{x:0.38,y:0.9},
+            {x:0.5,y:0.9},{x:0.62,y:0.9},{x:0.72,y:0.84},
+            {x:0.78,y:0.74},{x:0.82,y:0.62},{x:0.82,y:0.5},
+            {x:0.82,y:0.38},{x:0.78,y:0.26},{x:0.72,y:0.16},
+            {x:0.62,y:0.1},{x:0.5,y:0.1}
+        ]
+    ],
+    1: [
+        // Single vertical stroke from top to bottom
+        [{x:0.5,y:0.1},{x:0.5,y:0.9}]
+    ],
+    2: [
+        // Start from lower-left, rise to NE, then curve right and down
+        [
+            {x:0.15,y:0.35},
+            {x:0.18,y:0.28},{x:0.22,y:0.22},{x:0.28,y:0.15},{x:0.36,y:0.12},
+            {x:0.44,y:0.1},{x:0.56,y:0.1},{x:0.64,y:0.12},
+            {x:0.72,y:0.15},{x:0.78,y:0.22},{x:0.8,y:0.3},
+            {x:0.78,y:0.38},{x:0.72,y:0.46},{x:0.64,y:0.54},
+            {x:0.54,y:0.62},{x:0.44,y:0.7},{x:0.34,y:0.78},
+            {x:0.24,y:0.86},{x:0.15,y:0.9},
+            {x:0.3,y:0.9},{x:0.45,y:0.9},{x:0.6,y:0.9},{x:0.75,y:0.9},{x:0.88,y:0.9}
+        ]
+    ],
+    3: [
+        // Top half arc
+        [
+            {x:0.25,y:0.18},
+            {x:0.3,y:0.12},{x:0.4,y:0.1},{x:0.5,y:0.1},
+            {x:0.6,y:0.1},{x:0.72,y:0.14},{x:0.78,y:0.24},
+            {x:0.8,y:0.32},{x:0.76,y:0.4},{x:0.68,y:0.46},
+            {x:0.58,y:0.5},{x:0.5,y:0.5}
+        ],
+        // Bottom half arc
+        [
+            {x:0.5,y:0.5},
+            {x:0.6,y:0.5},{x:0.72,y:0.56},{x:0.78,y:0.64},
+            {x:0.8,y:0.72},{x:0.76,y:0.8},{x:0.68,y:0.86},
+            {x:0.58,y:0.9},{x:0.48,y:0.9},{x:0.38,y:0.88},
+            {x:0.28,y:0.82},{x:0.22,y:0.76}
+        ]
+    ],
+    4: [
+        // Diagonal down-left then horizontal right
+        [
+            {x:0.65,y:0.1},
+            {x:0.58,y:0.2},{x:0.5,y:0.3},{x:0.42,y:0.4},
+            {x:0.34,y:0.5},{x:0.26,y:0.6},{x:0.2,y:0.65},
+            {x:0.35,y:0.65},{x:0.5,y:0.65},{x:0.65,y:0.65},{x:0.8,y:0.65}
+        ],
+        // Vertical line on the right
+        [
+            {x:0.65,y:0.35},{x:0.65,y:0.5},{x:0.65,y:0.65},
+            {x:0.65,y:0.75},{x:0.65,y:0.9}
+        ]
+    ],
+    5: [
+        // Top horizontal line going right
+        [
+            {x:0.3,y:0.1},{x:0.45,y:0.1},{x:0.6,y:0.1},{x:0.75,y:0.1}
+        ],
+        // Down and curve (starts from left end)
+        [
+            {x:0.3,y:0.1},
+            {x:0.3,y:0.2},{x:0.3,y:0.3},{x:0.3,y:0.4},{x:0.3,y:0.48},
+            {x:0.4,y:0.44},{x:0.5,y:0.43},{x:0.6,y:0.45},
+            {x:0.7,y:0.5},{x:0.76,y:0.58},{x:0.78,y:0.68},
+            {x:0.76,y:0.76},{x:0.7,y:0.83},{x:0.6,y:0.88},
+            {x:0.5,y:0.9},{x:0.4,y:0.88},{x:0.3,y:0.84},
+            {x:0.22,y:0.78}
+        ]
+    ],
+    6: [
+        // Top curve down and full circle
+        [
+            {x:0.65,y:0.15},
+            {x:0.55,y:0.1},{x:0.42,y:0.12},{x:0.32,y:0.2},
+            {x:0.24,y:0.3},{x:0.2,y:0.42},{x:0.2,y:0.55},
+            {x:0.2,y:0.65},{x:0.24,y:0.76},{x:0.32,y:0.84},
+            {x:0.42,y:0.9},{x:0.54,y:0.9},{x:0.64,y:0.86},
+            {x:0.72,y:0.78},{x:0.76,y:0.68},{x:0.76,y:0.58},
+            {x:0.72,y:0.5},{x:0.64,y:0.44},{x:0.54,y:0.42},
+            {x:0.44,y:0.44},{x:0.34,y:0.5},{x:0.26,y:0.58},
+            {x:0.22,y:0.66}
+        ]
+    ],
+    7: [
+        // Horizontal top then diagonal down
+        [
+            {x:0.2,y:0.1},{x:0.35,y:0.1},{x:0.5,y:0.1},{x:0.65,y:0.1},{x:0.8,y:0.1},
+            {x:0.72,y:0.24},{x:0.64,y:0.38},{x:0.56,y:0.52},
+            {x:0.48,y:0.66},{x:0.42,y:0.78},{x:0.38,y:0.9}
+        ]
+    ],
+    8: [
+        // Top circle (clockwise: center→right→up→left→center)
+        [
+            {x:0.5,y:0.48},
+            {x:0.62,y:0.44},{x:0.72,y:0.36},{x:0.74,y:0.26},
+            {x:0.72,y:0.18},{x:0.64,y:0.12},{x:0.56,y:0.1},
+            {x:0.44,y:0.1},{x:0.36,y:0.12},{x:0.28,y:0.18},
+            {x:0.26,y:0.26},{x:0.28,y:0.36},{x:0.38,y:0.44},
+            {x:0.5,y:0.48}
+        ],
+        // Bottom circle (counter-clockwise: center→right→down→left→center)
+        [
+            {x:0.5,y:0.48},
+            {x:0.62,y:0.52},{x:0.74,y:0.6},{x:0.78,y:0.7},
+            {x:0.76,y:0.8},{x:0.68,y:0.86},{x:0.58,y:0.9},
+            {x:0.42,y:0.9},{x:0.32,y:0.86},{x:0.24,y:0.8},
+            {x:0.22,y:0.7},{x:0.26,y:0.6},{x:0.38,y:0.52},
+            {x:0.5,y:0.48}
+        ]
+    ],
+    9: [
+        // Top circle then tail down
+        [
+            {x:0.76,y:0.38},
+            {x:0.72,y:0.28},{x:0.64,y:0.2},{x:0.54,y:0.14},
+            {x:0.44,y:0.12},{x:0.34,y:0.16},{x:0.26,y:0.24},
+            {x:0.22,y:0.34},{x:0.24,y:0.44},{x:0.32,y:0.5},
+            {x:0.42,y:0.54},{x:0.54,y:0.54},{x:0.64,y:0.5},
+            {x:0.72,y:0.44},{x:0.76,y:0.38}
+        ],
+        // Tail down
+        [
+            {x:0.76,y:0.38},
+            {x:0.76,y:0.5},{x:0.74,y:0.62},{x:0.68,y:0.74},
+            {x:0.6,y:0.82},{x:0.5,y:0.88},{x:0.38,y:0.9}
+        ]
+    ],
+};
+
+// ══════════════════════════════════════════════════════════════
+// Interpolate strokes for smoother paths
+// ══════════════════════════════════════════════════════════════
+function isCollinear(a, b, c) {
+    // Check if 3 points are nearly collinear (cross product near zero)
+    const cross = Math.abs((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x));
+    const len = Math.hypot(c.x - a.x, c.y - a.y);
+    return len < 0.001 || cross / len < 0.008;
+}
+
+function interpolateSmooth(points, numPts) {
+    if (points.length < 2) return points;
+    // For 2 points, just linear
+    if (points.length === 2) {
+        const result = [];
+        for (let i = 0; i <= numPts; i++) {
+            const t = i / numPts;
+            result.push({ x: points[0].x + (points[1].x - points[0].x) * t, y: points[0].y + (points[1].y - points[0].y) * t });
+        }
+        return result;
+    }
+
+    // Classify each segment as straight or curved
+    function segIsStraight(idx) {
+        const prev = idx > 0 ? points[idx - 1] : null;
+        const cur = points[idx];
+        const next = points[idx + 1];
+        const next2 = idx + 2 < points.length ? points[idx + 2] : null;
+        if (prev && !isCollinear(prev, cur, next)) return false;
+        if (next2 && !isCollinear(cur, next, next2)) return false;
+        return true;
+    }
+
+    // Generate raw interpolated points per segment
+    const raw = [];
+    const ptsPerSeg = Math.max(6, Math.ceil(numPts / (points.length - 1)));
+
+    // Pad for Catmull-Rom
+    const padded = [
+        { x: 2 * points[0].x - points[1].x, y: 2 * points[0].y - points[1].y },
+        ...points,
+        { x: 2 * points[points.length-1].x - points[points.length-2].x, y: 2 * points[points.length-1].y - points[points.length-2].y }
+    ];
+
+    for (let s = 0; s < points.length - 1; s++) {
+        const straight = segIsStraight(s);
+        for (let i = 0; i <= ptsPerSeg; i++) {
+            if (s > 0 && i === 0) continue;
+            const t = i / ptsPerSeg;
+            if (straight) {
+                // Linear interpolation for straight segments
+                raw.push({
+                    x: points[s].x + (points[s+1].x - points[s].x) * t,
+                    y: points[s].y + (points[s+1].y - points[s].y) * t
+                });
+            } else {
+                // Catmull-Rom for curved segments
+                const p0 = padded[s], p1 = padded[s+1], p2 = padded[s+2], p3 = padded[s+3];
+                const t2 = t * t, t3 = t2 * t;
+                raw.push({
+                    x: 0.5 * ((2*p1.x) + (-p0.x+p2.x)*t + (2*p0.x-5*p1.x+4*p2.x-p3.x)*t2 + (-p0.x+3*p1.x-3*p2.x+p3.x)*t3),
+                    y: 0.5 * ((2*p1.y) + (-p0.y+p2.y)*t + (2*p0.y-5*p1.y+4*p2.y-p3.y)*t2 + (-p0.y+3*p1.y-3*p2.y+p3.y)*t3)
+                });
+            }
+        }
+    }
+
+    // Resample to uniform spacing
+    let totalLen = 0;
+    const segLens = [];
+    for (let i = 1; i < raw.length; i++) {
+        const len = Math.hypot(raw[i].x - raw[i-1].x, raw[i].y - raw[i-1].y);
+        segLens.push(len);
+        totalLen += len;
+    }
+    const result = [];
+    for (let i = 0; i <= numPts; i++) {
+        const target = (i / numPts) * totalLen;
+        let cum = 0;
+        for (let s = 0; s < segLens.length; s++) {
+            if (cum + segLens[s] >= target || s === segLens.length - 1) {
+                const t = segLens[s] > 0 ? Math.min(1, (target - cum) / segLens[s]) : 0;
+                result.push({ x: raw[s].x + (raw[s+1].x - raw[s].x) * t, y: raw[s].y + (raw[s+1].y - raw[s].y) * t });
+                break;
+            }
+            cum += segLens[s];
+        }
+    }
+    return result;
+}
+
+function getScaledStrokes(num, w, h) {
+    const raw = NUM_STROKES[num];
+    const margin = 20;
+    const usableW = w - margin * 2;
+    const usableH = h - margin * 2;
+    return raw.map(stroke => {
+        const interp = interpolateSmooth(stroke, 200);
+        return interp.map(p => ({
+            x: margin + p.x * usableW,
+            y: margin + p.y * usableH
+        }));
+    });
+}
+
+// ══════════════════════════════════════════════════════════════
+// Social login (stub)
+// ══════════════════════════════════════════════════════════════
+function socialLogin(provider) {
+    localStorage.setItem('slowmath_numberdraw_login', provider);
+    const _sp=sessionStorage.getItem('_sp');if(_sp){sessionStorage.removeItem('_sp');document.getElementById('login-view').classList.add('hidden');startGame(...JSON.parse(_sp));return;}
+    document.getElementById('login-view').classList.add('hidden');
+    document.getElementById('home-view').classList.remove('hidden');
+    document.querySelector('.logout-btn').style.display=localStorage.getItem('slowmath_numberdraw_login')?'':'none';
+}
+
+// ══════════════════════════════════════════════════════════════
+// DOM Setup
+// ══════════════════════════════════════════════════════════════
+const homeView = document.getElementById('home-view');
+const gameView = document.getElementById('game-view');
+const resultView = document.getElementById('result-view');
+const canvasWrap = document.getElementById('canvas-wrap');
+const gc = document.getElementById('gc');
+const ctx = gc.getContext('2d');
+
+// Build number grid (0-9, 초기 상태: 선택 없음)
+(function() {
+    const grid = document.getElementById('num-grid');
+    for (let i = 0; i <= 9; i++) {
+        const card = document.createElement('div');
+        card.className = 'num-card';
+        card.dataset.num = i;
+        card.textContent = i;
+        grid.appendChild(card);
+    }
+})();
+
+// 개별 숫자 선택 (하나만 선택, 10회 반복 연습)
+document.getElementById('num-grid').addEventListener('click', e => {
+    const card = e.target.closest('.num-card');
+    if (!card) return;
+    const num = parseInt(card.dataset.num);
+    G.nums = [num];
+    document.querySelectorAll('.num-card').forEach(c => c.classList.remove('sel'));
+    card.classList.add('sel');
+    // 범위 버튼 선택 해제 (독립 동작)
+    document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('sel'));
+});
+
+// 범위 선택 (독립 동작, 개별 숫자 선택 해제)
+function selectRange(from, to) {
+    G.nums = [];
+    for (let i = from; i <= to; i++) G.nums.push(i);
+    // 개별 숫자 선택 해제
+    document.querySelectorAll('.num-card').forEach(c => c.classList.remove('sel'));
+    // range-btn 하이라이트
+    document.querySelectorAll('.range-btn').forEach(b => {
+        b.classList.toggle('sel', b.dataset.range === from + '-' + to);
+    });
+}
+
+// Mode selection
+document.getElementById('mode-grid').addEventListener('click', e => {
+    const card = e.target.closest('.mode-card');
+    if (!card) return;
+    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('sel'));
+    card.classList.add('sel');
+    G.mode = card.dataset.mode;
+});
+
+// Start
+function startGame() {
+    if (!localStorage.getItem('slowmath_numberdraw_login')) {
+    sessionStorage.setItem('_sp',JSON.stringify([]));
+    document.getElementById('login-view').classList.remove('hidden');
+    document.getElementById('home-view').classList.add('hidden');
+    return;
+}
+    homeView.classList.add('hidden');
+    resultView.classList.add('hidden');
+    gameView.classList.remove('hidden');
+    // 개별 숫자 1개 선택 시 10회 반복, 범위 선택 시 숫자 개수만큼
+    TOTAL_TURNS = G.nums.length === 1 ? 10 : G.nums.length;
+    G.numIdx = 0;
+    G.num = G.nums[0];
+    G.turn = 0;
+    G.history = [];
+    buildProgressDots();
+    updateProgress();
+    document.getElementById('nav-title').textContent = '숫자 ' + G.num + ' - ' + MODE_LBL[G.mode];
+    requestAnimationFrame(() => {
+        initCanvas();
+        resetGame();
+        updateInstr();
+        render();
+        speak('숫자 ' + G.num);
+    });
+}
+
+function buildProgressDots() {
+    const container = document.getElementById('progress-dots');
+    container.innerHTML = '';
+    for (let i = 0; i < TOTAL_TURNS; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'progress-dot';
+        container.appendChild(dot);
+    }
+}
+
+function updateProgress() {
+    const dots = document.querySelectorAll('.progress-dot');
+    dots.forEach((dot, i) => {
+        dot.className = 'progress-dot';
+        if (i < G.turn) dot.classList.add('done');
+        else if (i === G.turn) dot.classList.add('current');
+    });
+    document.getElementById('progress-label').textContent = (G.turn + 1) + '/' + TOTAL_TURNS;
+    // Update button text for last turn
+    const btnChange = document.querySelector('.btn-change');
+    btnChange.textContent = (G.turn >= TOTAL_TURNS - 1) ? '결과 확인' : '다음';
+}
+
+document.getElementById('start-btn').addEventListener('click', startGame);
+
+// Back
+document.getElementById('btn-back').addEventListener('click', () => {
+    gameView.classList.add('hidden');
+    homeView.classList.remove('hidden');
+    document.querySelector('.logout-btn').style.display=localStorage.getItem('slowmath_numberdraw_login')?'':'none';
+});
+
+// Logout
+document.getElementById('logout-btn').addEventListener('click', () => {
+    localStorage.removeItem('slowmath_numberdraw_login');
+    homeView.classList.add('hidden');
+    document.getElementById('login-view').classList.remove('hidden');
+});
+
+// ══════════════════════════════════════════════════════════════
+// Canvas
+// ══════════════════════════════════════════════════════════════
+let LW = 0, LH = 0;
+let scaledStrokes = [];
+
+function initCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    canvasWrap.style.width = '';
+    LW = canvasWrap.clientWidth - 5;
+    LH = Math.max(320, Math.min(Math.floor(window.innerHeight * 0.48), 420));
+    gc.width = Math.round(LW * dpr);
+    gc.height = Math.round(LH * dpr);
+    gc.style.width = LW + 'px';
+    gc.style.height = LH + 'px';
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    scaledStrokes = getScaledStrokes(G.num, LW, LH);
+}
+
+function resetGame() {
+    G.drawing = false;
+    G.pts = [];
+    G.strokes = [];
+}
+
+// ══════════════════════════════════════════════════════════════
+// Offset path for guide corridor
+// ══════════════════════════════════════════════════════════════
+function offsetPath(path, d) {
+    return path.map((p, i) => {
+        let tx, ty;
+        if (i === 0) { tx = path[1].x - p.x; ty = path[1].y - p.y; }
+        else if (i === path.length - 1) { tx = p.x - path[i-1].x; ty = p.y - path[i-1].y; }
+        else { tx = path[i+1].x - path[i-1].x; ty = path[i+1].y - path[i-1].y; }
+        const l = Math.hypot(tx, ty) || 1;
+        return { x: p.x + (-ty / l) * d, y: p.y + (tx / l) * d };
+    });
+}
+
+// Smooth a path using moving average to remove jitter from offset normals
+function smoothPath(path, iterations) {
+    let pts = path.map(p => ({x: p.x, y: p.y}));
+    for (let iter = 0; iter < (iterations || 3); iter++) {
+        const next = [pts[0]];
+        for (let i = 1; i < pts.length - 1; i++) {
+            next.push({
+                x: pts[i-1].x * 0.25 + pts[i].x * 0.5 + pts[i+1].x * 0.25,
+                y: pts[i-1].y * 0.25 + pts[i].y * 0.5 + pts[i+1].y * 0.25
+            });
+        }
+        next.push(pts[pts.length - 1]);
+        pts = next;
+    }
+    return pts;
+}
+
+// ══════════════════════════════════════════════════════════════
+// Render
+// ══════════════════════════════════════════════════════════════
+function render() {
+    const w = LW, h = LH;
+    const tol = GUIDE_TOL;
+    ctx.clearRect(0, 0, w, h);
+
+    // Background
+    ctx.fillStyle = '#FAFAF8';
+    ctx.fillRect(0, 0, w, h);
+
+    // Draw light grid lines
+    ctx.strokeStyle = 'rgba(200,192,180,0.2)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(0, h / 2);
+    ctx.lineTo(w, h / 2);
+    ctx.stroke();
+
+    if (G.mode === 'free') {
+        // Free mode: completely empty canvas
+    } else {
+        // Draw all stroke guides simultaneously
+        scaledStrokes.forEach(stroke => {
+            if (G.mode === 'guide') {
+                renderGuideMode(stroke, tol);
+            } else if (G.mode === 'dotted') {
+                renderDottedMode(stroke);
+            }
+        });
+    }
+
+    // Draw user strokes (completed) - smooth
+    G.strokes.forEach(stroke => {
+        if (stroke.length > 1) {
+            ctx.beginPath();
+            drawSmoothPath(stroke);
+            ctx.strokeStyle = '#5BC886';
+            ctx.lineWidth = 7;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.setLineDash([]);
+            ctx.stroke();
+        }
+    });
+
+    // Draw current user drawing - smooth
+    if (G.pts.length > 1) {
+        ctx.beginPath();
+        drawSmoothPath(G.pts);
+        ctx.strokeStyle = '#5BC886';
+        ctx.lineWidth = 7;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.setLineDash([]);
+        ctx.stroke();
+    }
+}
+
+// Smooth curve through points using quadratic bezier
+function drawSmoothPath(points) {
+    if (points.length < 2) return;
+    ctx.moveTo(points[0].x, points[0].y);
+    if (points.length === 2) {
+        ctx.lineTo(points[1].x, points[1].y);
+        return;
+    }
+    for (let i = 0; i < points.length - 1; i++) {
+        const xm = (points[i].x + points[i+1].x) / 2;
+        const ym = (points[i].y + points[i+1].y) / 2;
+        if (i === 0) {
+            ctx.lineTo(xm, ym);
+        } else {
+            ctx.quadraticCurveTo(points[i].x, points[i].y, xm, ym);
+        }
+    }
+    const last = points[points.length - 1];
+    ctx.lineTo(last.x, last.y);
+}
+
+function drawStrokePath(stroke, color, width) {
+    if (stroke.length < 2) return;
+    ctx.beginPath();
+    drawSmoothPath(stroke);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.setLineDash([]);
+    ctx.stroke();
+}
+
+function renderGuideMode(stroke, tol) {
+    // Draw smooth corridor using canvas thick stroke (eliminates jaggedness from offset path computation)
+
+    // Outer border ring
+    ctx.beginPath();
+    drawSmoothPath(stroke);
+    ctx.strokeStyle = 'rgba(91,200,134,.30)';
+    ctx.lineWidth = tol * 2 + 4;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.setLineDash([]);
+    ctx.stroke();
+
+    // Inner fill
+    ctx.beginPath();
+    drawSmoothPath(stroke);
+    ctx.strokeStyle = 'rgba(91,200,134,.10)';
+    ctx.lineWidth = tol * 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.setLineDash([]);
+    ctx.stroke();
+
+    // Center guide (dashed)
+    ctx.beginPath();
+    drawSmoothPath(stroke);
+    ctx.strokeStyle = 'rgba(110,90,70,.15)';
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
+    ctx.setLineDash([8, 8]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Direction arrows
+    renderDirectionArrows(stroke, 'rgba(91,200,134,.55)');
+}
+
+function renderDirectionArrows(stroke, color, offset, count) {
+    const off = offset || 0;
+    const arrowCount = count || 4;
+    const arrowStep = Math.floor(stroke.length / (arrowCount + 1));
+    for (let i = 1; i <= arrowCount; i++) {
+        const idx = Math.min(i * arrowStep, stroke.length - 2);
+        const p = stroke[idx];
+        const pn = stroke[Math.min(idx + 8, stroke.length - 1)];
+        const angle = Math.atan2(pn.y - p.y, pn.x - p.x);
+        // offset perpendicular to stroke direction
+        const nx = -Math.sin(angle) * off;
+        const ny = Math.cos(angle) * off;
+        ctx.save();
+        ctx.translate(p.x + nx, p.y + ny);
+        ctx.rotate(angle);
+        ctx.beginPath();
+        ctx.moveTo(6, 0);
+        ctx.lineTo(-3, -4);
+        ctx.lineTo(-3, 4);
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+function renderDottedMode(stroke) {
+    // Draw smooth dotted line
+    ctx.beginPath();
+    drawSmoothPath(stroke);
+    ctx.strokeStyle = 'rgba(74,64,53,.3)';
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.setLineDash([2, 9]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Direction arrows (offset to avoid overlapping, minimal count)
+    renderDirectionArrows(stroke, 'rgba(240,144,30,.55)', -12, 2);
+}
+
+// ══════════════════════════════════════════════════════════════
+// Input handling
+// ══════════════════════════════════════════════════════════════
+function getPos(e) {
+    const r = gc.getBoundingClientRect();
+    const s = e.touches ? e.touches[0] : e;
+    return { x: (s.clientX - r.left) * (LW / r.width), y: (s.clientY - r.top) * (LH / r.height) };
+}
+
+gc.addEventListener('touchstart', onStart, { passive: false });
+gc.addEventListener('touchmove', onMove, { passive: false });
+gc.addEventListener('touchend', onEnd, { passive: false });
+gc.addEventListener('mousedown', onStart);
+gc.addEventListener('mousemove', onMove);
+gc.addEventListener('mouseup', onEnd);
+
+function onStart(e) {
+    e.preventDefault();
+    const p = getPos(e);
+    G.drawing = true;
+    G.pts = [p];
+    render();
+}
+
+function onMove(e) {
+    e.preventDefault();
+    if (!G.drawing) return;
+    const p = getPos(e);
+    const last = G.pts[G.pts.length - 1];
+    if (last) {
+        const dx = p.x - last.x, dy = p.y - last.y;
+        if (dx * dx + dy * dy < 36) return; // min distance 6px
+    }
+    G.pts.push(p);
+    render();
+}
+
+function onEnd(e) {
+    e.preventDefault();
+    if (G.drawing) {
+        if (G.pts.length > 3) {
+            G.strokes.push([...G.pts]);
+        }
+        G.drawing = false;
+        G.pts = [];
+        render();
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// Actions
+// ══════════════════════════════════════════════════════════════
+function updateInstr() {
+    if (G.mode === 'free') {
+        document.getElementById('instr').textContent = '숫자 ' + G.num + '을(를) 자유롭게 써보세요';
+    } else {
+        document.getElementById('instr').textContent = '가이드를 참고하여 숫자를 써보세요';
+    }
+}
+
+function retry() {
+    resetGame();
+    updateInstr();
+    render();
+}
+
+function saveCurrentDrawing() {
+    // Render user strokes only on a clean canvas for snapshot
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = gc.width;
+    tmpCanvas.height = gc.height;
+    const tmpCtx = tmpCanvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    tmpCtx.scale(dpr, dpr);
+    tmpCtx.fillStyle = '#FAFAF8';
+    tmpCtx.fillRect(0, 0, LW, LH);
+    // Draw guide faintly
+    tmpCtx.globalAlpha = 0.3;
+    if (G.mode === 'guide') {
+        scaledStrokes.forEach(s => {
+            tmpCtx.beginPath();
+            drawSmoothPathOn(tmpCtx, s);
+            tmpCtx.strokeStyle = 'rgba(91,200,134,.3)';
+            tmpCtx.lineWidth = 1;
+            tmpCtx.setLineDash([4, 4]);
+            tmpCtx.stroke();
+            tmpCtx.setLineDash([]);
+        });
+    } else if (G.mode === 'dotted') {
+        scaledStrokes.forEach(s => {
+            tmpCtx.beginPath();
+            drawSmoothPathOn(tmpCtx, s);
+            tmpCtx.strokeStyle = 'rgba(74,64,53,.2)';
+            tmpCtx.lineWidth = 3;
+            tmpCtx.setLineDash([2, 7]);
+            tmpCtx.stroke();
+            tmpCtx.setLineDash([]);
+        });
+    }
+    tmpCtx.globalAlpha = 1;
+    // Draw user strokes
+    G.strokes.forEach(stroke => {
+        if (stroke.length > 1) {
+            tmpCtx.beginPath();
+            drawSmoothPathOn(tmpCtx, stroke);
+            tmpCtx.strokeStyle = '#5BC886';
+            tmpCtx.lineWidth = 7;
+            tmpCtx.lineCap = 'round';
+            tmpCtx.lineJoin = 'round';
+            tmpCtx.setLineDash([]);
+            tmpCtx.stroke();
+        }
+    });
+    return tmpCanvas.toDataURL('image/png');
+}
+
+function drawSmoothPathOn(c, points) {
+    if (points.length < 2) return;
+    c.moveTo(points[0].x, points[0].y);
+    if (points.length === 2) { c.lineTo(points[1].x, points[1].y); return; }
+    for (let i = 0; i < points.length - 1; i++) {
+        const xm = (points[i].x + points[i+1].x) / 2;
+        const ym = (points[i].y + points[i+1].y) / 2;
+        if (i === 0) c.lineTo(xm, ym);
+        else c.quadraticCurveTo(points[i].x, points[i].y, xm, ym);
+    }
+    c.lineTo(points[points.length-1].x, points[points.length-1].y);
+}
+
+function nextTurn() {
+    // Save current drawing
+    const dataURL = saveCurrentDrawing();
+    G.history.push({ num: G.num, dataURL: dataURL, strokes: G.strokes.map(s => s.map(p => ({x: p.x, y: p.y}))) });
+    G.turn++;
+
+    if (G.turn >= TOTAL_TURNS) {
+        showResults();
+        return;
+    }
+
+    // Advance to next number
+    G.numIdx = (G.numIdx + 1) % G.nums.length;
+    G.num = G.nums[G.numIdx];
+    document.getElementById('nav-title').textContent = '숫자 ' + G.num + ' - ' + MODE_LBL[G.mode];
+    scaledStrokes = getScaledStrokes(G.num, LW, LH);
+    updateProgress();
+    resetGame();
+    updateInstr();
+    render();
+    speak('숫자 ' + G.num);
+}
+
+// ── Writing Analysis ──
+function analyzeWriting(history, canvasW, canvasH) {
+    if (!history || history.length === 0) return null;
+
+    let totalShakiness = 0, shakyCount = 0;
+    let totalBBoxRatioW = 0, totalBBoxRatioH = 0, bboxCount = 0;
+    let extraStrokeTurns = 0;
+    let veryShortStrokeTurns = 0;
+
+    history.forEach(item => {
+        const strokes = item.strokes || [];
+        if (strokes.length === 0) return;
+
+        // 떨림(shakiness): 각 점이 전후 점의 중간에서 얼마나 벗어나는지
+        let turnShakiness = 0, turnPts = 0;
+        strokes.forEach(pts => {
+            if (pts.length < 3) return;
+            for (let i = 1; i < pts.length - 1; i++) {
+                const ex = (pts[i-1].x + pts[i+1].x) / 2;
+                const ey = (pts[i-1].y + pts[i+1].y) / 2;
+                turnShakiness += Math.hypot(pts[i].x - ex, pts[i].y - ey);
+                turnPts++;
+            }
+        });
+        if (turnPts > 0) {
+            totalShakiness += turnShakiness / turnPts;
+            shakyCount++;
+        }
+
+        // 크기(bounding box)
+        const allPts = strokes.flat();
+        if (allPts.length > 1) {
+            const xs = allPts.map(p => p.x), ys = allPts.map(p => p.y);
+            totalBBoxRatioW += (Math.max(...xs) - Math.min(...xs)) / canvasW;
+            totalBBoxRatioH += (Math.max(...ys) - Math.min(...ys)) / canvasH;
+            bboxCount++;
+        }
+
+        // 획 수: 기대보다 2배 이상 많이 떼면 이슈
+        const expected = (NUM_STROKES[item.num] || []).length;
+        if (expected > 0 && strokes.length > expected * 2) extraStrokeTurns++;
+
+        // 획이 너무 짧으면(조심스럽게 씀)
+        const totalLen = strokes.flat().reduce((acc, _, i, arr) => {
+            if (i === 0) return 0;
+            return acc + Math.hypot(arr[i].x - arr[i-1].x, arr[i].y - arr[i-1].y);
+        }, 0);
+        if (totalLen < canvasW * 0.3) veryShortStrokeTurns++;
+    });
+
+    const avgShakiness = shakyCount > 0 ? totalShakiness / shakyCount : 0;
+    const avgBBoxW = bboxCount > 0 ? totalBBoxRatioW / bboxCount : 0;
+    const avgBBoxH = bboxCount > 0 ? totalBBoxRatioH / bboxCount : 0;
+    const extraRate = extraStrokeTurns / history.length;
+    const shortRate = veryShortStrokeTurns / history.length;
+
+    const lines = [];
+
+    // 떨림/힘 조절
+    if (avgShakiness > 5) {
+        lines.push('선이 많이 떨려요. 연필을 너무 꽉 쥐고 있는 건 아닐까요?');
+        lines.push('손에 힘을 빼고 편하게 잡아보세요.');
+    } else if (avgShakiness > 2.5) {
+        lines.push('선이 조금 흔들려요. 팔꿈치를 책상에 살짝 올려놓고 천천히 써보세요.');
+    } else if (avgShakiness < 0.8 && avgShakiness >= 0) {
+        lines.push('선이 안정적으로 잘 그어졌어요! 자세와 힘 조절이 좋아요.');
+    }
+
+    // 크기
+    if (avgBBoxW < 0.2 || avgBBoxH < 0.2) {
+        lines.push('숫자를 더 크게 써보세요.');
+        lines.push('공간을 넓게 활용하면 더 보기 좋아요.');
+    } else if (avgBBoxW > 0.85 && avgBBoxH > 0.85) {
+        lines.push('공간을 꽉 채워서 크고 시원하게 썼어요!');
+    }
+
+    // 획을 자주 떼는 경우
+    if (extraRate > 0.4) {
+        lines.push('획을 자주 끊고 있어요. 가능하면 이어서 한 번에 쓰는 연습을 해보세요.');
+    }
+
+    // 너무 짧게/조심스럽게 쓰는 경우
+    if (shortRate > 0.5 && lines.length < 2) {
+        lines.push('너무 조심스럽게 쓰는 것 같아요. 좀 더 자신 있게, 힘을 줘서 써보세요.');
+    }
+
+    if (lines.length === 0) return '균형 잡힌 글씨예요! 자세와 힘 조절 모두 잘 하고 있어요.';
+    return lines.slice(0, 2).join('<br>');
+}
+
+function showResults() {
+_smGameCompleted=true;
+    gameView.classList.add('hidden');
+    resultView.classList.remove('hidden');
+    speak('연습 완료! 잘했어요!');
+    document.getElementById('result-title').textContent = '연습 완료!';
+    document.getElementById('result-subtitle').textContent = G.nums.length === 1
+        ? '숫자 ' + G.nums[0] + '을(를) ' + TOTAL_TURNS + '번 써봤어요'
+        : TOTAL_TURNS + '개의 숫자를 모두 써봤어요';
+    const grid = document.getElementById('result-grid');
+    grid.innerHTML = '';
+    G.history.forEach((item, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'result-cell';
+        const label = document.createElement('div');
+        label.className = 'result-label';
+        label.textContent = item.num;
+        const img = document.createElement('img');
+        img.src = item.dataURL;
+        cell.appendChild(label);
+        cell.appendChild(img);
+        grid.appendChild(cell);
+    });
+
+    // ── Writing feedback (스트로크 분석) ──
+    const feedback = analyzeWriting(G.history, LW, LH);
+    const fbEl = document.getElementById('writing-feedback');
+    if (feedback) {
+        fbEl.innerHTML = '<div class="feedback-label">✏️ 쓰기 피드백</div>' + feedback;
+        fbEl.style.display = '';
+    } else {
+        fbEl.style.display = 'none';
+    }
+}
+
+function startAgain() {
+    startGame();
+}
+
+function goHome() {
+    gameView.classList.add('hidden');
+    resultView.classList.add('hidden');
+    homeView.classList.remove('hidden');
+    document.querySelector('.logout-btn').style.display=localStorage.getItem('slowmath_numberdraw_login')?'':'none';
+
+if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
+}
+
+function shareApp() {
+    var SHARE_KEY = 'slowmath_share_days';
+    var MAX_DAYS = 5;
+    var bubble = document.getElementById('share-bubble');
+    function onShared() {
+        var days = parseInt(localStorage.getItem(SHARE_KEY) || '0');
+        if (days < MAX_DAYS) { days = days + 1; localStorage.setItem(SHARE_KEY, days); }
+                if (bubble && days >= MAX_DAYS) { bubble.style.display = 'none'; }
+        var shareToast = document.getElementById('share-toast');
+        if (shareToast) {
+          shareToast.textContent = '하루 무료 이용권이 지급되었습니다!';
+          shareToast.style.opacity = '1';
+          clearTimeout(shareToast._t);
+          shareToast._t = setTimeout(function() { shareToast.style.opacity = '0'; }, 3000);
+        }
+    }
+    var title = document.title;
+    var url = location.href;
+    if (navigator.share) {
+        navigator.share({ title: title, url: url }).then(onShared).catch(function() {});
+    } else {
+        if (navigator.clipboard) { navigator.clipboard.writeText(url); }
+        alert('링크가 복사되었어요!');
+        onShared();
+    }
+}
+
+  /* ══ 공유 버블 초기화 ══ */
+  document.addEventListener('DOMContentLoaded', function() {
+    var days = parseInt(localStorage.getItem('slowmath_share_days') || '0');
+    if (days >= 5) { var b = document.getElementById('share-bubble'); if (b) b.style.display = 'none'; }
+  });
+
+// ─── 초기 뷰: 항상 메인 화면 표시 ───
+document.getElementById('login-view').classList.add('hidden');
+document.getElementById('home-view').classList.remove('hidden');
+document.querySelector('.logout-btn').style.display=localStorage.getItem('slowmath_numberdraw_login')?'':'none';
+
+// ─── Splash Screen (3초 후 페이드아웃) ───
+setTimeout(function() {
+    var splash = document.getElementById("splash");
+    if (splash) { splash.classList.add("fade-out"); setTimeout(function() { splash.remove(); }, 500); }
+}, 3000);
+
+// Share visibility: hide when logged out
+(function() {
+  var _SM_KEY = 'slowmath_numberdraw_login';
+  function _updateShareVis() {
+    document.body.classList.toggle('sm-loggedin', !!localStorage.getItem(_SM_KEY));
+  }
+  _updateShareVis();
+  ['socialLogin','socialLogout','goLogin'].forEach(function(fn) {
+    if (typeof window[fn] === 'function') {
+      var _orig = window[fn];
+      window[fn] = function() { _orig.apply(this, arguments); _updateShareVis(); };
+    }
+  });
+})();
+</script>
+
+<!-- ====== App Recommendation Popup ====== -->
+<div id="sm-reco-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.52);z-index:500;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">
+  <div style="background:#FFFDF8;border-radius:24px;padding:28px 22px 22px;max-width:270px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.18);animation:_smPop .32s cubic-bezier(.34,1.56,.64,1) both;">
+    <div style="font-size:0.72rem;font-weight:700;color:#C4AA82;letter-spacing:.08em;margin-bottom:14px;">도움이 될만한 앱을 소개드려요!</div>
+    <div id="sm-reco-emoji" style="font-size:2.75rem;margin-bottom:10px;line-height:1;"></div>
+    <div id="sm-reco-title" style="font-size:1.15rem;font-weight:900;color:#4A4035;margin-bottom:8px;"></div>
+    <div id="sm-reco-desc" style="font-size:0.84rem;color:#7B6545;line-height:1.65;margin-bottom:20px;"></div>
+    <a id="sm-reco-link" href="#" style="display:block;background:#6BADE8;color:#fff;border-radius:14px;padding:15px 0;font-size:0.975rem;font-weight:700;text-decoration:none;font-family:inherit;margin-bottom:10px;box-shadow:0 4px 12px rgba(107,173,232,.3);">바로 해보기 →</a>
+    <button onclick="document.getElementById('sm-reco-overlay').style.display='none'" style="background:none;border:none;color:#C4AA82;font-size:0.84rem;cursor:pointer;font-family:inherit;padding:6px;">다음에 할게요</button>
+  </div>
+</div>
+<style>@keyframes _smPop{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}</style>
+
+<script>
+/* ====== App Recommendation ====== */
+var _smGameCompleted = false;
+var _SM_RECO = [
+  {title:'선 긋기',emoji:'✏️',url:'https://sprit6487.github.io/slowmath_linedraw/',desc:'선을 따라 손을 움직여 보세요!'},
+  {title:'숫자 익히기',emoji:'🔢',url:'https://sprit6487.github.io/slowmath_number/',desc:'숫자를 순서대로 배워보세요'},
+  {title:'점선 따라 그리기',emoji:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 90" width="90" height="74" style="display:inline-block;vertical-align:middle"><rect x="2" y="2" width="106" height="86" rx="8" ry="8" fill="#fff" stroke="#D0C8B8" stroke-width="1.5"/><polyline points="15,15 95,15 15,73 95,73" fill="none" stroke="#D94040" stroke-width="2.5" stroke-dasharray="6,4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="15" cy="15" r="5.5" fill="#1a1a1a"/><circle cx="95" cy="15" r="5.5" fill="#1a1a1a"/><circle cx="68" cy="35" r="5.5" fill="#1a1a1a"/><circle cx="40" cy="55" r="5.5" fill="#1a1a1a"/><circle cx="15" cy="73" r="5.5" fill="#1a1a1a"/><circle cx="95" cy="73" r="5.5" fill="#1a1a1a"/></svg>',url:'https://sprit6487.github.io/slowmath_dot2dot/',desc:'따라서 점을 이어 보세요!'}
+];
+function _showRecoPopup() {
+  if (!_SM_RECO.length) return;
+  var item = _SM_RECO[Math.floor(Math.random() * _SM_RECO.length)];
+  document.getElementById('sm-reco-emoji').innerHTML = item.emoji;
+  document.getElementById('sm-reco-title').textContent = item.title;
+  document.getElementById('sm-reco-desc').innerHTML = item.desc;
+  document.getElementById('sm-reco-link').href = item.url;
+  document.getElementById('sm-reco-overlay').style.display = 'flex';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>느린아이 구구단 연습</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0; padding: 0;
+            background: #F5F1EB;
+            min-height: 100dvh;
+            display: flex; justify-content: center; align-items: flex-start;
+            color: #4A4035;
+        }
+
+        .app {
+            width: 100%; max-width: 480px;
+            min-height: 100dvh;
+            background: white;
+            padding: 24px 20px;
+            padding-top: max(24px, env(safe-area-inset-top));
+            padding-bottom: max(24px, env(safe-area-inset-bottom));
+            display: flex; flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            body { align-items: center; padding: 32px; }
+            .app {
+                max-width: 560px;
+                min-height: auto;
+                border-radius: 32px;
+                box-shadow: 0 8px 48px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+                padding: 44px 40px;
+            }
+        }
+
+        /* ── 프로그레스 바 ── */
+        .progress-bar {
+            height: 8px; border-radius: 99px;
+            background: #F0ECE6; overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        .progress-fill {
+            height: 100%; border-radius: 99px;
+            background: linear-gradient(90deg, #6BADE8, #5BC886);
+            transition: width 0.5s ease;
+        }
+
+        /* ── 수식 숫자 ── */
+        .eq-num { font-size: 3rem; font-weight: 900; line-height: 1; }
+        .eq-op { font-size: 2rem; font-weight: 600; color: #C8C0B4; line-height: 1; }
+        @media (min-width: 768px) {
+            .eq-num { font-size: 3.5rem; }
+            .eq-op { font-size: 2.5rem; }
+        }
+
+        /* ── 선택지 버튼 ── */
+        .option-btn {
+            border: 2.5px solid #E8E2DA;
+            background: white;
+            border-radius: 16px;
+            font-weight: 700;
+            color: #4A4035;
+            transition: transform 0.1s, border-color 0.15s, background 0.15s;
+            cursor: pointer; user-select: none;
+        }
+        .option-btn:active:not(:disabled) { transform: scale(0.95); }
+        .option-btn:disabled { cursor: default; }
+        .correct-selected {
+            background: #D4F5E0 !important; border-color: #5BC886 !important; color: #1A7A3A !important;
+        }
+        .wrong-selected {
+            background: #FDE8E8 !important; border-color: #F07070 !important; color: #B91C1C !important;
+            opacity: 0.5;
+        }
+
+        /* ── 선택 그룹 ── */
+        .select-group { display: flex; gap: 8px; }
+        .select-group.vertical { flex-direction: column; }
+        .select-item {
+            flex: 1; padding: 14px 16px;
+            border-radius: 14px; border: 2px solid #E8E2DA;
+            background: white; color: #B8AD9E;
+            font-weight: 600; font-size: 0.875rem;
+            cursor: pointer; transition: all 0.15s;
+            text-align: center; position: relative;
+        }
+        .select-item.active {
+            background: #FAF5EE; border-color: #C4AA82; color: #7B6545;
+        }
+        .select-item:not(.active):hover { border-color: #D0C8BC; color: #8C8070; }
+
+        /* ── 구구단 선택 그리드 ── */
+        .dan-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+        }
+        .dan-btn {
+            padding: 14px 8px; border-radius: 14px;
+            border: 2.5px solid #E8E2DA; background: white;
+            color: #B8AD9E; font-weight: 700; font-size: 1rem;
+            cursor: pointer; transition: all 0.15s; text-align: center;
+            font-family: inherit;
+        }
+        .dan-btn.active {
+            background: #FAF5EE; border-color: #C4AA82; color: #7B6545;
+        }
+        .dan-btn:not(.active):hover { border-color: #D0C8BC; color: #8C8070; }
+
+        /* ── 연습 모드 버튼 ── */
+        .mode-group { display: flex; flex-direction: column; gap: 8px; }
+        .mode-item {
+            padding: 14px 16px; border-radius: 14px;
+            border: 2px solid #E8E2DA; background: white;
+            color: #B8AD9E; font-weight: 600; font-size: 0.875rem;
+            cursor: pointer; transition: all 0.15s; text-align: left;
+            display: flex; align-items: center; gap: 10px;
+            font-family: inherit;
+        }
+        .mode-item .mode-icon { font-size: 1.3rem; flex-shrink: 0; }
+        .mode-item .mode-info { display: flex; flex-direction: column; }
+        .mode-item .mode-title { font-weight: 700; color: #4A4035; font-size: 0.95rem; }
+        .mode-item .mode-desc { font-size: 0.78rem; color: #B8AD9E; margin-top: 2px; }
+        .mode-item.active { background: #FAF5EE; border-color: #C4AA82; }
+        .mode-item.active .mode-title { color: #7B6545; }
+        .mode-item:not(.active):hover { border-color: #D0C8BC; }
+
+        /* ── 섹션 라벨 ── */
+        .section-label {
+            font-size: 0.75rem; font-weight: 700;
+            color: #B8AD9E; letter-spacing: 0.05em; margin-bottom: 0.5rem;
+        }
+
+        /* ── 딜레이 버튼 ── */
+        .delay-btn {
+            flex: 0 0 18%; padding: 8px 0;
+            border-radius: 10px; border: 2px solid #E8E2DA;
+            background: white; color: #8C8070;
+            font-weight: 600; font-size: 0.7rem;
+            cursor: pointer; transition: all 0.15s; text-align: center;
+        }
+        .delay-btn.active { background: #FAF5EE; border-color: #C4AA82; color: #7B6545; }
+        .delay-btn:not(.active):hover { border-color: #D0C8BC; color: #8C8070; }
+
+        /* ── 충동방지 모드 옵션 ── */
+        .impulse-mode-options {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;
+        }
+        .impulse-mode-btn {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 10px 8px; border-radius: 14px;
+            border: 2px solid #E8E2DA; background: white;
+            cursor: pointer; transition: all 0.15s; font-family: inherit;
+        }
+        .impulse-mode-btn.selected { border-color: #C4AA82; background: #FAF5EE; }
+        .impulse-mode-icon { font-size: 1.2rem; margin-bottom: 2px; }
+        .impulse-mode-label { font-size: 0.8rem; font-weight: 700; color: #4A4035; }
+        .impulse-mode-desc { font-size: 0.65rem; color: #B8AD9E; margin-top: 1px; }
+        .chips-hidden { visibility: hidden; }
+        .chips-locked { pointer-events: none; opacity: 0.45; }
+
+        .reveal-btn { display:block; width:100%; max-width:320px; margin:0 auto 12px; padding:14px 0; border-radius:14px; border:2px solid #C4AA82; background:#FAF5EE; color:#7B6545; font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer; transition:all .15s; text-align:center; }
+        .reveal-btn:active { background:#F0E6D6; transform:scale(.98); }
+
+        /* ── 토글 ── */
+        .toggle-track {
+            width: 48px; height: 28px; border-radius: 99px; position: relative;
+            background: #E0DAD0; transition: background 0.2s;
+            cursor: pointer; flex-shrink: 0; border: none;
+        }
+        .toggle-track.on { background: #5BC886; }
+        .toggle-knob {
+            width: 22px; height: 22px; border-radius: 50%; background: white;
+            position: absolute; top: 3px; left: 3px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12); transition: transform 0.2s;
+        }
+        .toggle-track.on .toggle-knob { transform: translateX(20px); }
+
+        /* ── 홈 버튼 ── */
+        .btn-home {
+            width: 36px; height: 36px; border-radius: 10px;
+            border: 2px solid #E8E2DA; background: white;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: background 0.15s; font-size: 1rem; color: #8C8070;
+        }
+        .btn-home:active { background: #F5F1EB; }
+        @media (min-width: 768px) { .btn-home { width: 40px; height: 40px; } }
+
+        /* ── 피드백 ── */
+        .feedback { text-align: center; min-height: 28px; font-size: 0.9375rem; font-weight: 700; }
+        .feedback-green { color: #5BC886; }
+        .feedback-red { color: #F07070; }
+        .feedback-muted { color: #B8AD9E; }
+
+        /* ── 패스 버튼 ── */
+        .btn-pass {
+            color: #B8AD9E; font-size: 0.875rem; font-weight: 500;
+            text-decoration: underline; background: none; border: none;
+            cursor: pointer; padding: 8px 0; transition: color 0.15s;
+        }
+        .btn-pass:hover { color: #6B5F50; }
+
+        /* ── 시작하기 버튼 ── */
+        .btn-start {
+            width: 100%; padding: 14px 0; border-radius: 16px; border: none;
+            background: #4A4035; color: white; font-size: 1.125rem; font-weight: 700;
+            cursor: pointer; transition: background 0.15s, transform 0.1s;
+            box-shadow: 0 2px 8px rgba(74,64,53,0.15); font-family: inherit;
+        }
+        .btn-start:active { transform: scale(0.98); background: #2E261D; }
+
+        .btn-next-q { display:block; width:100%; max-width:360px; margin:12px auto 0; padding:14px 0; border-radius:16px; border:none; background:#4A4035; color:white; font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer; transition:background 0.15s, transform 0.1s; box-shadow:0 2px 8px rgba(74,64,53,0.15); }
+        .btn-next-q:active { transform:scale(0.98); background:#2E261D; }
+
+        /* ── 동그라미 시각화 ── */
+        .circles-wrap {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            justify-items: center;
+            margin: 10px 0 18px;
+        }
+        .circle-group {
+            display: flex; flex-wrap: wrap; justify-content: center;
+            gap: 4px; padding: 8px;
+            border-radius: 12px; border: 2px solid #E8E2DA; background: #FAF5EE;
+        }
+        .circle-dot {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: #6BADE8; display: inline-block;
+        }
+        @media (max-width: 380px) {
+            .circle-dot { width: 18px; height: 18px; }
+            .circle-group { padding: 6px; gap: 3px; }
+        }
+
+        /* ── Login View ── */
+        .login-view {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; flex: 1; min-height: 100dvh; padding: 40px 20px;
+        }
+        .login-logo-area { text-align: center; margin-bottom: 48px; }
+        .login-logo-area svg { display: block; margin: 0 auto; }
+        .login-logo-area h1 {
+            font-size: clamp(1.6rem, 5.5vw, 2rem); font-weight: 900;
+            letter-spacing: -0.025em; margin-top: 8px; white-space: nowrap;
+        }
+        .login-subtitle { color: #B8AD9E; font-size: 0.9375rem; margin-top: 4px; }
+
+        @keyframes floatBubble { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        .login-trial {
+            position: relative; background: #FFF8F0; border: 1.5px solid #EDD080;
+            border-radius: 14px; padding: 9px 16px; font-size: 0.78rem;
+            color: #7B6545; font-weight: 600; text-align: center;
+            margin-bottom: 24px; line-height: 1.4;
+            box-shadow: 0 4px 14px rgba(220,160,50,.18);
+            animation: floatBubble 2.8s ease-in-out infinite; align-self: center;
+        }
+        .login-trial::before {
+            content: ''; position: absolute; bottom: -9px; left: 50%;
+            transform: translateX(-50%); border: 5px solid transparent;
+            border-top: 8px solid #EDD080; border-bottom: 0;
+        }
+        .login-trial::after {
+            content: ''; position: absolute; bottom: -7px; left: 50%;
+            transform: translateX(-50%); border: 4px solid transparent;
+            border-top: 7px solid #FFF8F0; border-bottom: 0; z-index: 1;
+        }
+        .login-buttons { width: 100%; max-width: 270px; display: flex; flex-direction: column; gap: 12px; }
+        .login-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 16px 20px; border-radius: 14px;
+            font-size: 1rem; font-weight: 700; font-family: inherit; line-height: 1.2;
+            border: none; cursor: pointer; transition: transform 0.1s;
+        }
+        .login-btn:active { transform: scale(0.97); }
+        .login-btn svg { flex-shrink: 0; }
+        .login-btn.kakao { background: #FEE500; color: #191919; }
+        .login-btn.naver { background: #03C75A; color: #FFFFFF; }
+        .login-btn.google { background: #FFFFFF; color: #444444; border: 1.5px solid #DADCE0; }
+        .login-btn.facebook { background: #1877F2; color: #FFFFFF; }
+
+        .logout-btn {
+            background: none; border: 1.5px solid #E8E2DA; border-radius: 8px;
+            padding: 6px 14px; font-size: 0.75rem; font-weight: 600; color: #B8AD9E;
+            cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: background 0.15s;
+        }
+        .logout-btn:hover { background: #F5F1EB; }
+
+        /* ── 페이드 인 ── */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+
+        /* ── Splash Screen ── */
+        .splash-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #FFFFFF;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999; transition: opacity 0.5s ease-out;
+        }
+        .splash-overlay.fade-out { opacity: 0; pointer-events: none; }
+        .splash-logo { animation: splashFloat 2.4s ease-in-out infinite; margin-bottom: 24px; }
+        .splash-title { font-size: 2rem; font-weight: 900; letter-spacing: -0.025em; margin-bottom: 8px; }
+        .splash-subtitle { color: #B8B0A8; font-size: 0.9375rem; font-weight: 500; }
+        .brand-sub { font-size:.8rem; color:#B8AD9E; margin-top:6px; margin-bottom:0; font-weight:500; }
+        @keyframes splashFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @media (max-width:380px) { .splash-title{font-size:1.4rem} }
+        @media (min-width:768px) { .splash-logo svg{width:160px;height:134px} .splash-title{font-size:2.5rem} .splash-subtitle{font-size:1.0625rem} }
+
+        .complete-overlay { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 40px 0; }
+        .complete-emoji { font-size: 56px; }
+        .complete-msg { font-size: 1.25rem; font-weight: 900; color: #4A4035; }
+        .complete-sub { font-size: 0.85rem; color: #B8AD9E; }
+        .next-btn { margin-top: 8px; padding: 14px 36px; border: none; border-radius: 12px; background: #6BADE8; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform 0.12s; }
+        .next-btn:active { transform: scale(0.96); }
+
+        /* share bubble */
+        .share-bubble { position:absolute; right:0; background:#FFF8F0; border:1.5px solid #EDD080; border-radius:12px; padding:8px 12px; font-size:0.55rem; color:#7B6545; font-weight:600; box-shadow:0 4px 12px rgba(220,160,50,.18); z-index:20; animation:floatBubble 2.8s ease-in-out infinite; line-height:1.5; text-align:right; max-width:200px; }
+        .share-bubble::before { content:''; position:absolute; top:-8px; right:10px; border:4px solid transparent; border-bottom:7px solid #EDD080; border-top:0; }
+        .share-bubble::after { content:''; position:absolute; top:-6px; right:11px; border:3px solid transparent; border-bottom:6px solid #FFF8F0; border-top:0; z-index:1; }
+        @media (max-width:768px){ .share-bubble{font-size:0.60rem;max-width:170px;padding:7px 10px;} }
+        @media (max-width:480px){ .share-bubble{font-size:0.62rem;max-width:165px;padding:7px 9px;} }
+
+        /* Hide share button/bubble when not logged in */
+        body:not(.sm-loggedin) [title="공유하기"],
+        body:not(.sm-loggedin) #share-bubble { display: none !important; }
+
+        /* ── 키패드 ── */
+        .keypad-display {
+            font-size: 2.25rem; font-weight: 700; border: 2.5px solid #E8E2DA;
+            border-radius: 16px; padding: 16px 0; text-align: center; color: #D0C8BC;
+            margin-bottom: 12px; background: white; transition: all 0.2s;
+        }
+        .keypad-display.has-input { border-color: #B8AD9E; color: #4A4035; }
+        .keypad-display.correct-input { border-color: #5BC886; background: #D4F5E0; color: #1A7A3A; }
+        .keypad-display.wrong-input { border-color: #F07070; background: #FDE8E8; color: #B91C1C; }
+        .keypad-btn {
+            border: 2.5px solid #E8E2DA; background: white; border-radius: 14px;
+            font-weight: 700; font-size: 1.25rem; color: #4A4035; padding: 14px 0;
+            cursor: pointer; transition: transform 0.1s, background 0.1s; font-family: inherit;
+        }
+        .keypad-btn:active:not(:disabled) { transform: scale(0.95); background: #F5F1EB; }
+        .keypad-btn.confirm { background: #4A4035; border-color: #4A4035; color: white; }
+        .keypad-btn.confirm:active:not(:disabled) { background: #2E261D; }
+    </style>
+</head>
+<body>
+
+<!-- ══════ Splash Screen ══════ -->
+<div id="splash" class="splash-overlay">
+    <div class="splash-logo">
+        <svg viewBox="0 0 120 100" width="140" height="117" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+            <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+            <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+            <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+            <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+            <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+            <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+            <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+            <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+            <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+            <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+            <circle cx="101" cy="33" r="1" fill="white"/>
+            <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+            <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <h1 class="splash-title">
+        <span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">구구단 연습</span>
+    </h1>
+    <p class="splash-subtitle">천천히 생각하고 풀어보세요</p>
+</div>
+<script>
+setTimeout(function() {
+    var splash = document.getElementById("splash");
+    if (splash) { splash.classList.add("fade-out"); setTimeout(function() { splash.remove(); }, 500); }
+}, 3000);
+</script>
+
+<div class="app">
+
+    <!-- ══════════════ 로그인 화면 ══════════════ -->
+    <div id="login-view" class="login-view">
+        <div class="login-logo-area">
+            <svg viewBox="0 0 120 100" width="120" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+                <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+                <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+                <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+                <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+                <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+                <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity="0.35" transform="rotate(-15 42 26)"/>
+                <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity="0.2"/>
+                <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+                <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+                <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+                <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+                <circle cx="101" cy="33" r="1" fill="white"/>
+                <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity="0.4"/>
+                <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">구구단 연습</span></h1>
+            <p class="login-subtitle">천천히 생각하고 풀어보세요</p>
+        </div>
+        <p class="login-trial">가입하시고 하루 동안 모든 기능을<br>무료로 체험해보세요</p>
+        <div class="login-buttons">
+            <button class="login-btn kakao" onclick="socialLogin('kakao')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 1C4.477 1 0 4.477 0 8.667c0 2.7 1.753 5.072 4.393 6.413-.192.717-.694 2.6-.794 3.004-.124.497.182.49.383.356.158-.105 2.51-1.708 3.525-2.398.8.118 1.628.18 2.493.18 5.523 0 10-3.477 10-7.555C20 4.477 15.523 1 10 1z" fill="#191919"/></svg>
+                카카오로 시작하기
+            </button>
+            <button class="login-btn naver" onclick="socialLogin('naver')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M13.57 10.684L6.066 0H0v20h6.43V9.316L13.934 20H20V0h-6.43v10.684z" fill="white"/></svg>
+                네이버로 시작하기
+            </button>
+            <button class="login-btn google" onclick="socialLogin('google')">
+                <svg width="20" height="20" viewBox="0 0 48 48"><path d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" fill="#FFC107"/><path d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" fill="#FF3D00"/><path d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" fill="#4CAF50"/><path d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.001-.001 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" fill="#1976D2"/></svg>
+                Google로 시작하기
+            </button>
+            <button class="login-btn facebook" onclick="socialLogin('facebook')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" fill="white"/></svg>
+                Facebook으로 시작하기
+            </button>
+        </div>
+    </div>
+
+    <!-- ══════════════ 시작 화면 ══════════════ -->
+    <div id="start-view" class="flex flex-col flex-1 hidden relative">
+        <button onclick="shareApp()" style="position:absolute; top:0; right:0; background:white; border:2px solid #E8E2DA; border-radius:10px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#8C8070; z-index:10;" title="공유하기">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+        </button>
+        <div id="share-bubble" class="share-bubble" style="top:44px;">지금 지인에게 공유하시면<br>하루 무료 이용권을 드려요</div>
+        <div id="share-toast" style="display:block;position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#3A7D44;color:white;padding:12px 20px;border-radius:14px;font-size:0.85rem;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.25);transition:opacity 0.4s;opacity:0;pointer-events:none;white-space:nowrap;"></div>
+
+        <!-- 헤더 -->
+        <div class="text-center pt-0 pb-3">
+            <div class="inline-block mb-2">
+                <svg viewBox="0 0 120 100" width="90" height="75" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+                    <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+                    <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+                    <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+                    <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+                    <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+                    <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                    <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                    <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                    <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                    <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                    <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity="0.35" transform="rotate(-15 42 26)"/>
+                    <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity="0.2"/>
+                    <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+                    <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+                    <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+                    <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+                    <circle cx="101" cy="33" r="1" fill="white"/>
+                    <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity="0.4"/>
+                    <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-black tracking-tight" style="font-size:1.6rem; margin-top:12px;">
+                <span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">구구단 연습</span>
+            </h1>
+            <p class="brand-sub">천천히 생각하고 풀어보세요</p>
+        </div>
+
+        <!-- 설정 영역 -->
+        <div class="flex flex-col gap-4 flex-1">
+            <!-- 단 선택 -->
+            <div>
+                <p class="section-label">단 선택</p>
+                <div class="dan-grid">
+                    <button class="dan-btn active" onclick="selectDan(2)" id="dan-2">2단</button>
+                    <button class="dan-btn" onclick="selectDan(3)" id="dan-3">3단</button>
+                    <button class="dan-btn" onclick="selectDan(4)" id="dan-4">4단</button>
+                    <button class="dan-btn" onclick="selectDan(5)" id="dan-5">5단</button>
+                    <button class="dan-btn" onclick="selectDan(6)" id="dan-6">6단</button>
+                    <button class="dan-btn" onclick="selectDan(7)" id="dan-7">7단</button>
+                    <button class="dan-btn" onclick="selectDan(8)" id="dan-8">8단</button>
+                    <button class="dan-btn" onclick="selectDan(9)" id="dan-9">9단</button>
+                </div>
+            </div>
+
+            <!-- 연습 방법 -->
+            <div>
+                <p class="section-label">연습 방법</p>
+                <div class="mode-group">
+                    <button class="mode-item active" onclick="selectMode('circle')" id="mode-circle">
+                        <span class="mode-icon">⭕</span>
+                        <span class="mode-info">
+                            <span class="mode-title">동그라미로 연습</span>
+                            <span class="mode-desc">동그라미로 숫자를 눈으로 세며 풀어요</span>
+                        </span>
+                    </button>
+                    <button class="mode-item" onclick="selectMode('sequence')" id="mode-sequence">
+                        <span class="mode-icon">📋</span>
+                        <span class="mode-info">
+                            <span class="mode-title">순서대로 연습</span>
+                            <span class="mode-desc">2×1, 2×2, 2×3 ... 순서대로 풀어요</span>
+                        </span>
+                    </button>
+                    <button class="mode-item" onclick="selectMode('random')" id="mode-random">
+                        <span class="mode-icon">🎲</span>
+                        <span class="mode-info">
+                            <span class="mode-title">랜덤으로 연습</span>
+                            <span class="mode-desc">문제가 무작위 순서로 나와요</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 시작 버튼 -->
+            <div>
+                <button onclick="startGame()" class="btn-start">시작하기</button>
+            </div>
+        </div>
+
+        <!-- 음성 설정 -->
+        <div class="mt-5 pt-5" style="border-top:1.5px solid #F0ECE6;">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold" style="color:#4A4035;">음성</p>
+                    <p class="text-xs mt-0.5" style="color:#B8AD9E;">정답/오답 음성 안내</p>
+                </div>
+                <button id="tts-toggle" onclick="toggleTTS()" role="switch" aria-checked="true" class="toggle-track on">
+                    <span class="toggle-knob"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 충동방지 -->
+        <div class="mt-5 pt-5" style="border-top:1.5px solid #F0ECE6;">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold" style="color:#4A4035;">충동방지</p>
+                    <p class="text-xs mt-0.5" style="color:#B8AD9E;">생각할 시간을 줘요</p>
+                </div>
+                <button id="impulse-toggle" onclick="toggleImpulsePrevention()" role="switch" aria-checked="true" class="toggle-track on">
+                    <span class="toggle-knob"></span>
+                </button>
+            </div>
+            <div id="impulse-seconds" class="mt-3">
+                <div class="impulse-mode-options">
+                    <button class="impulse-mode-btn selected" onclick="setImpulseMode('hide')" data-mode="hide">
+                        <span class="impulse-mode-icon">👀</span>
+                        <span class="impulse-mode-label">보기 확인</span>
+                        <span class="impulse-mode-desc">버튼을 누르면 보기가 나타나요</span>
+                    </button>
+                    <button class="impulse-mode-btn" onclick="setImpulseMode('lock')" data-mode="lock">
+                        <span class="impulse-mode-icon">🔒</span>
+                        <span class="impulse-mode-label">선택 잠금</span>
+                        <span class="impulse-mode-desc">N초 동안 선택할 수 없어요</span>
+                    </button>
+                </div>
+                <div style="display:none; grid-template-columns:repeat(5, 1fr); gap:6px;" id="impulse-delay-row">
+                    <button onclick="updateImpulseDelay(1)" class="delay-btn">1초</button>
+                    <button onclick="updateImpulseDelay(2)" class="delay-btn">2초</button>
+                    <button onclick="updateImpulseDelay(3)" class="delay-btn">3초</button>
+                    <button onclick="updateImpulseDelay(4)" class="delay-btn">4초</button>
+                    <button onclick="updateImpulseDelay(5)" class="delay-btn active">5초</button>
+                    <button onclick="updateImpulseDelay(6)" class="delay-btn">6초</button>
+                    <button onclick="updateImpulseDelay(7)" class="delay-btn">7초</button>
+                    <button onclick="updateImpulseDelay(8)" class="delay-btn">8초</button>
+                    <button onclick="updateImpulseDelay(9)" class="delay-btn">9초</button>
+                    <button onclick="updateImpulseDelay(10)" class="delay-btn">10초</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:24px;">
+            <button class="logout-btn" style="display:none" onclick="socialLogout()">로그아웃</button>
+        </div>
+    </div>
+
+    <!-- ══════════════ 게임 화면 ══════════════ -->
+    <div id="play-view" class="hidden flex flex-col flex-1 fade-in">
+        <!-- 상단 바 -->
+        <div class="flex items-center gap-3 mb-2">
+            <button onclick="resetGame()" class="btn-home" title="홈">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-8 9 8M5 11v9a1 1 0 001 1h3m8 0h3a1 1 0 001-1v-9"/></svg>
+            </button>
+            <div class="flex-1">
+                <div class="flex justify-between items-center mb-1">
+                    <span id="question-number" class="text-xs font-medium" style="color:#B8AD9E;">문제 1 / 9</span>
+                    <span id="dan-label" class="text-xs font-bold" style="color:#6BADE8;">2단</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill" style="width:11%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 수식 -->
+        <div class="flex items-center justify-center gap-4 my-4">
+            <span id="num1" class="eq-num" style="color:#6BADE8;">2</span>
+            <span class="eq-op">×</span>
+            <span id="num2" class="eq-num" style="color:#F0A050;">1</span>
+            <span class="eq-op">=</span>
+            <span class="eq-num" style="color:#D8D2C8;">?</span>
+        </div>
+
+        <!-- 동그라미 시각화 (circle 모드 전용) -->
+        <div id="circles-area" class="hidden">
+            <div id="circles-wrap" class="circles-wrap"></div>
+        </div>
+
+        <!-- 선택지 -->
+        <div id="options-grid" class="grid grid-cols-2 gap-3 mb-4"></div>
+
+        <!-- 키패드 (keypad 모드) -->
+        <div id="keypad-area" class="hidden mb-4">
+            <div id="keypad-display" class="keypad-display">?</div>
+            <div class="grid grid-cols-3 gap-2">
+                <button class="keypad-btn" onclick="appendKey('1')">1</button>
+                <button class="keypad-btn" onclick="appendKey('2')">2</button>
+                <button class="keypad-btn" onclick="appendKey('3')">3</button>
+                <button class="keypad-btn" onclick="appendKey('4')">4</button>
+                <button class="keypad-btn" onclick="appendKey('5')">5</button>
+                <button class="keypad-btn" onclick="appendKey('6')">6</button>
+                <button class="keypad-btn" onclick="appendKey('7')">7</button>
+                <button class="keypad-btn" onclick="appendKey('8')">8</button>
+                <button class="keypad-btn" onclick="appendKey('9')">9</button>
+                <button class="keypad-btn" onclick="deleteKey()">←</button>
+                <button class="keypad-btn" onclick="appendKey('0')">0</button>
+                <button id="keypad-confirm" class="keypad-btn confirm" onclick="submitKeypad()">✓</button>
+            </div>
+        </div>
+
+        <!-- 피드백 + 패스 -->
+        <div class="flex flex-col gap-2 mt-auto">
+            <p id="feedback" class="feedback"></p>
+            <button id="pass-btn" onclick="passQuestion()" class="btn-pass">이 문제 패스하기</button>
+        </div>
+        <button class="btn-next-q" id="next-q-btn" style="display:none;" onclick="onNextQ()">다음 문제 →</button>
+    </div>
+
+    <!-- ══════════════ 결과 화면 ══════════════ -->
+    <div id="result-view" class="hidden flex flex-col flex-1 fade-in">
+        <div class="complete-overlay">
+            <div class="complete-emoji" id="result-emoji">🏆</div>
+            <div class="complete-msg" id="result-msg">9문제 완료!</div>
+            <div class="complete-sub" id="result-sub">9개 정답</div>
+            <button class="next-btn" onclick="resetGame()">다시 하기</button>
+            <button class="next-btn" onclick="resetGame()" style="background:#EDE8E0;color:#8C8070;margin-top:6px;">홈으로</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    /* ─── 상태 변수 ─── */
+    const TOTAL_Q = 9;
+    let currentQuestion = 1;
+    let perfectScore = 0;
+    let totalPassed = 0;
+    let tableNum = 2;       // 현재 선택 단
+    let practiceMode = 'circle'; // 'circle' | 'sequence' | 'random'
+    let questionQueue = []; // 문제 순서
+    let num1, num2, correctAnswer;
+    let isProcessing = false;
+    let tryCount = 0;
+    let ttsEnabled = true;
+    let impulsePrevention = true;
+    let impulsePreventionTimer = null;
+    let impulseDelay = 5;
+    let impulseMode = 'hide';
+    let keypadInput = '';
+    let pendingKeypadClear = false;
+
+    const startView  = document.getElementById('start-view');
+    const playView   = document.getElementById('play-view');
+    const resultView = document.getElementById('result-view');
+    const feedback   = document.getElementById('feedback');
+    const optionsGrid = document.getElementById('options-grid');
+    const passBtn    = document.getElementById('pass-btn');
+
+    /* ─── 설정 저장/불러오기 ─── */
+    function saveSettings() {
+        localStorage.setItem('slowmath_times_settings', JSON.stringify({
+            ttsEnabled, impulsePrevention, impulseMode, impulseDelay, tableNum, practiceMode
+        }));
+    }
+    function loadSettings() {
+        try {
+            const s = JSON.parse(localStorage.getItem('slowmath_times_settings'));
+            if (!s) return;
+            if (typeof s.ttsEnabled === 'boolean') ttsEnabled = s.ttsEnabled;
+            if (typeof s.impulsePrevention === 'boolean') impulsePrevention = s.impulsePrevention;
+            if (s.impulseMode === 'hide' || s.impulseMode === 'lock') impulseMode = s.impulseMode;
+            if (typeof s.impulseDelay === 'number') impulseDelay = s.impulseDelay;
+            if (s.tableNum >= 2 && s.tableNum <= 9) tableNum = s.tableNum;
+            if (['circle','sequence','random'].includes(s.practiceMode)) practiceMode = s.practiceMode;
+        } catch(e) {}
+    }
+    function applySettingsUI() {
+        document.getElementById('tts-toggle').classList.toggle('on', ttsEnabled);
+        const impulseToggle = document.getElementById('impulse-toggle');
+        if (impulsePrevention) {
+            impulseToggle.classList.add('on');
+            document.getElementById('impulse-seconds').classList.remove('hidden');
+        } else {
+            impulseToggle.classList.remove('on');
+            document.getElementById('impulse-seconds').classList.add('hidden');
+        }
+        document.querySelectorAll('.impulse-mode-btn').forEach(b =>
+            b.classList.toggle('selected', b.dataset.mode === impulseMode));
+        document.getElementById('impulse-delay-row').style.display = impulseMode === 'lock' ? 'grid' : 'none';
+        document.querySelectorAll('.delay-btn').forEach(btn =>
+            btn.classList.toggle('active', btn.textContent === impulseDelay + '초'));
+        selectDan(tableNum, true);
+        selectMode(practiceMode, true);
+    }
+
+    /* ─── TTS ─── */
+    function speak(text) {
+        if (!ttsEnabled || !window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        if (!text || text.trim() === '') return;
+        const utt = new SpeechSynthesisUtterance(text);
+        utt.lang = 'ko-KR';
+        utt.rate = 1.1;
+        setTimeout(() => window.speechSynthesis.speak(utt), 50);
+    }
+
+    function setFeedback(text, type) {
+        feedback.textContent = text;
+        feedback.className = 'feedback';
+        if (type === 'green') feedback.classList.add('feedback-green');
+        else if (type === 'red') feedback.classList.add('feedback-red');
+        else if (type === 'muted') feedback.classList.add('feedback-muted');
+    }
+
+    /* ─── 단 & 모드 선택 ─── */
+    function selectDan(n, skipSave) {
+        tableNum = n;
+        document.querySelectorAll('.dan-btn').forEach(b => b.classList.remove('active'));
+        const btn = document.getElementById('dan-' + n);
+        if (btn) btn.classList.add('active');
+        if (!skipSave) saveSettings();
+    }
+
+    function selectMode(mode, skipSave) {
+        practiceMode = mode;
+        document.querySelectorAll('.mode-item').forEach(b => b.classList.remove('active'));
+        const btn = document.getElementById('mode-' + mode);
+        if (btn) btn.classList.add('active');
+        if (!skipSave) saveSettings();
+    }
+
+    /* ─── 토글 ─── */
+    function toggleTTS() {
+        ttsEnabled = !ttsEnabled;
+        document.getElementById('tts-toggle').classList.toggle('on', ttsEnabled);
+        if (!ttsEnabled && window.speechSynthesis) window.speechSynthesis.cancel();
+        saveSettings();
+    }
+
+    function toggleImpulsePrevention() {
+        impulsePrevention = !impulsePrevention;
+        const toggle = document.getElementById('impulse-toggle');
+        const details = document.getElementById('impulse-seconds');
+        toggle.classList.toggle('on', impulsePrevention);
+        details.classList.toggle('hidden', !impulsePrevention);
+        saveSettings();
+    }
+
+    function setImpulseMode(mode) {
+        impulseMode = mode;
+        document.querySelectorAll('.impulse-mode-btn').forEach(b =>
+            b.classList.toggle('selected', b.dataset.mode === mode));
+        document.getElementById('impulse-delay-row').style.display = mode === 'lock' ? 'grid' : 'none';
+        saveSettings();
+    }
+
+    function updateImpulseDelay(val) {
+        impulseDelay = parseInt(val);
+        document.querySelectorAll('.delay-btn').forEach(btn =>
+            btn.classList.toggle('active', btn.textContent === val + '초'));
+        saveSettings();
+    }
+
+    /* ─── 문제 큐 생성 ─── */
+    function buildQueue() {
+        const base = [1,2,3,4,5,6,7,8,9];
+        // circle 모드와 sequence 모드 모두 순서대로
+        if (practiceMode === 'circle' || practiceMode === 'sequence') return [...base];
+        // random
+        const arr = [...base];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    /* ─── 게임 시작 ─── */
+    function startGame() {
+        if (!localStorage.getItem('slowmath_times_login')) {
+            startView.classList.add('hidden');
+            document.getElementById('login-view').style.display = 'flex';
+            return;
+        }
+        if (window.speechSynthesis) {
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+        }
+        currentQuestion = 1;
+        perfectScore = 0;
+        totalPassed = 0;
+        questionQueue = buildQueue();
+        startView.classList.add('hidden');
+        resultView.classList.add('hidden');
+        playView.classList.remove('hidden');
+        document.getElementById('dan-label').textContent = tableNum + '단';
+        generateQuestion();
+    }
+
+    /* ─── 문제 생성 ─── */
+    function generateQuestion() {
+        if (impulsePreventionTimer) { clearInterval(impulsePreventionTimer); impulsePreventionTimer = null; }
+        const oldReveal = document.getElementById('revealBtn');
+        if (oldReveal) oldReveal.remove();
+        isProcessing = false;
+        tryCount = 0;
+        keypadInput = '';
+        pendingKeypadClear = false;
+        passBtn.disabled = false;
+        passBtn.style.opacity = '';
+
+        const multiplier = questionQueue[currentQuestion - 1];
+        num1 = tableNum;
+        num2 = multiplier;
+        correctAnswer = num1 * num2;
+
+        document.getElementById('num1').textContent = num1;
+        document.getElementById('num2').textContent = num2;
+        document.getElementById('question-number').textContent = '문제 ' + currentQuestion + ' / ' + TOTAL_Q;
+        document.getElementById('progress-fill').style.width = ((currentQuestion / TOTAL_Q) * 100) + '%';
+        setFeedback('', '');
+
+        // 동그라미 표시
+        const circlesArea = document.getElementById('circles-area');
+        if (practiceMode === 'circle') {
+            circlesArea.classList.remove('hidden');
+            renderCircles(num1, num2);
+        } else {
+            circlesArea.classList.add('hidden');
+        }
+
+        // 선택지 생성 (모든 모드 공통)
+        document.getElementById('options-grid').classList.remove('hidden');
+        document.getElementById('keypad-area').classList.add('hidden');
+        updateKeypadDisplay();
+        createOptions();
+    }
+
+    /* ─── 동그라미 렌더링 ─── */
+    function renderCircles(table, mult) {
+        // 단별 행 레이아웃 정의 (각 행에 몇 개씩)
+        const rowLayouts = {
+            2: [2],
+            3: [3],
+            4: [2, 2],
+            5: [3, 2],
+            6: [3, 3],
+            7: [3, 3, 1],
+            8: [3, 3, 2],
+            9: [3, 3, 3]
+        };
+        const rows = rowLayouts[table] || [table];
+        const dotSize = (table >= 7) ? 16 : (table >= 5) ? 18 : 20;
+
+        const wrap = document.getElementById('circles-wrap');
+        wrap.innerHTML = '';
+        wrap.style.display = 'grid';
+        wrap.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        wrap.style.gap = '8px';
+        wrap.style.justifyItems = 'center';
+
+        for (let g = 0; g < mult; g++) {
+            const group = document.createElement('div');
+            group.className = 'circle-group';
+            group.style.cssText = 'width:100%; display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px;';
+
+            for (const rowCount of rows) {
+                const rowEl = document.createElement('div');
+                rowEl.style.cssText = 'display:flex; gap:3px;';
+                for (let d = 0; d < rowCount; d++) {
+                    const dot = document.createElement('span');
+                    dot.style.cssText = `display:inline-block; width:${dotSize}px; height:${dotSize}px; border-radius:50%; background:#6BADE8; flex-shrink:0;`;
+                    rowEl.appendChild(dot);
+                }
+                group.appendChild(rowEl);
+            }
+            wrap.appendChild(group);
+        }
+    }
+
+    /* ─── 선택지 ─── */
+    function createOptions() {
+        optionsGrid.innerHTML = '';
+        let options = [correctAnswer];
+        const tableAnswers = [1,2,3,4,5,6,7,8,9].map(x => tableNum * x);
+
+        // 정답과 가까운 순으로 정렬 후 3개 선택
+        const candidates = tableAnswers
+            .filter(v => v !== correctAnswer)
+            .sort((a, b) => Math.abs(a - correctAnswer) - Math.abs(b - correctAnswer));
+        for (const c of candidates) {
+            if (options.length >= 4) break;
+            options.push(c);
+        }
+        options.sort(() => Math.random() - 0.5);
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.textContent = String(opt);
+            btn.className = 'option-btn py-5 text-2xl focus:outline-none';
+            btn.onclick = () => checkAnswer(opt, btn);
+            optionsGrid.appendChild(btn);
+        });
+
+        applyImpulse(optionsGrid.querySelectorAll('button'), 'options');
+    }
+
+    /* ─── 충동방지 적용 ─── */
+    function applyImpulse(buttons, context) {
+        if (!impulsePrevention) return;
+        if (impulseMode === 'hide') {
+            buttons.forEach(b => { b.disabled = true; b.style.opacity = '0'; });
+            passBtn.disabled = true;
+            const revealBtn = document.createElement('button');
+            revealBtn.className = 'reveal-btn';
+            revealBtn.id = 'revealBtn';
+            revealBtn.textContent = '보기 확인';
+            revealBtn.addEventListener('click', () => {
+                buttons.forEach(b => { b.disabled = false; b.style.opacity = ''; });
+                passBtn.disabled = false;
+                revealBtn.remove();
+                setFeedback('', '');
+            });
+            optionsGrid.parentNode.insertBefore(revealBtn, optionsGrid);
+        } else {
+            buttons.forEach(b => { b.disabled = true; b.style.opacity = '0.35'; });
+            passBtn.disabled = true;
+            let countdown = impulseDelay;
+            setFeedback(countdown + '초 동안 생각해 보세요', 'muted');
+            impulsePreventionTimer = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    setFeedback(countdown + '초 동안 생각해 보세요', 'muted');
+                } else {
+                    clearInterval(impulsePreventionTimer);
+                    impulsePreventionTimer = null;
+                    buttons.forEach(b => { b.disabled = false; b.style.opacity = ''; });
+                    passBtn.disabled = false;
+                    setFeedback('', '');
+                }
+            }, 1000);
+        }
+    }
+
+    /* ─── 답 확인 ─── */
+    function checkAnswer(selected, btn) {
+        if (isProcessing) return;
+        tryCount++;
+        if (parseInt(selected) === parseInt(correctAnswer)) {
+            isProcessing = true;
+            if (impulsePreventionTimer) { clearInterval(impulsePreventionTimer); impulsePreventionTimer = null; }
+            passBtn.disabled = true;
+            passBtn.style.opacity = '0';
+            if (tryCount === 1) perfectScore++;
+            optionsGrid.querySelectorAll('button').forEach(b => { b.disabled = true; });
+            setFeedback('정답입니다!', 'green');
+            btn.classList.add('correct-selected');
+            speak('정답입니다.');
+            document.getElementById('next-q-btn').style.display = '';
+        } else {
+            btn.disabled = true;
+            btn.classList.add('wrong-selected');
+            setFeedback('아니에요. 다시 해볼까요?', 'red');
+            speak('아니에요.');
+        }
+    }
+
+    /* ─── 키패드 ─── */
+    function appendKey(digit) {
+        if (keypadInput.length >= 3) return;
+        keypadInput += digit;
+        updateKeypadDisplay();
+    }
+    function deleteKey() {
+        keypadInput = keypadInput.slice(0, -1);
+        updateKeypadDisplay();
+    }
+    function updateKeypadDisplay() {
+        const display = document.getElementById('keypad-display');
+        if (display) {
+            if (keypadInput) {
+                display.textContent = keypadInput;
+                display.className = 'keypad-display has-input';
+            } else {
+                display.textContent = '?';
+                display.className = 'keypad-display';
+            }
+        }
+    }
+    function submitKeypad() {
+        if (!keypadInput || isProcessing) return;
+        const selected = parseInt(keypadInput);
+        tryCount++;
+        if (selected === parseInt(correctAnswer)) {
+            isProcessing = true;
+            if (tryCount === 1) perfectScore++;
+            passBtn.disabled = true; passBtn.style.opacity = '0';
+            document.getElementById('keypad-display').className = 'keypad-display correct-input';
+            document.querySelectorAll('#keypad-area button').forEach(b => b.disabled = true);
+            setFeedback('정답입니다!', 'green');
+            speak('정답입니다.');
+            pendingKeypadClear = true;
+            document.getElementById('next-q-btn').style.display = '';
+        } else {
+            setFeedback('아니에요. 다시 해볼까요?', 'red');
+            document.getElementById('keypad-display').className = 'keypad-display wrong-input';
+            speak('아니에요.');
+            setTimeout(() => {
+                keypadInput = '';
+                updateKeypadDisplay();
+                setFeedback('', '');
+            }, 800);
+        }
+    }
+
+    /* ─── 패스 / 다음 / 결과 ─── */
+    function passQuestion() {
+        if (isProcessing) return;
+        totalPassed++;
+        speak('패스합니다.');
+        nextStep();
+    }
+
+    function nextStep() {
+        document.getElementById('next-q-btn').style.display = 'none';
+        if (currentQuestion < TOTAL_Q) {
+            currentQuestion++;
+            generateQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function onNextQ() {
+        document.getElementById('next-q-btn').style.display = 'none';
+        if (pendingKeypadClear) { keypadInput = ''; pendingKeypadClear = false; }
+        nextStep();
+    }
+
+    function showResults() {
+        playView.classList.add('hidden');
+        resultView.classList.remove('hidden');
+        const isPerfect = perfectScore === TOTAL_Q;
+        document.getElementById('result-emoji').textContent = isPerfect ? '🏆' : '👏';
+        document.getElementById('result-msg').textContent = TOTAL_Q + '문제 완료!';
+        document.getElementById('result-sub').textContent = TOTAL_Q + '문제 중 ' + perfectScore + '개 정답';
+        const counts = ['영','한','두','세','네','다섯','여섯','일곱','여덟','아홉'];
+        const kor = counts[perfectScore] || perfectScore;
+        speak('모든 연습이 끝났습니다. 한 번에 ' + kor + ' 문제를 맞혔네요.');
+    }
+
+    function resetGame() {
+        if (impulsePreventionTimer) { clearInterval(impulsePreventionTimer); impulsePreventionTimer = null; }
+        const oldReveal = document.getElementById('revealBtn');
+        if (oldReveal) oldReveal.remove();
+        resultView.classList.add('hidden');
+        playView.classList.add('hidden');
+        startView.classList.remove('hidden');
+        document.querySelector('.logout-btn').style.display =
+            localStorage.getItem('slowmath_times_login') ? '' : 'none';
+    }
+
+    /* ─── 로그인 / 로그아웃 ─── */
+    function socialLogin(provider) {
+        localStorage.setItem('slowmath_times_login', JSON.stringify({
+            provider, loginTime: new Date().toISOString()
+        }));
+        document.getElementById('login-view').style.display = 'none';
+        startView.classList.remove('hidden');
+        document.querySelector('.logout-btn').style.display = '';
+        updateShareVis();
+    }
+
+    function socialLogout() {
+        localStorage.removeItem('slowmath_times_login');
+        startView.classList.add('hidden');
+        document.getElementById('login-view').style.display = 'flex';
+        updateShareVis();
+    }
+
+    /* ─── 공유하기 ─── */
+    function shareApp() {
+        const SHARE_KEY = 'slowmath_times_share_days';
+        const MAX_DAYS = 5;
+        const bubble = document.getElementById('share-bubble');
+        function onShared() {
+            let days = parseInt(localStorage.getItem(SHARE_KEY) || '0');
+            if (days < MAX_DAYS) { days++; localStorage.setItem(SHARE_KEY, days); }
+            if (bubble && days >= MAX_DAYS) bubble.style.display = 'none';
+            const toast = document.getElementById('share-toast');
+            if (toast) {
+                toast.textContent = '하루 무료 이용권이 지급되었습니다!';
+                toast.style.opacity = '1';
+                clearTimeout(toast._t);
+                toast._t = setTimeout(() => toast.style.opacity = '0', 3000);
+            }
+        }
+        if (navigator.share) {
+            navigator.share({ title: document.title, url: location.href }).then(onShared).catch(() => {});
+        } else {
+            if (navigator.clipboard) navigator.clipboard.writeText(location.href);
+            alert('링크가 복사되었어요!');
+            onShared();
+        }
+    }
+
+    /* ─── 공유 버블 visibility ─── */
+    function updateShareVis() {
+        document.body.classList.toggle('sm-loggedin', !!localStorage.getItem('slowmath_times_login'));
+    }
+
+    /* ─── 초기화 ─── */
+    (function init() {
+        loadSettings();
+        try { applySettingsUI(); } catch(e) {}
+        // 자동 로그인 상태 확인
+        const loggedIn = !!localStorage.getItem('slowmath_times_login');
+        document.getElementById('login-view').style.display = loggedIn ? 'none' : 'flex';
+        startView.classList.toggle('hidden', !loggedIn);
+        document.querySelector('.logout-btn').style.display = loggedIn ? '' : 'none';
+        updateShareVis();
+
+        // 공유 버블 초기화
+        const days = parseInt(localStorage.getItem('slowmath_times_share_days') || '0');
+        if (days >= 5) {
+            const b = document.getElementById('share-bubble');
+            if (b) b.style.display = 'none';
+        }
+
+        // TTS 초기화
+        if (window.speechSynthesis) {
+            speechSynthesis.getVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+            }
+        }
+    })();
+</script>
+</body>
+</html>

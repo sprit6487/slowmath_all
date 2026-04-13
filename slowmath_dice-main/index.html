@@ -1,0 +1,2605 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>느린아이 세기</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #F5F1EB;
+  color: #4A4035;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.app {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100dvh;
+  background: white;
+  padding: 24px 20px;
+  padding-top: max(24px, env(safe-area-inset-top));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  body { align-items: center; padding: 32px; }
+  .app {
+    max-width: 560px;
+    min-height: auto;
+    border-radius: 32px;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+    padding: 44px 40px;
+  }
+}
+
+.hidden { display: none !important; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.3s ease-out; }
+
+/* =========================================
+   START VIEW
+   ========================================= */
+
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  position: relative;
+  width: 100%;
+}
+
+.turtle-logo {
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+#startView h1 {
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  margin-top: 8px; margin-bottom: 0;
+  text-align: center;
+}
+
+.app-desc {
+  color: #B8AD9E;
+  font-size: 0.8rem;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.settings-section {
+  margin-bottom: 20px;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #B8AD9E;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  display: block;
+  text-align: left;
+}
+
+/* 설정 (plusone 스타일) */
+.setting-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.setting-label { font-size: 0.875rem; font-weight: 600; color: #4A4035; }
+.setting-desc { font-size: 0.75rem; color: #B8AD9E; margin-top: 2px; }
+
+.select-group {
+  display: flex;
+  gap: 8px;
+}
+
+.select-item {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 2px solid #E8E2DA;
+  background: white;
+  color: #B8AD9E;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.select-item.active {
+  background: #FAF5EE;
+  border-color: #C4AA82;
+  color: #7B6545;
+}
+
+.select-item:not(.active):hover {
+  border-color: #D0C8BC;
+  color: #8C8070;
+}
+
+/* Toggle */
+.toggle-track {
+  width: 48px;
+  height: 28px;
+  border-radius: 99px;
+  position: relative;
+  background: #E0DAD0;
+  transition: background 0.2s;
+  cursor: pointer;
+  flex-shrink: 0;
+  border: none;
+  outline: none;
+}
+
+.toggle-track.on { background: #5BC886; }
+
+.toggle-knob {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  transition: transform 0.2s;
+}
+
+.toggle-track.on .toggle-knob { transform: translateX(20px); }
+
+/* Impulse Mode Options */
+.impulse-mode-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-bottom: 9px;
+}
+
+.impulse-mode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 9px 7px;
+  border-radius: 13px;
+  border: 2px solid #E8E2DA;
+  background: white;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.impulse-mode-btn.selected {
+  border-color: #C4AA82;
+  background: #FAF5EE;
+}
+
+.impulse-mode-icon { font-size: 1.08rem; margin-bottom: 2px; }
+.impulse-mode-label { font-size: 0.72rem; font-weight: 700; color: #4A4035; }
+.impulse-mode-desc { font-size: 0.59rem; color: #B8AD9E; margin-top: 1px; }
+
+/* Delay Buttons */
+.imp-sec-row { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+.imp-sec { flex: 0 0 calc((100% - 16px) / 5); padding: 8px 0; font-size: 0.7rem; font-weight: 600; border-radius: 10px; border: 2px solid #E8E2DA; background: white; color: #8C8070; cursor: pointer; transition: all 0.15s; text-align: center; font-family: inherit; }
+.imp-sec.active { border-color: #C4AA82; background: #FAF5EE; color: #7B6545; }
+
+/* Start Button */
+.btn-start {
+  width: 100%;
+  padding: 14px 0;
+  border-radius: 16px;
+  border: none;
+  background: #4A4035;
+  color: white;
+  font-family: inherit;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 2px 8px rgba(74,64,53,0.15);
+  margin-top: 24px;
+}
+
+.btn-start:active {
+  transform: scale(0.98);
+  background: #2E261D;
+}
+
+/* =========================================
+   PLAY VIEW
+   ========================================= */
+
+#playView {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.play-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.play-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  flex: 1;
+}
+
+.score-board {
+  display: flex;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: #B8AD9E;
+}
+
+.score-correct b { color: #5BC886; }
+.score-wrong b { color: #F07070; }
+
+.btn-home {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 2px solid #E8E2DA;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 1rem;
+  color: #8C8070;
+}
+
+.btn-home:active { background: #F5F1EB; }
+
+/* Play Body */
+.play-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* Display Area */
+.display-area {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  margin: 16px 0 20px;
+  min-height: 150px;
+  width: 100%;
+}
+
+/* ---- Dice ---- */
+.dice-wrapper { position: relative; }
+
+.dice {
+  width: 115px;
+  height: 115px;
+  background: #fff;
+  border-radius: 18px;
+  display: grid;
+  padding: 17px;
+  border: 2.5px solid #E8E2DA;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.dice.rolling { animation: roll 0.5s ease-out; }
+
+@keyframes roll {
+  0%   { transform: rotateX(0) rotateY(0) scale(0.8); }
+  25%  { transform: rotateX(180deg) rotateY(90deg) scale(1.1); }
+  50%  { transform: rotateX(360deg) rotateY(180deg) scale(0.95); }
+  75%  { transform: rotateX(540deg) rotateY(270deg) scale(1.05); }
+  100% { transform: rotateX(720deg) rotateY(360deg) scale(1); }
+}
+
+.dice.correct { border-color: #5BC886; box-shadow: 0 0 0 3px rgba(91,200,134,0.25); }
+.dice.wrong   { border-color: #F07070; box-shadow: 0 0 0 3px rgba(240,112,112,0.25); }
+
+.dot {
+  width: 18px;
+  height: 18px;
+  background: #111;
+  border-radius: 50%;
+}
+
+.dice[data-val="1"] { grid-template: 1fr / 1fr; place-items: center; }
+.dice[data-val="2"] { grid-template: 1fr 1fr / 1fr; }
+.dice[data-val="2"] .dot:nth-child(1) { justify-self: end; align-self: start; }
+.dice[data-val="2"] .dot:nth-child(2) { justify-self: start; align-self: end; }
+.dice[data-val="3"] { grid-template: 1fr 1fr 1fr / 1fr; }
+.dice[data-val="3"] .dot:nth-child(1) { justify-self: end; align-self: start; }
+.dice[data-val="3"] .dot:nth-child(2) { justify-self: center; align-self: center; }
+.dice[data-val="3"] .dot:nth-child(3) { justify-self: start; align-self: end; }
+.dice[data-val="4"] { grid-template: 1fr 1fr / 1fr 1fr; place-items: center; }
+.dice[data-val="5"] { grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr; }
+.dice[data-val="5"] .dot:nth-child(1) { grid-area: 1/1; justify-self: start; align-self: start; }
+.dice[data-val="5"] .dot:nth-child(2) { grid-area: 1/3; justify-self: end; align-self: start; }
+.dice[data-val="5"] .dot:nth-child(3) { grid-area: 2/2; justify-self: center; align-self: center; }
+.dice[data-val="5"] .dot:nth-child(4) { grid-area: 3/1; justify-self: start; align-self: end; }
+.dice[data-val="5"] .dot:nth-child(5) { grid-area: 3/3; justify-self: end; align-self: end; }
+.dice[data-val="6"] { grid-template: 1fr 1fr 1fr / 1fr 1fr; place-items: center; }
+
+/* ---- Card ---- */
+.card-wrapper { position: relative; }
+
+.card {
+  width: 125px;
+  height: 174px;
+  background: #fff;
+  border-radius: 14px;
+  border: 2.5px solid #E8E2DA;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 8px;
+  position: relative;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.card.correct { border-color: #5BC886; box-shadow: 0 0 0 3px rgba(91,200,134,0.25); }
+.card.wrong   { border-color: #F07070; box-shadow: 0 0 0 3px rgba(240,112,112,0.25); }
+
+.card-corner {
+  position: absolute;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+.card-corner-tl { top: 6px; left: 8px; }
+.card-corner-br { bottom: 6px; right: 8px; transform: rotate(180deg); }
+
+.card-symbols {
+  position: relative;
+  width: 80px;
+  height: 112px;
+}
+
+.card-sym {
+  position: absolute;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  font-size: 1.3rem;
+}
+.card-symbols.s1 .card-sym { font-size: 2.6rem; }
+.card-symbols.s2 .card-sym,
+.card-symbols.s3 .card-sym { font-size: 1.5rem; }
+.card-symbols.s4 .card-sym,
+.card-symbols.s5 .card-sym,
+.card-symbols.s6 .card-sym { font-size: 1.3rem; }
+.card-symbols.s7 .card-sym,
+.card-symbols.s8 .card-sym { font-size: 1.2rem; }
+.card-symbols.s9 .card-sym,
+.card-symbols.s10 .card-sym { font-size: 1.05rem; }
+
+.suit-red { color: #d32f2f; }
+.suit-black { color: #222; }
+
+.plus-sign {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #C8C0B4;
+}
+
+/* ---- Match Mode ---- */
+.match-area {
+  display: none;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.match-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.match-drop {
+  width: 56px; height: 56px;
+  border: 2.5px dashed #D8D2C8;
+  border-radius: 14px;
+  background: #FDFCFA;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; font-weight: 900; color: #D8D2C8;
+  transition: all 0.18s;
+  position: relative;
+}
+.match-drop.drag-over {
+  border-color: #5BC886; border-style: solid;
+  background: #D4F5E0;
+}
+.match-drop.matched {
+  border-color: #5BC886; border-style: solid;
+  background: #D4F5E0; color: #1A7A3A;
+}
+.match-drop.wrong-match {
+  border-color: #F07070; border-style: solid;
+  background: #FDE8E8; color: #B91C1C;
+}
+.match-chips {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.match-chip {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  border: 2.5px solid #E8E2DA;
+  background: white;
+  font-size: 1.4rem; font-weight: 900; color: #4A4035;
+  display: flex; align-items: center; justify-content: center;
+  cursor: grab; touch-action: none; user-select: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: transform 0.1s, opacity 0.15s;
+}
+.match-chip:active { cursor: grabbing; transform: scale(1.08); }
+.match-chip.used { opacity: 0.3; pointer-events: none; }
+.match-chip.floating {
+  position: fixed; z-index: 9999; pointer-events: none;
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+.match-plus {
+  font-size: 1.5rem; font-weight: 600; color: #C8C0B4;
+}
+.match-eq {
+  font-size: 1.2rem; font-weight: 700; color: #C8C0B4;
+  text-align: center; margin-top: 4px;
+}
+
+/* Question */
+.question {
+  font-size: 1.05rem;
+  color: #B8AD9E;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.question .hl {
+  color: #7B6545;
+  font-weight: 700;
+}
+
+/* Feedback */
+.feedback {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.feedback.success { color: #5BC886; }
+.feedback.fail { color: #F07070; }
+
+/* Delay Countdown */
+.delay-countdown {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #C4AA82;
+  padding: 16px 0;
+  animation: pulse-count 1s ease infinite;
+}
+@keyframes pulse-count {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.7; }
+}
+
+/* Choice Grid */
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto 16px;
+}
+
+.choice-btn {
+  padding: 11px 0;
+  border: 2px solid #E8E2DA;
+  border-radius: 12px;
+  background: white;
+  color: #4A4035;
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.15s, background 0.15s;
+}
+
+.choice-btn:active:not(:disabled) { transform: scale(0.95); }
+.choice-btn:hover:not(:disabled) { border-color: #D0C8BC; }
+
+.choice-btn.correct-choice {
+  background: #D4F5E0;
+  border-color: #5BC886;
+  color: #1A7A3A;
+}
+
+.choice-btn.wrong-choice {
+  background: #FDE8E8;
+  border-color: #F07070;
+  color: #B91C1C;
+}
+
+/* ---- Finger ---- */
+.finger-wrapper { position: relative; }
+.finger-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+.hand-image {
+  display: block;
+  max-height: 200px;
+  max-width: 260px;
+  object-fit: contain;
+}
+
+@media (max-width: 360px) {
+  .hand-image { max-height: 160px; max-width: 200px; }
+  .finger-display { min-height: 170px; }
+}
+@media (min-width: 600px) {
+  .hand-image { max-height: 260px; max-width: 340px; }
+  .finger-display { min-height: 270px; }
+}
+@media (min-width: 768px) {
+  .hand-image { max-height: 280px; max-width: 360px; }
+  .finger-display { min-height: 300px; }
+}
+
+/* Impulse prevention states */
+.chips-hidden { visibility: hidden; }
+.chips-locked { pointer-events: none; opacity: 0.45; }
+
+.reveal-btn{display:block;width:100%;max-width:320px;margin:0 auto 12px;padding:14px 0;border-radius:14px;border:2px solid #C4AA82;background:#FAF5EE;color:#7B6545;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;}
+.reveal-btn:active{background:#F0E6D6;transform:scale(.98);}
+
+/* Keypad */
+.keypad-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto 16px;
+}
+
+.keypad-display {
+  width: 100%;
+  font-size: 2.25rem;
+  font-weight: 700;
+  border: 2.5px solid #E8E2DA;
+  border-radius: 16px;
+  padding: 16px 0;
+  text-align: center;
+  color: #D0C8BC;
+  background: white;
+  transition: all 0.2s;
+}
+
+.keypad-display.has-input {
+  border-color: #B8AD9E;
+  color: #4A4035;
+}
+
+.keypad-display.correct-input {
+  border-color: #5BC886;
+  background: #D4F5E0;
+  color: #1A7A3A;
+}
+
+.keypad-display.wrong-input {
+  border-color: #F07070;
+  background: #FDE8E8;
+  color: #B91C1C;
+}
+
+.keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.key-btn {
+  padding: 14px 0;
+  border: 2.5px solid #E8E2DA;
+  border-radius: 14px;
+  background: white;
+  color: #4A4035;
+  font-family: inherit;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.1s;
+}
+
+.key-btn:active:not(:disabled) {
+  transform: scale(0.95);
+  background: #F5F1EB;
+}
+
+.key-btn.key-submit {
+  background: #4A4035;
+  border-color: #4A4035;
+  color: white;
+}
+
+.key-btn.key-submit:active:not(:disabled) {
+  background: #2E261D;
+}
+
+.key-btn.key-del {
+  color: #B8AD9E;
+}
+
+/* Progress */
+.progress-info {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #C4AA82;
+  white-space: nowrap;
+}
+
+/* Result View */
+.result-area {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: white;
+  z-index: 10;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.result-emoji { font-size: 56px; margin-bottom: 12px; }
+
+.result-title {
+  font-size: 1.25rem;
+  font-weight: 900;
+  margin-bottom: 20px;
+  color: #4A4035;
+}
+
+.next-btn { margin-top: 8px; padding: 14px 36px; border: none; border-radius: 12px; background: #6BADE8; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform 0.12s; }
+.next-btn:active { transform: scale(0.96); }
+
+.result-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.result-stat {
+  text-align: center;
+}
+
+.result-stat-value {
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.result-stat-value.green { color: #5BC886; }
+.result-stat-value.red { color: #F07070; }
+
+.result-stat-label {
+  font-size: 0.8rem;
+  color: #B8AD9E;
+  font-weight: 600;
+}
+
+.btn-retry {
+  width: 100%;
+  max-width: 320px;
+  padding: 14px 0;
+  border-radius: 16px;
+  border: none;
+  background: #4A4035;
+  color: white;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 2px 8px rgba(74,64,53,0.15);
+  margin-bottom: 10px;
+}
+
+.btn-retry:active {
+  transform: scale(0.98);
+  background: #2E261D;
+}
+
+.btn-back-home {
+  width: 100%;
+  max-width: 320px;
+  padding: 12px 0;
+  border-radius: 16px;
+  border: 2px solid #E8E2DA;
+  background: white;
+  color: #8C8070;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-back-home:active { background: #F5F1EB; }
+
+/* Next Button */
+.btn-next {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 14px 0;
+  border-radius: 16px;
+  border: none;
+  background: #4A4035;
+  color: white;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 2px 8px rgba(74,64,53,0.15);
+}
+
+.btn-next:active {
+  transform: scale(0.98);
+  background: #2E261D;
+}
+
+/* =========================================
+   Responsive
+   ========================================= */
+
+@media (max-width: 400px) {
+  .dice { width: 92px; height: 92px; padding: 12px; border-radius: 14px; }
+  .dot { width: 14px; height: 14px; }
+  .card { width: 100px; height: 138px; }
+  .card-symbols { width: 64px; height: 90px; }
+  .choice-btn { padding: 10px 0; font-size: 1rem; }
+  .key-btn { padding: 12px 0; font-size: 1.1rem; }
+}
+
+@media (min-width: 600px) {
+  .dice { width: 132px; height: 132px; padding: 20px; }
+  .dot { width: 20px; height: 20px; }
+  .card { width: 143px; height: 200px; }
+  .card-symbols { width: 94px; height: 132px; }
+  .card-corner { font-size: 0.8rem; }
+  .choice-grid { max-width: 360px; gap: 10px; }
+  .choice-btn { padding: 13px 0; font-size: 1.2rem; }
+  .key-btn { padding: 16px 0; font-size: 1.3rem; }
+  .keypad-area { max-width: 400px; }
+}
+
+@media (min-width: 768px) {
+  .btn-home { width: 40px; height: 40px; }
+  .dice { width: 144px; height: 144px; padding: 22px; }
+  .dot { width: 22px; height: 22px; }
+  .card { width: 156px; height: 218px; }
+  .card-symbols { width: 102px; height: 144px; }
+  .card-corner { font-size: 0.85rem; }
+}
+
+        /* ── Login View ── */
+        .login-view {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          flex: 1;
+          min-height: 100dvh;
+          padding: 40px 20px;
+        }
+
+        .login-logo-area {
+          text-align: center;
+          margin-bottom: 48px;
+        }
+
+        .login-logo-area svg {
+          display: block;
+          margin: 0 auto;
+        }
+
+        .login-logo-area h1 {
+          font-size: clamp(1.8rem, 6vw, 2.25rem);
+          font-weight: 900;
+          letter-spacing: -0.025em;
+          margin-top: 8px;
+          white-space: nowrap;
+        }
+
+        .login-subtitle {
+          color: #B8AD9E;
+          font-size: 0.9375rem;
+          margin-top: 4px;
+        }
+
+          @keyframes floatBubble {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+.login-trial {
+    position: relative;
+    background: #FFF8F0;
+    border: 1.5px solid #EDD080;
+    border-radius: 14px;
+    padding: 9px 16px;
+    font-size: 0.78rem;
+    color: #7B6545;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+    line-height: 1.4;
+    box-shadow: 0 4px 14px rgba(220,160,50,.18);
+    animation: floatBubble 2.8s ease-in-out infinite;
+    align-self: center;
+}
+.login-trial::before {
+    content: '';
+    position: absolute;
+    bottom: -9px; left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top: 8px solid #EDD080;
+    border-bottom: 0;
+}
+.login-trial::after {
+    content: '';
+    position: absolute;
+    bottom: -7px; left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top: 7px solid #FFF8F0;
+    border-bottom: 0;
+    z-index: 1;
+}
+.share-bubble{position:absolute;right:0;background:#FFF8F0;border:1.5px solid #EDD080;border-radius:12px;padding:8px 12px;font-size:0.55rem;color:#7B6545;font-weight:600;box-shadow:0 4px 12px rgba(220,160,50,.18);z-index:20;animation:floatBubble 2.8s ease-in-out infinite;line-height:1.5;text-align:right;max-width:200px;}
+.share-bubble::before{content:'';position:absolute;top:-8px;right:10px;border:4px solid transparent;border-bottom:7px solid #EDD080;border-top:0;}
+.share-bubble::after{content:'';position:absolute;top:-6px;right:11px;border:3px solid transparent;border-bottom:6px solid #FFF8F0;border-top:0;z-index:1;}
+@media (max-width:768px){.share-bubble{font-size:0.60rem;max-width:170px;padding:7px 10px;}}
+@media (max-width:480px){.share-bubble{font-size:0.62rem;max-width:165px;padding:7px 9px;}}
+  .login-buttons {
+          width: 100%;
+          max-width: 270px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .login-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+          padding: 16px 20px;
+          border-radius: 14px;
+          font-size: 1rem;
+          font-weight: 700;
+          font-family: inherit;
+          line-height: 1.2;
+          border: none;
+          cursor: pointer;
+          transition: transform 0.1s;
+        }
+        .login-btn:active { transform: scale(0.97); }
+        .login-btn svg { flex-shrink: 0; }
+        .login-btn.kakao { background: #FEE500; color: #191919; }
+        .login-btn.naver { background: #03C75A; color: #FFFFFF; }
+        .login-btn.google { background: #FFFFFF; color: #444444; border: 1.5px solid #DADCE0; }
+        .login-btn.facebook { background: #1877F2; color: #FFFFFF; }
+  background: #1877F2;
+  color: #FFFFFF;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+  color: #C8C0B4;
+  font-size: 0.8125rem;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #E8E2DA;
+}
+
+.logout-btn {
+  background: none;
+  border: 1.5px solid #E8E2DA;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #B8AD9E;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: background 0.15s;
+}
+
+.logout-btn:hover { background: #F5F1EB; }
+
+/* =========================================
+   WRONG NOTES (오답노트)
+   ========================================= */
+.wrong-notes-btn { width: 100%; padding: 14px 0; border-radius: 14px; border: 2.5px solid #F07070; background: #FFF5F5; color: #F07070; font-family: 'Noto Sans KR', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; transition: transform .1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.wrong-notes-btn:active { transform: scale(.97); }
+.wrong-notes-btn .badge { background: #F07070; color: white; border-radius: 50%; min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; }
+.wn-view { display: none; flex-direction: column; align-items: center; padding: 24px 20px; }
+.wn-view.active { display: flex; }
+.wn-header { text-align: center; margin-bottom: 20px; }
+.wn-header h2 { font-size: 1.25rem; font-weight: 900; color: #4A4035; margin: 0 0 4px; }
+.wn-header p { font-size: .85rem; color: #B8AD9E; margin: 0; }
+.wn-list { width: 100%; max-width: 400px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
+.wn-chip { padding: 8px 16px; border-radius: 10px; background: #FFF5F5; border: 1.5px solid #F07070; font-size: .9rem; font-weight: 700; color: #F07070; }
+.wn-empty { color: #B8AD9E; font-size: .9rem; margin: 40px 0; }
+.wn-actions { display: flex; gap: 10px; width: 100%; max-width: 320px; }
+.wn-actions button { flex: 1; padding: 13px 0; border-radius: 12px; font-family: 'Noto Sans KR', sans-serif; font-size: .9rem; font-weight: 700; cursor: pointer; transition: transform .1s; }
+.wn-actions button:active { transform: scale(.97); }
+.wn-btn-back { border: 2.5px solid #E8E2DA; background: white; color: #8C8070; }
+.wn-btn-start { border: none; background: #F07070; color: white; box-shadow: 0 2px 8px rgba(240,112,112,.3); }
+.wn-btn-clear { border: 1.5px solid #E8E2DA; background: white; color: #B8AD9E; padding: 8px 16px; border-radius: 8px; font-size: .75rem; font-weight: 600; cursor: pointer; margin-top: 12px; font-family: 'Noto Sans KR', sans-serif; }
+
+    /* ── Splash Screen ── */
+    .splash-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: #FFFFFF;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+    }
+    .splash-overlay.fade-out { opacity: 0; pointer-events: none; }
+    .splash-logo { animation: splashFloat 2.4s ease-in-out infinite; margin-bottom: 24px; }
+    .splash-title { font-size: 2rem; font-weight: 900; letter-spacing: -0.025em; margin-bottom: 8px; }
+    .splash-subtitle { color: #B8B0A8; font-size: 0.9375rem; font-weight: 500; }
+    @keyframes splashFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @media (max-width:380px) { .splash-title{font-size:1.5rem} }
+    @media (min-width:768px) { .splash-logo svg{width:160px;height:134px} .splash-title{font-size:2.5rem} .splash-subtitle{font-size:1.0625rem} }
+
+/* Hide share button/bubble when not logged in */
+body:not(.sm-loggedin) [title="공유하기"],
+body:not(.sm-loggedin) #share-bubble { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ══════ Splash Screen ══════ -->
+<div id="splash" class="splash-overlay">
+    <div class="splash-logo">
+        <svg viewBox="0 0 120 100" width="140" height="117" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+            <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+            <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+            <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+            <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+            <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+            <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+            <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+            <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+            <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+            <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+            <circle cx="101" cy="33" r="1" fill="white"/>
+            <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+            <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <h1 class="splash-title">
+        <span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">세기</span>
+    </h1>
+    <p class="splash-subtitle">손가락, 주사위, 카드를 세어보세요</p>
+</div>
+<script>
+setTimeout(function() {
+    var splash = document.getElementById("splash");
+    if (splash) { splash.classList.add("fade-out"); setTimeout(function() { splash.remove(); }, 500); }
+}, 3000);
+</script>
+
+<div class="app">
+
+    <!-- ══════════════ 로그인 화면 ══════════════ -->
+    <div id="loginView" class="login-view">
+        <div class="login-logo-area">
+            <svg viewBox="0 0 120 100" width="120" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+                <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+                <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+                <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+                <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+                <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+                <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity="0.35" transform="rotate(-15 42 26)"/>
+                <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity="0.2"/>
+                <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+                <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+                <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+                <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+                <circle cx="101" cy="33" r="1" fill="white"/>
+                <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity="0.4"/>
+                <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">세기</span></h1>
+            <p class="login-subtitle">손가락, 주사위, 카드를 세어보세요</p>
+        </div>
+          <p class="login-trial">가입하시고 하루 동안 모든 기능을<br>무료로 체험해보세요</p>
+<div class="login-buttons">
+            <button class="login-btn kakao" onclick="socialLogin('kakao')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 1C4.477 1 0 4.477 0 8.667c0 2.7 1.753 5.072 4.393 6.413-.192.717-.694 2.6-.794 3.004-.124.497.182.49.383.356.158-.105 2.51-1.708 3.525-2.398.8.118 1.628.18 2.493.18 5.523 0 10-3.477 10-7.555C20 4.477 15.523 1 10 1z" fill="#191919"/></svg>
+                카카오로 시작하기
+            </button>
+            <button class="login-btn naver" onclick="socialLogin('naver')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M13.57 10.684L6.066 0H0v20h6.43V9.316L13.934 20H20V0h-6.43v10.684z" fill="white"/></svg>
+                네이버로 시작하기
+            </button>
+            <button class="login-btn google" onclick="socialLogin('google')">
+                <svg width="20" height="20" viewBox="0 0 48 48"><path d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" fill="#FFC107"/><path d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" fill="#FF3D00"/><path d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" fill="#4CAF50"/><path d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.001-.001 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" fill="#1976D2"/></svg>
+                Google로 시작하기
+            </button>
+            <button class="login-btn facebook" onclick="socialLogin('facebook')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" fill="white"/></svg>
+                Facebook으로 시작하기
+            </button>
+        </div>
+        <div style="margin-top: 32px; text-align: center;">
+            <p style="color: #B8AD9E; font-size: 0.85rem; margin: 0; line-height: 1.5;">지금 지인에게 공유하시면<br>하루 무료 이용권을 드려요</p>
+            <button style="margin-top: 12px; padding: 8px 20px; border: 1.5px solid #4A4035; background: none; border-radius: 8px; color: #4A4035; font-weight: 600; cursor: pointer; font-family: inherit;" onclick="shareApp()">공유하기</button>
+        </div>
+    </div>
+
+  <!-- ===== START VIEW ===== -->
+  <div id="startView" class="hidden" style="position:relative;">
+        <button onclick="shareApp()" style="position:absolute; top:0; right:0; background:white; border:2px solid #E8E2DA; border-radius:10px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#8C8070; z-index:10;" title="공유하기">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+        </button>
+        <div id="share-bubble" class="share-bubble" style="top:44px;">지금 지인에게 공유하시면<br>하루 무료 이용권을 드려요</div>
+        <div id="share-toast" style="display:block;position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#3A7D44;color:white;padding:12px 20px;border-radius:14px;font-size:0.85rem;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.25);transition:opacity 0.4s;opacity:0;pointer-events:none;white-space:nowrap;"></div>
+
+    <div class="logo-area">
+      <div class="turtle-logo">
+        <svg viewBox="0 0 120 100" width="90" height="75" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 뒷다리 -->
+          <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+          <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+          <!-- 앞다리 -->
+          <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+          <!-- 꼬리 -->
+          <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+          <!-- 몸통 -->
+          <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+          <!-- 등껍질 -->
+          <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+          <!-- 등껍질 패턴 -->
+          <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+          <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+          <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+          <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+          <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+          <!-- 등껍질 하이라이트 -->
+          <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity="0.35" transform="rotate(-15 42 26)"/>
+          <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity="0.2"/>
+          <!-- 머리 -->
+          <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+          <!-- 앞다리 (머리 앞) -->
+          <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+          <!-- 눈 -->
+          <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+          <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+          <circle cx="101" cy="33" r="1" fill="white"/>
+          <!-- 볼 -->
+          <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity="0.4"/>
+          <!-- 미소 -->
+          <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">세기</span></h1>
+    <p class="app-desc">손가락, 주사위, 카드를 세어보세요.</p>
+    </div>
+
+    <!-- Game Type -->
+    <div class="settings-section">
+      <label class="section-label">게임</label>
+      <div class="select-group" id="gameGroup">
+        <button class="select-item active" data-game="finger">✌️ 손가락</button>
+        <button class="select-item" data-game="dice">🎲 주사위</button>
+        <button class="select-item" data-game="card">♣ 카드</button>
+      </div>
+    </div>
+
+    <!-- Count -->
+    <div class="settings-section">
+      <label class="section-label">개수</label>
+      <div class="select-group" id="countGroup" style="flex-wrap:wrap;">
+        <button class="select-item active" data-count="single" id="countBtn1">1개</button>
+        <button class="select-item" data-count="double-match" id="countBtn3" style="display:none;">2개 (매칭)</button>
+        <button class="select-item" data-count="double" id="countBtn2">2개</button>
+      </div>
+    </div>
+
+    <!-- Input Mode -->
+    <div class="settings-section">
+      <label class="section-label">입력방식</label>
+      <div class="select-group" id="inputGroup">
+        <button class="select-item active" data-imode="choice">선택하기</button>
+        <button class="select-item" data-imode="keypad">키패드 입력</button>
+      </div>
+    </div>
+
+    <!-- 시작 버튼 -->
+    <div>
+      <button class="btn-start" id="startBtn">시작하기</button>
+      <button class="wrong-notes-btn hidden" id="wrongNotesBtn" onclick="showWrongNotes()">
+        오답노트 <span class="badge" id="wrongNotesBadge">0</span>
+      </button>
+    </div>
+
+    <!-- 음성 + 충동방지 (plusone 스타일) -->
+    <div class="settings-section" style="margin-top:16px; padding-top:16px; border-top:1.5px solid #F0ECE6;">
+      <div class="setting-row">
+        <div>
+            <div class="setting-label">음성</div>
+            <div class="setting-desc">정답/오답 음성 안내</div>
+        </div>
+        <button id="tts-toggle" onclick="toggleTTS()" class="toggle-track on">
+            <span class="toggle-knob"></span>
+        </button>
+      </div>
+
+      <div class="setting-row">
+        <div>
+            <div class="setting-label">충동방지</div>
+            <div class="setting-desc">생각할 시간을 줘요</div>
+        </div>
+        <button id="impulse-toggle" onclick="toggleImpulse()" class="toggle-track on">
+            <span class="toggle-knob"></span>
+        </button>
+      </div>
+      <div id="impulse-details">
+        <div class="impulse-mode-options">
+          <button class="impulse-mode-btn selected" onclick="setImpulseMode('hide')" data-mode="hide">
+            <span class="impulse-mode-icon">&#x1F440;</span>
+            <span class="impulse-mode-label">보기 확인</span>
+            <span class="impulse-mode-desc">버튼을 누르면 보기가 나타나요</span>
+          </button>
+          <button class="impulse-mode-btn" onclick="setImpulseMode('lock')" data-mode="lock">
+            <span class="impulse-mode-icon">&#x1F512;</span>
+            <span class="impulse-mode-label">선택 잠금</span>
+            <span class="impulse-mode-desc">N초 동안 선택할 수 없어요</span>
+          </button>
+        </div>
+        <div class="imp-sec-row" id="impulse-delay-row">
+          <button onclick="setImpulseDelay(1)" class="imp-sec">1초</button>
+          <button onclick="setImpulseDelay(2)" class="imp-sec">2초</button>
+          <button onclick="setImpulseDelay(3)" class="imp-sec">3초</button>
+          <button onclick="setImpulseDelay(4)" class="imp-sec">4초</button>
+          <button onclick="setImpulseDelay(5)" class="imp-sec active">5초</button>
+          <button onclick="setImpulseDelay(6)" class="imp-sec">6초</button>
+          <button onclick="setImpulseDelay(7)" class="imp-sec">7초</button>
+          <button onclick="setImpulseDelay(8)" class="imp-sec">8초</button>
+          <button onclick="setImpulseDelay(9)" class="imp-sec">9초</button>
+          <button onclick="setImpulseDelay(10)" class="imp-sec">10초</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:24px;">
+      <button class="logout-btn" style="display:none" onclick="socialLogout()">로그아웃</button>
+    </div>
+
+  </div>
+
+  <!-- ===== WRONG NOTES VIEW ===== -->
+  <div id="wrongNotesView" class="wn-view">
+    <div class="wn-header">
+      <h2>오답노트</h2>
+      <p>틀렸던 문제를 다시 풀어보세요</p>
+    </div>
+    <div class="wn-list" id="wnList"></div>
+    <div class="wn-actions" id="wnActions">
+      <button class="wn-btn-back" onclick="hideWrongNotes()">돌아가기</button>
+      <button class="wn-btn-start" id="wnStartBtn" onclick="startWrongNotesPractice()">연습하기</button>
+    </div>
+    <button class="wn-btn-clear hidden" id="wnClearBtn" onclick="clearWrongNotes()">전체 삭제</button>
+  </div>
+
+  <!-- ===== PLAY VIEW ===== -->
+  <div id="playView" class="hidden">
+
+    <div class="play-header">
+      <button class="btn-home" id="backBtn" title="홈"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-8 9 8M5 11v9a1 1 0 001 1h3m8 0h3a1 1 0 001-1v-9"/></svg></button>
+      <span class="play-title" id="gameTitle">🎲 주사위 맞추기</span>
+      <div class="score-board">
+        <span class="progress-info" id="progressInfo">1/10</span>
+        <span class="score-correct">⭕ <b id="correctCount">0</b></span>
+        <span class="score-wrong">❌ <b id="wrongCount">0</b></span>
+      </div>
+    </div>
+
+    <div class="play-body">
+
+      <!-- Display Area -->
+      <div class="display-area" id="displayArea">
+        <div class="finger-wrapper" id="fingerWrapper" style="display:none">
+          <div class="finger-display">
+            <img id="fingerImage" class="hand-image" src="" alt="손가락">
+          </div>
+        </div>
+        <div class="dice-wrapper" id="dice1Wrapper">
+          <div class="dice" id="dice1" data-val="1"><div class="dot"></div></div>
+        </div>
+        <span class="plus-sign" id="plusSign" style="display:none">+</span>
+        <div class="dice-wrapper" id="dice2Wrapper" style="display:none">
+          <div class="dice" id="dice2" data-val="1"><div class="dot"></div></div>
+        </div>
+        <div class="card-wrapper" id="card1Wrapper" style="display:none">
+          <div class="card" id="card1"></div>
+        </div>
+        <span class="plus-sign" id="plusSignCard" style="display:none">+</span>
+        <div class="card-wrapper" id="card2Wrapper" style="display:none">
+          <div class="card" id="card2"></div>
+        </div>
+      </div>
+
+      <!-- Match Area (for double-match mode) -->
+      <div class="match-area" id="matchArea">
+        <div class="match-row">
+          <div class="match-drop" id="matchDrop1" data-idx="0">?</div>
+          <span class="match-plus">+</span>
+          <div class="match-drop" id="matchDrop2" data-idx="1">?</div>
+        </div>
+        <div class="match-eq" id="matchEq"></div>
+        <div class="match-chips" id="matchChips"></div>
+      </div>
+
+      <div class="question" id="question"></div>
+      <div class="feedback" id="feedback"></div>
+
+      <div class="choice-grid" id="choiceGrid" style="display:none"></div>
+
+      <div class="keypad-area hidden" id="keypadArea">
+        <div class="keypad-display" id="keypadDisplay">?</div>
+        <div class="keypad-grid" id="keypadGrid"></div>
+      </div>
+
+      <button class="btn-next hidden" id="nextBtn">다음 문제 →</button>
+
+      <!-- Result Area -->
+      <div class="result-area hidden" id="resultArea">
+        <div class="result-emoji" id="resultEmoji"></div>
+        <div class="result-title" id="resultTitle"></div>
+        <div class="result-stats">
+          <div class="result-stat">
+            <div class="result-stat-value green" id="resultCorrect">0</div>
+            <div class="result-stat-label">맞음</div>
+          </div>
+          <div class="result-stat">
+            <div class="result-stat-value red" id="resultWrong">0</div>
+            <div class="result-stat-label">틀림</div>
+          </div>
+        </div>
+        <button class="next-btn" id="retryBtn" style="width:100%;max-width:320px;">다시 하기</button>
+        <button class="next-btn" id="resultHomeBtn" style="width:100%;max-width:320px;background:#EDE8E0;color:#8C8070;">처음으로</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+
+  // ---- State ----
+  let gameType = 'finger';
+  let countMode = 'single';
+  let inputMode = 'choice';
+  let answer = 0;
+  let correctCount = 0;
+  let wrongCount = 0;
+  let streak = 0;
+  let currentRound = 0;
+  var TOTAL_ROUNDS = 10;
+  var MAX_REPEAT = 2;
+  let answerHistory = [];
+  let answered = false;
+  let ttsEnabled = true;
+  let impulsePrevention = true;
+  let impulseMode = 'hide';
+  let impulseDelay = 5;
+  let impulseTimer = null;
+
+  function saveSettings() {
+    localStorage.setItem('slowmath_dice_settings', JSON.stringify({
+      gameType, countMode, inputMode, ttsEnabled, impulsePrevention, impulseMode, impulseDelay
+    }));
+  }
+  function loadSettings() {
+    try {
+      var s = JSON.parse(localStorage.getItem('slowmath_dice_settings'));
+      if (!s) return;
+      if (['finger','dice','card'].indexOf(s.gameType) !== -1) gameType = s.gameType;
+      if (['single','double','double-match'].indexOf(s.countMode) !== -1) countMode = s.countMode;
+      if (s.inputMode === 'choice' || s.inputMode === 'keypad') inputMode = s.inputMode;
+      if (typeof s.ttsEnabled === 'boolean') ttsEnabled = s.ttsEnabled;
+      if (typeof s.impulsePrevention === 'boolean') impulsePrevention = s.impulsePrevention;
+      if (s.impulseMode === 'hide' || s.impulseMode === 'lock') impulseMode = s.impulseMode;
+      if (typeof s.impulseDelay === 'number' && s.impulseDelay >= 1 && s.impulseDelay <= 10) impulseDelay = s.impulseDelay;
+    } catch(e) {}
+  }
+  function applySettingsUI() {
+    document.querySelectorAll('#gameGroup .select-item').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.game === gameType);
+    });
+    document.querySelectorAll('#countGroup .select-item').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.count === countMode);
+    });
+    updateCountLabels();
+    document.querySelectorAll('#inputGroup .select-item').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.imode === inputMode);
+    });
+    document.getElementById('tts-toggle').classList.toggle('on', ttsEnabled);
+    document.getElementById('impulse-toggle').classList.toggle('on', impulsePrevention);
+    document.getElementById('impulse-details').style.display = impulsePrevention ? '' : 'none';
+    document.querySelectorAll('.impulse-mode-btn').forEach(function(b) {
+      b.classList.toggle('selected', b.dataset.mode === impulseMode);
+    });
+    document.getElementById('impulse-delay-row').style.display = impulseMode === 'lock' ? '' : 'none';
+    document.querySelectorAll('.imp-sec').forEach(function(b, i) {
+      b.classList.toggle('active', i + 1 === impulseDelay);
+    });
+  }
+
+  const SUITS = [
+    { symbol: '\u2663', colorClass: 'suit-black' },
+    { symbol: '\u2665', colorClass: 'suit-red'   },
+    { symbol: '\u2660', colorClass: 'suit-black' },
+    { symbol: '\u2666', colorClass: 'suit-red'   },
+  ];
+
+  // ---- DOM refs ----
+  const startView = document.getElementById('startView');
+  const playView = document.getElementById('playView');
+  const gameTitle = document.getElementById('gameTitle');
+  const dice1El = document.getElementById('dice1');
+  const dice2El = document.getElementById('dice2');
+  const dice1Wrapper = document.getElementById('dice1Wrapper');
+  const dice2Wrapper = document.getElementById('dice2Wrapper');
+  const card1El = document.getElementById('card1');
+  const card2El = document.getElementById('card2');
+  const card1Wrapper = document.getElementById('card1Wrapper');
+  const card2Wrapper = document.getElementById('card2Wrapper');
+  const plusSign = document.getElementById('plusSign');
+  const plusSignCard = document.getElementById('plusSignCard');
+  const questionEl = document.getElementById('question');
+  const choiceGrid = document.getElementById('choiceGrid');
+  const keypadArea = document.getElementById('keypadArea');
+  const keypadDisplay = document.getElementById('keypadDisplay');
+  const keypadGrid = document.getElementById('keypadGrid');
+  const feedbackEl = document.getElementById('feedback');
+  const nextBtn = document.getElementById('nextBtn');
+  const progressInfo = document.getElementById('progressInfo');
+  const resultArea = document.getElementById('resultArea');
+
+  function rand(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  // ---- TTS ----
+  function speak(text) {
+    if (!ttsEnabled || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    if (!text || text.trim() === '') return;
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ko-KR';
+    u.rate = 0.9;
+    setTimeout(function() { window.speechSynthesis.speak(u); }, 50);
+  }
+
+  // ---- Start View Setup ----
+
+  // Game type selection
+  document.querySelectorAll('#gameGroup .select-item').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#gameGroup .select-item').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      gameType = btn.dataset.game;
+      updateCountLabels();
+      saveSettings();
+    });
+  });
+
+  function updateCountLabels() {
+    var countBtn1 = document.getElementById('countBtn1');
+    var countBtn2 = document.getElementById('countBtn2');
+    var countBtn3 = document.getElementById('countBtn3');
+    if (gameType === 'finger') {
+      countBtn1.textContent = '1~5 한 손';
+      countBtn2.textContent = '1~10 두 손';
+      countBtn3.style.display = 'none';
+      if (countMode === 'double-match') { countMode = 'double'; saveSettings(); }
+    } else if (gameType === 'dice') {
+      countBtn1.textContent = '1개';
+      countBtn2.textContent = '2개';
+      countBtn3.textContent = '2개 (매칭)';
+      countBtn3.style.display = '';
+    } else {
+      countBtn1.textContent = '1장';
+      countBtn2.textContent = '2장';
+      countBtn3.style.display = 'none';
+      if (countMode === 'double-match') { countMode = 'double'; saveSettings(); }
+    }
+    // Update active states
+    document.querySelectorAll('#countGroup .select-item').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.count === countMode);
+    });
+  }
+
+  // Count selection
+  document.querySelectorAll('#countGroup .select-item').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#countGroup .select-item').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      countMode = btn.dataset.count;
+      saveSettings();
+    });
+  });
+
+  // Input mode selection
+  document.querySelectorAll('#inputGroup .select-item').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#inputGroup .select-item').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      inputMode = btn.dataset.imode;
+      saveSettings();
+    });
+  });
+
+  // TTS toggle (called from inline onclick)
+  window.toggleTTS = function() {
+    ttsEnabled = !ttsEnabled;
+    document.getElementById('tts-toggle').classList.toggle('on', ttsEnabled);
+    if (!ttsEnabled && window.speechSynthesis) window.speechSynthesis.cancel();
+    saveSettings();
+  };
+
+  // Impulse prevention toggle (called from inline onclick)
+  window.toggleImpulse = function() {
+    impulsePrevention = !impulsePrevention;
+    document.getElementById('impulse-toggle').classList.toggle('on', impulsePrevention);
+    document.getElementById('impulse-details').style.display = impulsePrevention ? '' : 'none';
+    saveSettings();
+  };
+
+  // Impulse mode selection (called from inline onclick)
+  window.setImpulseMode = function(mode) {
+    impulseMode = mode;
+    document.querySelectorAll('.impulse-mode-btn').forEach(function(b) { b.classList.toggle('selected', b.dataset.mode === mode); });
+    document.getElementById('impulse-delay-row').style.display = mode === 'lock' ? '' : 'none';
+    saveSettings();
+  };
+
+  // Impulse delay selection (called from inline onclick)
+  window.setImpulseDelay = function(sec) {
+    impulseDelay = sec;
+    document.querySelectorAll('.imp-sec').forEach(function(b, i) { b.classList.toggle('active', i + 1 === sec); });
+    saveSettings();
+  };
+
+  // Load saved settings after UI is ready
+  loadSettings();
+  applySettingsUI();
+
+  // Start button
+  document.getElementById('startBtn').addEventListener('click', function() {
+    // Unlock TTS on iOS
+    if (window.speechSynthesis) {
+      var unlock = new SpeechSynthesisUtterance('');
+      window.speechSynthesis.speak(unlock);
+    }
+    startGame();
+  });
+
+  // ---- Navigation ----
+  function startGame() {
+        if (!localStorage.getItem('slowmath_dice_login')) {
+            sessionStorage.setItem('_sp',JSON.stringify([]));
+            document.getElementById('startView').classList.add('hidden');
+            document.getElementById('loginView').classList.remove('hidden');
+            return;
+        }
+            // 게임 유형에 따라 문제 수 결정
+    if (gameType === 'finger' && countMode === 'single') {
+      TOTAL_ROUNDS = 5;
+    } else if (gameType === 'dice' && countMode === 'single') {
+      TOTAL_ROUNDS = 6;
+    } else {
+      TOTAL_ROUNDS = 10;
+    }
+    resetMatchArea();
+    MAX_REPEAT = 1;
+    correctCount = 0; wrongCount = 0; streak = 0; currentRound = 0; answerHistory = [];
+    document.getElementById('correctCount').textContent = 0;
+    document.getElementById('wrongCount').textContent = 0;
+    resultArea.classList.add('hidden');
+    updateGameLabels();
+
+    startView.classList.add('hidden');
+    playView.classList.remove('hidden');
+    newRound();
+  }
+
+  function showMenu() {
+    clearImpulseTimer();
+    resetMatchArea();
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    playView.classList.add('hidden');
+    startView.classList.remove('hidden');
+    document.querySelector('.logout-btn').style.display=localStorage.getItem('slowmath_dice_login')?'':'none';
+  
+if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
+}
+
+  function shareApp() {
+    var SHARE_KEY = 'slowmath_share_days';
+    var MAX_DAYS = 5;
+    var bubble = document.getElementById('share-bubble');
+    function onShared() {
+        var days = parseInt(localStorage.getItem(SHARE_KEY) || '0');
+        if (days < MAX_DAYS) { days = days + 1; localStorage.setItem(SHARE_KEY, days); }
+                if (bubble && days >= MAX_DAYS) { bubble.style.display = 'none'; }
+        var shareToast = document.getElementById('share-toast');
+        if (shareToast) {
+          shareToast.textContent = '하루 무료 이용권이 지급되었습니다!';
+          shareToast.style.opacity = '1';
+          clearTimeout(shareToast._t);
+          shareToast._t = setTimeout(function() { shareToast.style.opacity = '0'; }, 3000);
+        }
+    }
+    var title = document.title;
+    var url = location.href;
+    if (navigator.share) {
+        navigator.share({ title: title, url: url }).then(onShared).catch(function() {});
+    } else {
+        if (navigator.clipboard) { navigator.clipboard.writeText(url); }
+        alert('링크가 복사되었어요!');
+        onShared();
+    }
+}
+
+  /* ══ 공유 버블 초기화 ══ */
+  document.addEventListener('DOMContentLoaded', function() {
+    var days = parseInt(localStorage.getItem('slowmath_share_days') || '0');
+    if (days >= 5) { var b = document.getElementById('share-bubble'); if (b) b.style.display = 'none'; }
+  });
+
+  function updateGameLabels() {
+    if (gameType === 'finger') {
+      gameTitle.textContent = '✌️ 손가락 맞추기';
+    } else if (gameType === 'dice') {
+      gameTitle.textContent = isMatchMode() ? '🎲 주사위 매칭' : '🎲 주사위 맞추기';
+    } else {
+      gameTitle.textContent = '♣ 카드 맞추기';
+    }
+  }
+
+  // ---- Dice ----
+  function renderDice(el, val) {
+    el.setAttribute('data-val', val);
+    el.innerHTML = '';
+    for (var i = 0; i < val; i++) {
+      var d = document.createElement('div');
+      d.className = 'dot';
+      el.appendChild(d);
+    }
+  }
+
+  function rollDice(el, finalVal, cb) {
+    el.classList.add('rolling');
+    var c = 0;
+    var iv = setInterval(function() {
+      renderDice(el, rand(1, 6));
+      if (++c >= 8) {
+        clearInterval(iv);
+        renderDice(el, finalVal);
+        el.classList.remove('rolling');
+        if (cb) cb();
+      }
+    }, 60);
+  }
+
+  // ---- Card ----
+  var PIP_POS = {
+    1:  [[50,50]],
+    2:  [[50,10],[50,90]],
+    3:  [[50,10],[50,50],[50,90]],
+    4:  [[28,10],[72,10],[28,90],[72,90]],
+    5:  [[28,10],[72,10],[50,50],[28,90],[72,90]],
+    6:  [[28,10],[72,10],[28,50],[72,50],[28,90],[72,90]],
+    7:  [[28,10],[72,10],[50,30],[28,50],[72,50],[28,90],[72,90]],
+    8:  [[28,10],[72,10],[50,30],[28,50],[72,50],[50,70],[28,90],[72,90]],
+    9:  [[28,10],[72,10],[28,36],[72,36],[50,50],[28,64],[72,64],[28,90],[72,90]],
+    10: [[28,10],[72,10],[50,23],[28,36],[72,36],[28,64],[72,64],[50,77],[28,90],[72,90]]
+  };
+
+  function renderCard(el, val, suit) {
+    var s = SUITS[suit];
+    el.innerHTML = '';
+    el.className = 'card';
+    var sc = document.createElement('div');
+    sc.className = 'card-symbols s' + val;
+    var positions = PIP_POS[val] || PIP_POS[10];
+    positions.forEach(function(pos) {
+      var sp = document.createElement('span');
+      sp.className = 'card-sym ' + s.colorClass;
+      sp.textContent = s.symbol;
+      sp.style.left = pos[0] + '%';
+      sp.style.top = pos[1] + '%';
+      sc.appendChild(sp);
+    });
+    el.appendChild(sc);
+  }
+
+  function flipCard(el, finalVal, finalSuit, cb) {
+    renderCard(el, finalVal, finalSuit);
+    if (cb) cb();
+  }
+
+  // ---- Game Logic ----
+  function getRange() {
+    if (gameType === 'finger') return countMode === 'single' ? { min: 1, max: 5 } : { min: 1, max: 10 };
+    if (gameType === 'dice') return countMode === 'single' ? { min: 1, max: 6 } : { min: 2, max: 12 };
+    return countMode === 'single' ? { min: 1, max: 10 } : { min: 2, max: 20 };
+  }
+
+  // ---- Match Mode State ----
+  var matchVal1 = 0, matchVal2 = 0;
+  var matchDrops = [null, null]; // values placed
+  var matchDragging = null;
+  var matchFloating = null;
+
+  function isMatchMode() {
+    return gameType === 'dice' && countMode === 'double-match';
+  }
+
+  function resetMatchArea() {
+    var area = document.getElementById('matchArea');
+    area.style.display = 'none';
+    document.getElementById('matchDrop1').textContent = '?';
+    document.getElementById('matchDrop1').className = 'match-drop';
+    document.getElementById('matchDrop2').textContent = '?';
+    document.getElementById('matchDrop2').className = 'match-drop';
+    document.getElementById('matchChips').innerHTML = '';
+    document.getElementById('matchChips').style.display = '';
+    document.getElementById('matchEq').textContent = '';
+    matchDrops = [null, null];
+  }
+
+  function startMatchPhase(v1, v2) {
+    matchVal1 = v1; matchVal2 = v2;
+    matchDrops = [null, null];
+    var area = document.getElementById('matchArea');
+    area.style.display = 'block';
+    document.getElementById('matchDrop1').textContent = '?';
+    document.getElementById('matchDrop1').className = 'match-drop';
+    document.getElementById('matchDrop2').textContent = '?';
+    document.getElementById('matchDrop2').className = 'match-drop';
+    document.getElementById('matchEq').textContent = '';
+    questionEl.innerHTML = '각 주사위의 <span class="hl">숫자</span>를 맞춰보세요';
+
+    // Generate chips: always include both correct values + 2 unique distractors
+    var arr = [v1, v2];
+    var existing = new Set(arr);
+    var candidates = [1,2,3,4,5,6].filter(function(n) { return !existing.has(n); });
+    // Shuffle candidates
+    for (var ci = candidates.length - 1; ci > 0; ci--) {
+      var cj = Math.floor(Math.random() * (ci + 1));
+      var tmp = candidates[ci]; candidates[ci] = candidates[cj]; candidates[cj] = tmp;
+    }
+    while (arr.length < 4 && candidates.length > 0) arr.push(candidates.shift());
+    // Fallback if not enough unique values
+    while (arr.length < 4) arr.push(rand(1, 6));
+    arr.sort(function() { return Math.random() - 0.5; });
+
+    var container = document.getElementById('matchChips');
+    container.innerHTML = '';
+    container.style.display = '';
+    arr.forEach(function(val) {
+      var chip = document.createElement('div');
+      chip.className = 'match-chip';
+      chip.textContent = val;
+      chip.dataset.val = val;
+      addMatchDrag(chip);
+      container.appendChild(chip);
+    });
+  }
+
+  function addMatchDrag(chip) {
+    function onStart(e) {
+      if (chip.classList.contains('used')) return;
+      e.preventDefault();
+      var t = e.touches ? e.touches[0] : e;
+      matchDragging = chip;
+
+      matchFloating = document.createElement('div');
+      matchFloating.className = 'match-chip floating';
+      matchFloating.textContent = chip.textContent;
+      matchFloating.style.left = t.clientX + 'px';
+      matchFloating.style.top = t.clientY + 'px';
+      document.body.appendChild(matchFloating);
+      chip.style.opacity = '0.3';
+
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('mouseup', onEnd);
+      document.addEventListener('touchend', onEnd);
+    }
+
+    function onMove(e) {
+      if (!matchDragging || !matchFloating) return;
+      e.preventDefault();
+      var t = e.touches ? e.touches[0] : e;
+      matchFloating.style.left = t.clientX + 'px';
+      matchFloating.style.top = t.clientY + 'px';
+
+      ['matchDrop1','matchDrop2'].forEach(function(id) {
+        var drop = document.getElementById(id);
+        var r = drop.getBoundingClientRect();
+        var over = t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom;
+        drop.classList.toggle('drag-over', over && !drop.classList.contains('matched'));
+      });
+    }
+
+    function onEnd(e) {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('mouseup', onEnd);
+      document.removeEventListener('touchend', onEnd);
+
+      if (!matchDragging) return;
+      var t = e.changedTouches ? e.changedTouches[0] : e;
+
+      if (matchFloating) { matchFloating.remove(); matchFloating = null; }
+
+      ['matchDrop1','matchDrop2'].forEach(function(id, idx) {
+        var drop = document.getElementById(id);
+        drop.classList.remove('drag-over');
+        if (drop.classList.contains('matched')) return;
+        var r = drop.getBoundingClientRect();
+        var over = t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom;
+        if (over) {
+          var expected = idx === 0 ? matchVal1 : matchVal2;
+          var val = Number(chip.dataset.val);
+          if (val === expected) {
+            drop.textContent = val;
+            drop.classList.add('matched');
+            chip.classList.add('used');
+            matchDrops[idx] = val;
+            speak(val + '');
+            checkMatchComplete();
+          } else {
+            drop.classList.add('wrong-match');
+            drop.textContent = val;
+            setTimeout(function() {
+              drop.classList.remove('wrong-match');
+              drop.textContent = '?';
+            }, 500);
+            speak('다시 해봐요');
+          }
+        }
+      });
+
+      chip.style.opacity = chip.classList.contains('used') ? '0.3' : '';
+      matchDragging = null;
+    }
+
+    chip.addEventListener('mousedown', onStart);
+    chip.addEventListener('touchstart', onStart, { passive: false });
+  }
+
+  function checkMatchComplete() {
+    if (matchDrops[0] !== null && matchDrops[1] !== null) {
+      document.getElementById('matchEq').textContent = matchDrops[0] + ' + ' + matchDrops[1] + ' = ?';
+      questionEl.innerHTML = '두 주사위의 <span class="hl">합</span>은?';
+      // Hide match chips, show answer choices
+      document.getElementById('matchChips').style.display = 'none';
+      setTimeout(function() { showInput(); }, 400);
+    }
+  }
+
+  // dummy end to avoid syntax issues
+  function _matchEnd() {
+  }
+
+  function generateChoices(ans) {
+    var range = getRange();
+    var n = Math.min(6, range.max - range.min + 1);
+    var set = new Set([ans]);
+    while (set.size < n) set.add(rand(range.min, range.max));
+    return Array.from(set).sort(function(a, b) { return a - b; });
+  }
+
+  function renderChoices(choices) {
+    choiceGrid.innerHTML = '';
+    choices.forEach(function(v) {
+      var btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = v;
+      btn.addEventListener('click', function() { handleAnswer(v, btn); });
+      choiceGrid.appendChild(btn);
+    });
+  }
+
+  function renderKeypad() {
+    keypadGrid.innerHTML = '';
+    var range = getRange();
+    var keys = [1,2,3,4,5,6,7,8,9];
+    if (range.max > 9) keys.push(0);
+    keys.forEach(function(k) {
+      var btn = document.createElement('button');
+      btn.className = 'key-btn';
+      btn.textContent = k;
+      btn.addEventListener('click', function() {
+        if (answered) return;
+        var cur = keypadDisplay.textContent.trim();
+        var next = (cur === '' || cur === '?') ? String(k) : cur + String(k);
+        if (Number(next) <= range.max) {
+          keypadDisplay.textContent = next;
+          keypadDisplay.classList.add('has-input');
+        }
+      });
+      keypadGrid.appendChild(btn);
+    });
+    // Delete
+    var del = document.createElement('button');
+    del.className = 'key-btn key-del';
+    del.textContent = '\u2190';
+    del.addEventListener('click', function() {
+      if (answered) return;
+      var cur = keypadDisplay.textContent.trim();
+      if (cur.length > 1) {
+        keypadDisplay.textContent = cur.slice(0, -1);
+      } else {
+        keypadDisplay.textContent = '?';
+        keypadDisplay.classList.remove('has-input');
+      }
+    });
+    keypadGrid.appendChild(del);
+    // Submit
+    var sub = document.createElement('button');
+    sub.className = 'key-btn key-submit';
+    sub.textContent = '확인';
+    sub.addEventListener('click', function() {
+      if (answered) return;
+      var v = Number(keypadDisplay.textContent.trim());
+      if (v >= 1) handleAnswer(v, null);
+    });
+    keypadGrid.appendChild(sub);
+  }
+
+  function getVisuals() {
+    if (gameType === 'finger') return [];
+    if (gameType === 'dice') return (countMode === 'double' || countMode === 'double-match') ? [dice1El, dice2El] : [dice1El];
+    return countMode === 'double' ? [card1El, card2El] : [card1El];
+  }
+
+  function handleAnswer(val, btnEl) {
+    if (answered) return;
+    var ok = val === answer;
+    var vis = getVisuals();
+
+    if (ok) {
+      answered = true;
+      correctCount++; streak++;
+      feedbackEl.textContent = '정답!';
+      feedbackEl.className = 'feedback success';
+      vis.forEach(function(e) { e.classList.add('correct'); });
+      if (btnEl) btnEl.classList.add('correct-choice');
+      speak('정답이에요');
+
+      document.getElementById('correctCount').textContent = correctCount;
+      document.getElementById('wrongCount').textContent = wrongCount;
+      choiceGrid.querySelectorAll('.choice-btn').forEach(function(b) { b.style.pointerEvents = 'none'; });
+
+      if (inputMode === 'keypad') {
+        keypadDisplay.classList.remove('has-input');
+        keypadDisplay.classList.add('correct-input');
+      }
+
+      var isLastRound = currentRound >= TOTAL_ROUNDS;
+      if (isLastRound) {
+        setTimeout(function() { showResult(); }, 600);
+      } else if (inputMode === 'choice') {
+        setTimeout(function() { newRound(); }, 600);
+      } else {
+        nextBtn.classList.remove('hidden');
+        if (currentRound >= TOTAL_ROUNDS) nextBtn.textContent = '결과 보기';
+      }
+    } else {
+      wrongCount++; streak = 0;
+      feedbackEl.textContent = '다시 해봐요!';
+      feedbackEl.className = 'feedback fail';
+      vis.forEach(function(e) { e.classList.add('wrong'); });
+      setTimeout(function() { vis.forEach(function(e) { e.classList.remove('wrong'); }); }, 600);
+      if (btnEl) {
+        btnEl.classList.add('wrong-choice');
+        btnEl.style.pointerEvents = 'none';
+      }
+      speak('다시 해봐요');
+
+      document.getElementById('wrongCount').textContent = wrongCount;
+
+      if (inputMode === 'keypad') {
+        keypadDisplay.classList.remove('has-input');
+        keypadDisplay.classList.add('wrong-input');
+        setTimeout(function() {
+          keypadDisplay.classList.remove('wrong-input');
+          keypadDisplay.textContent = '?';
+        }, 600);
+      }
+    }
+  }
+
+  var fingerWrapper = document.getElementById('fingerWrapper');
+  var fingerImage = document.getElementById('fingerImage');
+
+  function hideAllVisuals() {
+    fingerWrapper.style.display = 'none';
+    dice1Wrapper.style.display = 'none';
+    dice2Wrapper.style.display = 'none';
+    card1Wrapper.style.display = 'none';
+    card2Wrapper.style.display = 'none';
+    plusSign.style.display = 'none';
+    plusSignCard.style.display = 'none';
+  }
+
+  function clearImpulseTimer() {
+    if (impulseTimer) { clearInterval(impulseTimer); impulseTimer = null; }
+    var cd = document.getElementById('impulse-countdown');
+    if (cd) cd.remove();
+    var oldReveal = document.getElementById('revealBtn');
+    if (oldReveal) oldReveal.remove();
+    document.querySelectorAll('.chips-hidden, .chips-locked').forEach(function(el) {
+      el.classList.remove('chips-hidden', 'chips-locked');
+    });
+  }
+
+  function applyImpulsePrevention() {
+    if (!impulsePrevention) return;
+
+    var target = inputMode === 'choice' ? choiceGrid : keypadArea;
+    var countdownParent = target.parentNode;
+
+    if (impulseMode === 'hide') {
+      target.classList.add('chips-hidden');
+      var revealBtn = document.createElement('button');
+      revealBtn.className = 'reveal-btn';
+      revealBtn.id = 'revealBtn';
+      revealBtn.textContent = '보기 확인';
+      revealBtn.addEventListener('click', function() {
+        target.classList.remove('chips-hidden');
+        revealBtn.remove();
+      });
+      countdownParent.insertBefore(revealBtn, target);
+    } else {
+      target.classList.add('chips-locked');
+      var cdEl = document.createElement('div');
+      cdEl.className = 'delay-countdown';
+      cdEl.id = 'impulse-countdown';
+      countdownParent.insertBefore(cdEl, target);
+
+      var remaining = impulseDelay;
+      cdEl.textContent = remaining + '초 동안 생각해 보세요';
+
+      impulseTimer = setInterval(function() {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(impulseTimer);
+          impulseTimer = null;
+          cdEl.remove();
+          target.classList.remove('chips-locked');
+        } else {
+          cdEl.textContent = remaining + '초 동안 생각해 보세요';
+        }
+      }, 1000);
+    }
+  }
+
+  function showResult() {
+_smGameCompleted=true;
+    // Hide play elements
+    choiceGrid.style.display = 'none';
+    keypadArea.classList.add('hidden');
+    nextBtn.classList.add('hidden');
+    feedbackEl.textContent = '';
+    questionEl.textContent = '';
+    hideAllVisuals();
+    clearImpulseTimer();
+
+    // Show result
+    var pct = Math.round((correctCount / TOTAL_ROUNDS) * 100);
+    var emoji, title;
+    if (pct === 100)     { emoji = '🏆'; title = '완벽해요!'; }
+    else if (pct >= 80)  { emoji = '🎉'; title = '잘했어요!'; }
+    else if (pct >= 60)  { emoji = '👍'; title = '괜찮아요!'; }
+    else                 { emoji = '💪'; title = '다시 해봐요!'; }
+
+    document.getElementById('resultEmoji').textContent = emoji;
+    document.getElementById('resultTitle').textContent = TOTAL_ROUNDS + '문제 완료!';
+    document.getElementById('resultCorrect').textContent = correctCount;
+    document.getElementById('resultWrong').textContent = wrongCount;
+    resultArea.classList.remove('hidden');
+
+    if (pct === 100) speak('완벽해요!');
+    else if (pct >= 80) speak('잘했어요!');
+    else speak('다시 해봐요!');
+  }
+
+  function newRound() {
+    currentRound++;
+    progressInfo.textContent = currentRound + '/' + TOTAL_ROUNDS;
+    nextBtn.textContent = '다음 문제 →';
+
+    answered = false;
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'feedback';
+    nextBtn.classList.add('hidden');
+    clearImpulseTimer();
+    resetMatchArea();
+
+    // Clear previous round visuals
+    choiceGrid.style.display = 'none';
+    choiceGrid.innerHTML = '';
+    keypadArea.classList.add('hidden');
+    keypadDisplay.classList.remove('has-input', 'correct-input', 'wrong-input');
+
+    [dice1El, dice2El, card1El, card2El].forEach(function(e) { e.classList.remove('correct', 'wrong'); });
+    hideAllVisuals();
+
+    var ready = 0;
+    var total = (countMode === 'double' || countMode === 'double-match') ? 2 : 1;
+    var matchVal1Cur = 0, matchVal2Cur = 0;
+    var onReady = function() {
+      if (++ready >= total) {
+        if (isMatchMode()) {
+          startMatchPhase(matchVal1Cur, matchVal2Cur);
+        } else {
+          showInput();
+        }
+      }
+    };
+
+    function answerCount(val) {
+      return answerHistory.filter(function(v) { return v === val; }).length;
+    }
+
+    if (gameType === 'finger') {
+      fingerWrapper.style.display = 'block';
+      var maxFinger = countMode === 'single' ? 5 : 10;
+      var fv = rand(1, maxFinger);
+      while (answerCount(fv) >= MAX_REPEAT) { fv = rand(1, maxFinger); }
+      answer = fv;
+      fingerImage.src = 'images/' + fv + '.png';
+      fingerImage.alt = '손가락 ' + fv + '개';
+      questionEl.innerHTML = '손가락이 <span class="hl">몇 개</span>일까요?';
+      showInput();
+    } else if (gameType === 'dice') {
+      dice1Wrapper.style.display = 'block';
+      if (countMode === 'double' || countMode === 'double-match') {
+        var v1, v2;
+        do { v1 = rand(1, 6); v2 = rand(1, 6); } while (answerCount(v1 + v2) >= MAX_REPEAT);
+        answer = v1 + v2;
+        matchVal1Cur = v1; matchVal2Cur = v2;
+        plusSign.style.display = 'inline';
+        dice2Wrapper.style.display = 'block';
+        if (!isMatchMode()) questionEl.innerHTML = '두 주사위의 <span class="hl">합</span>은?';
+        rollDice(dice1El, v1, onReady);
+        rollDice(dice2El, v2, onReady);
+      } else {
+        var v1 = rand(1, 6);
+        while (answerCount(v1) >= MAX_REPEAT) { v1 = rand(1, 6); }
+        answer = v1;
+        questionEl.innerHTML = '주사위의 <span class="hl">숫자</span>는?';
+        rollDice(dice1El, v1, onReady);
+      }
+    } else {
+      card1Wrapper.style.display = 'block';
+      if (countMode === 'double') {
+        var cv1, cv2, s1, s2;
+        do { cv1 = rand(1, 10); cv2 = rand(1, 10); } while (answerCount(cv1 + cv2) >= MAX_REPEAT);
+        s1 = rand(0, 3); s2 = rand(0, 3);
+        answer = cv1 + cv2;
+        plusSignCard.style.display = 'inline';
+        card2Wrapper.style.display = 'block';
+        questionEl.innerHTML = '두 카드 모양의 <span class="hl">합</span>은?';
+        flipCard(card1El, cv1, s1, onReady);
+        flipCard(card2El, cv2, s2, onReady);
+      } else {
+        var cv1 = rand(1, 10), s1 = rand(0, 3);
+        while (answerCount(cv1) >= 1) { cv1 = rand(1, 10); }
+        s1 = rand(0, 3);
+        answer = cv1;
+        questionEl.innerHTML = '카드의 <span class="hl">모양 수</span>는?';
+        flipCard(card1El, cv1, s1, onReady);
+      }
+    }
+
+    answerHistory.push(answer);
+  }
+
+  function showInput() {
+    clearImpulseTimer();
+    choiceGrid.style.display = 'none';
+    keypadArea.classList.add('hidden');
+
+    if (inputMode === 'choice') {
+      choiceGrid.style.display = 'grid';
+      renderChoices(generateChoices(answer));
+    } else {
+      keypadArea.classList.remove('hidden');
+      keypadDisplay.textContent = '?';
+      keypadDisplay.classList.remove('has-input', 'correct-input', 'wrong-input');
+      renderKeypad();
+    }
+
+    applyImpulsePrevention();
+  }
+
+  // ---- In-game Events ----
+
+  document.getElementById('backBtn').addEventListener('click', showMenu);
+
+  nextBtn.addEventListener('click', function() {
+    if (currentRound >= TOTAL_ROUNDS) { showResult(); }
+    else { newRound(); }
+  });
+
+  document.getElementById('retryBtn').addEventListener('click', startGame);
+  document.getElementById('resultHomeBtn').addEventListener('click', showMenu);
+
+  // Initial label update for default game type
+  updateCountLabels();
+
+  document.addEventListener('keydown', function(e) {
+    if (answered && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      if (currentRound >= TOTAL_ROUNDS) { showResult(); }
+      else { newRound(); }
+    }
+    if (!answered && inputMode === 'choice') {
+      var num = Number(e.key);
+      if (num >= 1) {
+        choiceGrid.querySelectorAll('.choice-btn').forEach(function(btn) {
+          if (Number(btn.textContent) === num) handleAnswer(num, btn);
+        });
+      }
+    }
+  });
+
+  // ---- Wrong Notes (오답노트) ----
+  var WN_KEY = 'slowmath_dice_wrong_notes';
+  var wrongNotePracticeMode = false;
+  var wrongNotePracticeList = [];
+
+  function getWrongNotes() {
+    try { return JSON.parse(localStorage.getItem(WN_KEY)) || []; }
+    catch(e) { return []; }
+  }
+
+  function saveWrongNotes(notes) {
+    localStorage.setItem(WN_KEY, JSON.stringify(notes));
+  }
+
+  function addWrongNote(ans, gt, cm) {
+    var notes = getWrongNotes();
+    // Avoid duplicates for same answer+gameType+countMode
+    var exists = notes.some(function(n) {
+      return n.answer === ans && n.gameType === gt && n.countMode === cm;
+    });
+    if (!exists) {
+      notes.push({ answer: ans, gameType: gt, countMode: cm });
+      saveWrongNotes(notes);
+    }
+    updateWrongNotesBtn();
+  }
+
+  function removeWrongNote(ans, gt, cm) {
+    var notes = getWrongNotes();
+    notes = notes.filter(function(n) {
+      return !(n.answer === ans && n.gameType === gt && n.countMode === cm);
+    });
+    saveWrongNotes(notes);
+    updateWrongNotesBtn();
+  }
+
+  function updateWrongNotesBtn() {
+    var notes = getWrongNotes();
+    var btn = document.getElementById('wrongNotesBtn');
+    var badge = document.getElementById('wrongNotesBadge');
+    if (notes.length > 0) {
+      btn.classList.remove('hidden');
+      badge.textContent = notes.length;
+    } else {
+      btn.classList.add('hidden');
+    }
+  }
+
+  // Patch handleAnswer to record wrong notes
+  var _originalHandleAnswer = handleAnswer;
+  handleAnswer = function(val, btnEl) {
+    if (answered) return;
+    var ok = val === answer;
+    if (!ok) {
+      addWrongNote(answer, gameType, countMode);
+    }
+    if (ok && wrongNotePracticeMode) {
+      removeWrongNote(answer, gameType, countMode);
+      // Update practice list
+      wrongNotePracticeList = wrongNotePracticeList.filter(function(n) {
+        return !(n.answer === answer && n.gameType === gameType && n.countMode === countMode);
+      });
+    }
+    _originalHandleAnswer(val, btnEl);
+  };
+
+  function getGameTypeLabel(gt) {
+    if (gt === 'finger') return '✌️';
+    if (gt === 'dice') return '🎲';
+    return '♣';
+  }
+
+  function getCountModeLabel(cm) {
+    if (cm === 'double-match') return '2개(매칭)';
+    return cm === 'double' ? '2개' : '1개';
+  }
+
+  window.showWrongNotes = function() {
+    var notes = getWrongNotes();
+    var wnList = document.getElementById('wnList');
+    var wnStartBtn = document.getElementById('wnStartBtn');
+    var wnClearBtn = document.getElementById('wnClearBtn');
+    wnList.innerHTML = '';
+
+    if (notes.length === 0) {
+      wnList.innerHTML = '<div class="wn-empty">틀린 문제가 없어요!</div>';
+      wnStartBtn.style.display = 'none';
+      wnClearBtn.classList.add('hidden');
+    } else {
+      notes.forEach(function(n) {
+        var chip = document.createElement('div');
+        chip.className = 'wn-chip';
+        chip.textContent = getGameTypeLabel(n.gameType) + ' 정답: ' + n.answer + ' (' + getCountModeLabel(n.countMode) + ')';
+        wnList.appendChild(chip);
+      });
+      wnStartBtn.style.display = '';
+      wnClearBtn.classList.remove('hidden');
+    }
+
+    startView.classList.add('hidden');
+    document.getElementById('wrongNotesView').classList.add('active');
+  };
+
+  window.hideWrongNotes = function() {
+    document.getElementById('wrongNotesView').classList.remove('active');
+    startView.classList.remove('hidden');
+    document.querySelector('.logout-btn').style.display=localStorage.getItem('slowmath_dice_login')?'':'none';
+  };
+
+  window.clearWrongNotes = function() {
+    if (confirm('오답노트를 전체 삭제할까요?')) {
+      saveWrongNotes([]);
+      updateWrongNotesBtn();
+      window.showWrongNotes();
+    }
+  };
+
+  window.startWrongNotesPractice = function() {
+    var notes = getWrongNotes();
+    if (notes.length === 0) return;
+
+    wrongNotePracticeMode = true;
+    wrongNotePracticeList = notes.slice();
+
+    document.getElementById('wrongNotesView').classList.remove('active');
+    playView.classList.remove('hidden');
+
+    TOTAL_ROUNDS = wrongNotePracticeList.length;
+    MAX_REPEAT = 999;
+    correctCount = 0; wrongCount = 0; streak = 0; currentRound = 0; answerHistory = [];
+    document.getElementById('correctCount').textContent = 0;
+    document.getElementById('wrongCount').textContent = 0;
+    resultArea.classList.add('hidden');
+    gameTitle.textContent = '📝 오답노트 연습';
+
+    newWrongNoteRound();
+  };
+
+  function newWrongNoteRound() {
+    if (wrongNotePracticeList.length === 0) {
+      showResult();
+      return;
+    }
+
+    currentRound++;
+    TOTAL_ROUNDS = currentRound - 1 + wrongNotePracticeList.length;
+    progressInfo.textContent = currentRound + '/' + TOTAL_ROUNDS;
+    nextBtn.textContent = '다음 문제 →';
+
+    answered = false;
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'feedback';
+    nextBtn.classList.add('hidden');
+    clearImpulseTimer();
+
+    choiceGrid.style.display = 'none';
+    choiceGrid.innerHTML = '';
+    keypadArea.classList.add('hidden');
+    keypadDisplay.classList.remove('has-input', 'correct-input', 'wrong-input');
+    [dice1El, dice2El, card1El, card2El].forEach(function(e) { e.classList.remove('correct', 'wrong'); });
+    hideAllVisuals();
+
+    // Pick a random note from practice list
+    var idx = rand(0, wrongNotePracticeList.length - 1);
+    var note = wrongNotePracticeList[idx];
+
+    // Set game context for this round
+    gameType = note.gameType;
+    countMode = note.countMode;
+    inputMode = document.querySelector('#inputGroup .select-item.active').dataset.imode || 'choice';
+
+    var targetAnswer = note.answer;
+    answer = targetAnswer;
+
+    resetMatchArea();
+    var ready = 0;
+    var total = (countMode === 'double' || countMode === 'double-match') ? 2 : 1;
+    var wnMatchV1 = 0, wnMatchV2 = 0;
+    var onReady = function() {
+      if (++ready >= total) {
+        if (isMatchMode()) {
+          startMatchPhase(wnMatchV1, wnMatchV2);
+        } else {
+          showInput();
+        }
+      }
+    };
+
+    if (gameType === 'finger') {
+      fingerWrapper.style.display = 'block';
+      fingerImage.src = 'images/' + targetAnswer + '.png';
+      fingerImage.alt = '손가락 ' + targetAnswer + '개';
+      questionEl.innerHTML = '손가락이 <span class="hl">몇 개</span>일까요?';
+      showInput();
+    } else if (gameType === 'dice') {
+      dice1Wrapper.style.display = 'block';
+      if (countMode === 'double' || countMode === 'double-match') {
+        // Generate two dice that sum to targetAnswer
+        var minV = Math.max(1, targetAnswer - 6);
+        var maxV = Math.min(6, targetAnswer - 1);
+        var v1 = rand(minV, maxV);
+        var v2 = targetAnswer - v1;
+        wnMatchV1 = v1; wnMatchV2 = v2;
+        plusSign.style.display = 'inline';
+        dice2Wrapper.style.display = 'block';
+        if (!isMatchMode()) questionEl.innerHTML = '두 주사위의 <span class="hl">합</span>은?';
+        rollDice(dice1El, v1, onReady);
+        rollDice(dice2El, v2, onReady);
+      } else {
+        questionEl.innerHTML = '주사위의 <span class="hl">숫자</span>는?';
+        rollDice(dice1El, targetAnswer, onReady);
+      }
+    } else {
+      card1Wrapper.style.display = 'block';
+      if (countMode === 'double') {
+        var minC = Math.max(1, targetAnswer - 10);
+        var maxC = Math.min(10, targetAnswer - 1);
+        var cv1 = rand(minC, maxC);
+        var cv2 = targetAnswer - cv1;
+        var s1 = rand(0, 3), s2 = rand(0, 3);
+        plusSignCard.style.display = 'inline';
+        card2Wrapper.style.display = 'block';
+        questionEl.innerHTML = '두 카드 모양의 <span class="hl">합</span>은?';
+        flipCard(card1El, cv1, s1, onReady);
+        flipCard(card2El, cv2, s2, onReady);
+      } else {
+        var s1 = rand(0, 3);
+        questionEl.innerHTML = '카드의 <span class="hl">모양 수</span>는?';
+        flipCard(card1El, targetAnswer, s1, onReady);
+      }
+    }
+
+    answerHistory.push(answer);
+  }
+
+  // Override newRound and showResult for wrong note practice mode
+  var _originalNewRound = newRound;
+  newRound = function() {
+    if (wrongNotePracticeMode) {
+      newWrongNoteRound();
+    } else {
+      _originalNewRound();
+    }
+  };
+
+  var _originalShowResult = showResult;
+  showResult = function() {
+    if (wrongNotePracticeMode) {
+      wrongNotePracticeMode = false;
+      // Restore gameType/countMode from settings
+      loadSettings();
+      applySettingsUI();
+    }
+    _originalShowResult();
+  };
+
+  var _originalStartGame = startGame;
+  startGame = function() {
+    wrongNotePracticeMode = false;
+    wrongNotePracticeList = [];
+    _originalStartGame();
+  };
+
+  var _originalShowMenu = showMenu;
+  showMenu = function() {
+    wrongNotePracticeMode = false;
+    wrongNotePracticeList = [];
+    loadSettings();
+    applySettingsUI();
+    _originalShowMenu();
+    updateWrongNotesBtn();
+  };
+
+  // Re-bind buttons that reference showMenu/newRound/showResult/startGame
+  document.getElementById('backBtn').removeEventListener('click', _originalShowMenu);
+  document.getElementById('backBtn').addEventListener('click', function() { showMenu(); });
+  document.getElementById('resultHomeBtn').removeEventListener('click', _originalShowMenu);
+  document.getElementById('resultHomeBtn').addEventListener('click', function() { showMenu(); });
+  document.getElementById('retryBtn').removeEventListener('click', _originalStartGame);
+  document.getElementById('retryBtn').addEventListener('click', function() { startGame(); });
+
+  // Initialize wrong notes button on load
+  updateWrongNotesBtn();
+
+  // Expose startGame globally so socialLogin (outside this IIFE) can call it
+  window.startGame = startGame;
+
+})();
+
+  // ---- Social Login ----
+  function socialLogin(provider) {
+    localStorage.setItem('slowmath_dice_login', JSON.stringify({
+      provider: provider,
+      loginTime: new Date().toISOString()
+    }));
+    const _sp=sessionStorage.getItem('_sp');if(_sp){sessionStorage.removeItem('_sp');document.getElementById('loginView').classList.add('hidden');startGame(...JSON.parse(_sp));return;}
+    document.getElementById('loginView').classList.add('hidden');
+    document.getElementById('startView').classList.remove('hidden');
+    document.querySelector('.logout-btn').style.display=localStorage.getItem('slowmath_dice_login')?'':'none';
+  }
+
+  function socialLogout() {
+    localStorage.removeItem('slowmath_dice_login');
+    document.getElementById('startView').classList.add('hidden');
+    document.getElementById('loginView').classList.remove('hidden');
+  }
+
+  // Check login state on load
+  (function checkLoginState() {
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('startView').classList.remove('hidden');
+    document.querySelector('.logout-btn').style.display=localStorage.getItem('slowmath_dice_login')?'':'none';
+  })();
+
+// ─── Splash Screen (3초 후 페이드아웃) ───
+setTimeout(function() {
+    var splash = document.getElementById("splash");
+    if (splash) { splash.classList.add("fade-out"); setTimeout(function() { splash.remove(); }, 500); }
+}, 3000);
+
+// Share visibility: hide when logged out
+(function() {
+  var _SM_KEY = 'slowmath_dice_login';
+  function _updateShareVis() {
+    document.body.classList.toggle('sm-loggedin', !!localStorage.getItem(_SM_KEY));
+  }
+  _updateShareVis();
+  ['socialLogin','socialLogout','goLogin'].forEach(function(fn) {
+    if (typeof window[fn] === 'function') {
+      var _orig = window[fn];
+      window[fn] = function() { _orig.apply(this, arguments); _updateShareVis(); };
+    }
+  });
+})();
+</script>
+
+<!-- ====== App Recommendation Popup ====== -->
+<div id="sm-reco-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.52);z-index:500;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">
+  <div style="background:#FFFDF8;border-radius:24px;padding:28px 22px 22px;max-width:270px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.18);animation:_smPop .32s cubic-bezier(.34,1.56,.64,1) both;">
+    <div style="font-size:0.72rem;font-weight:700;color:#C4AA82;letter-spacing:.08em;margin-bottom:14px;">도움이 될만한 앱을 소개드려요!</div>
+    <div id="sm-reco-emoji" style="font-size:2.75rem;margin-bottom:10px;line-height:1;"></div>
+    <div id="sm-reco-title" style="font-size:1.15rem;font-weight:900;color:#4A4035;margin-bottom:8px;"></div>
+    <div id="sm-reco-desc" style="font-size:0.84rem;color:#7B6545;line-height:1.65;margin-bottom:20px;"></div>
+    <a id="sm-reco-link" href="#" style="display:block;background:#6BADE8;color:#fff;border-radius:14px;padding:15px 0;font-size:0.975rem;font-weight:700;text-decoration:none;font-family:inherit;margin-bottom:10px;box-shadow:0 4px 12px rgba(107,173,232,.3);">바로 해보기 →</a>
+    <button onclick="document.getElementById('sm-reco-overlay').style.display='none'" style="background:none;border:none;color:#C4AA82;font-size:0.84rem;cursor:pointer;font-family:inherit;padding:6px;">다음에 할게요</button>
+  </div>
+</div>
+<style>@keyframes _smPop{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}</style>
+
+<script>
+/* ====== App Recommendation ====== */
+var _smGameCompleted = false;
+var _SM_RECO = [
+  {title:'숫자 익히기',emoji:'🔢',url:'https://sprit6487.github.io/slowmath_number/',desc:'숫자를 순서대로 배워보세요'},
+  {title:'숫자 매칭',emoji:'🎯',url:'https://sprit6487.github.io/slowmath_matching/',desc:'숫자를 보고, 동그라미를 옮겨보세요'},
+  {title:'비교하기 기초 2',emoji:'⚖️',url:'https://sprit6487.github.io/slowmath_comparing2/',desc:'비교하는 연습을 해보아요'}
+];
+function _showRecoPopup() {
+  if (!_SM_RECO.length) return;
+  var item = _SM_RECO[Math.floor(Math.random() * _SM_RECO.length)];
+  document.getElementById('sm-reco-emoji').textContent = item.emoji;
+  document.getElementById('sm-reco-title').textContent = item.title;
+  document.getElementById('sm-reco-desc').innerHTML = item.desc;
+  document.getElementById('sm-reco-link').href = item.url;
+  document.getElementById('sm-reco-overlay').style.display = 'flex';
+}
+</script>
+</body>
+</html>

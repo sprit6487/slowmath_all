@@ -1,0 +1,11 @@
+{
+  "appId": "com.slowmath.dot2dot",
+  "appName": "느린아이 점잇기",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#FFFFFF"
+  }
+}

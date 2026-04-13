@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>느린아이 패턴 연습</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --warm-50: #FDFCFA; --warm-100: #FAF7F2; --warm-200: #F3EDE4;
+    --warm-300: #E0D5C5; --warm-400: #B8AD9E; --warm-500: #8C7E6A;
+    --warm-600: #6B5F50; --warm-700: #4A4035; --warm-800: #2E261D;
+    --border: #E8E2DA; --border-light: #F0ECE6;
+    --app-blue: #6BADE8; --app-blue-light: #D9EDFC; --app-blue-soft: #EEF6FD;
+    --app-orange: #F0A050; --app-orange-light: #FDE8C8; --app-orange-soft: #FFF6EB;
+    --app-green: #5BC886; --app-green-light: #D4F5E0;
+    --app-red: #F07070; --app-red-light: #FDE8E8;
+    --bg: #F5F1EB;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; justify-content: center; align-items: flex-start;
+    color: var(--warm-700);
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .hidden { display: none !important; }
+
+  .app {
+    width: 100%; max-width: 480px;
+    min-height: 100dvh;
+    background: #fff;
+    padding: 24px 20px;
+    padding-top: max(24px, env(safe-area-inset-top));
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    display: flex; flex-direction: column; align-items: center;
+    position: relative;
+  }
+
+        /* ── Login View ── */
+        .login-view {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          flex: 1;
+          min-height: 100dvh;
+          padding: 40px 20px;
+          width: 100%;
+        }
+
+        .login-logo-area {
+          text-align: center;
+          margin-bottom: 48px;
+        }
+
+        .login-logo-area svg {
+          display: block;
+          margin: 0 auto;
+        }
+
+        .login-logo-area h1 {
+          font-size: clamp(1.8rem, 6vw, 2.25rem);
+          font-weight: 900;
+          letter-spacing: -0.025em;
+          margin-top: 8px;
+          white-space: nowrap;
+        }
+
+        .login-subtitle {
+          color: #B8AD9E;
+          font-size: 0.9375rem;
+          margin-top: 4px;
+        }
+
+          @keyframes floatBubble {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+.login-trial {
+    position: relative;
+    background: #FFF8F0;
+    border: 1.5px solid #EDD080;
+    border-radius: 14px;
+    padding: 9px 16px;
+    font-size: 0.78rem;
+    color: #7B6545;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+    line-height: 1.4;
+    box-shadow: 0 4px 14px rgba(220,160,50,.18);
+    animation: floatBubble 2.8s ease-in-out infinite;
+    align-self: center;
+}
+.login-trial::before {
+    content: '';
+    position: absolute;
+    bottom: -9px; left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top: 8px solid #EDD080;
+    border-bottom: 0;
+}
+.login-trial::after {
+    content: '';
+    position: absolute;
+    bottom: -7px; left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top: 7px solid #FFF8F0;
+    border-bottom: 0;
+    z-index: 1;
+}
+  .login-buttons {
+          width: 100%;
+          max-width: 270px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .login-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+          padding: 16px 20px;
+          border-radius: 14px;
+          font-size: 1rem;
+          font-weight: 700;
+          font-family: inherit;
+          line-height: 1.2;
+          border: none;
+          cursor: pointer;
+          transition: transform 0.1s;
+        }
+        .login-btn:active { transform: scale(0.97); }
+        .login-btn svg { flex-shrink: 0; }
+        .login-btn.kakao { background: #FEE500; color: #191919; }
+        .login-btn.naver { background: #03C75A; color: #FFFFFF; }
+        .login-btn.google { background: #FFFFFF; color: #444444; border: 1.5px solid #DADCE0; }
+        .login-btn.facebook { background: #1877F2; color: #FFFFFF; }
+
+  /* ===== Share Bubble ===== */
+  .share-bubble {
+    position: absolute;
+    right: 0;
+    background: #FFF8F0;
+    border: 1.5px solid #EDD080;
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 0.55rem;
+    color: #7B6545;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(220,160,50,.18);
+    z-index: 20;
+    animation: floatBubble 2.8s ease-in-out infinite;
+    line-height: 1.5;
+    text-align: right;
+    max-width: 200px;
+    white-space: nowrap;
+  }
+  .share-bubble::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 10px;
+    border: 4px solid transparent;
+    border-bottom: 7px solid #EDD080;
+    border-top: 0;
+  }
+  .share-bubble::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 11px;
+    border: 3px solid transparent;
+    border-bottom: 6px solid #FFF8F0;
+    border-top: 0;
+    z-index: 1;
+  }
+@media (max-width:768px){.share-bubble{font-size:0.60rem;max-width:170px;padding:7px 10px;}}
+@media (max-width:480px){.share-bubble{font-size:0.62rem;max-width:165px;padding:7px 9px;}}
+
+  /* ===== Start View ===== */
+  #start-view { width: 100%; display: flex; flex-direction: column; align-items: center; }
+  .brand { display:flex;flex-direction:column;align-items:center;margin-bottom:20px;position:relative;width:100%; }
+  .brand .turtle-svg { display: inline-block; margin-bottom: 0; }
+  .brand h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.025em;  margin-top: 8px; }
+  .brand-sub { font-size: 0.8rem; color: var(--warm-400); margin-bottom: 0; font-weight: 500; }
+
+  /* Mode Cards */
+  .mode-card {
+    background: #fff; border: 2px solid var(--border);
+    border-radius: 20px; padding: 20px 18px; width: 100%;
+    margin-bottom: 12px; text-align: center;
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+  .mode-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
+  .mode-card:active { transform: scale(0.98); }
+  .mode-card h2 { font-size: 1.05rem; font-weight: 700; color: var(--warm-700); margin-bottom: 4px; }
+  .mode-card .desc { font-size: 0.75rem; color: var(--warm-400); margin-bottom: 14px; }
+  .mode-card .mode-preview {
+    display: flex; justify-content: center; align-items: flex-end;
+    margin-bottom: 14px; min-height: 60px; font-size: 2rem; gap: 4px;
+  }
+  .mode-card .mode-preview svg { position: relative; top: 6px; }
+  .mode-card .mode-preview.svg-aligned svg { top: 0; }
+  .mode-btns { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  .cycle-selector {
+    display: flex; align-items: center; gap: 6px; justify-content: center; margin-bottom: 4px;
+  }
+  .cycle-label { font-size: 0.78rem; color: var(--warm-400); font-weight: 600; margin-right: 2px; }
+  .cycle-btn {
+    padding: 5px 14px; border-radius: 16px; border: 1.5px solid var(--border);
+    background: white; color: var(--warm-500); font-size: 0.78rem; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: all 0.15s;
+  }
+  .cycle-btn.selected {
+    background: var(--app-blue-light); border-color: var(--app-blue); color: var(--app-blue);
+  }
+  .diff-selector {
+    display: flex; align-items: center; gap: 6px; justify-content: center; margin-bottom: 10px;
+  }
+  .diff-btn {
+    padding: 5px 10px; border-radius: 16px; border: 1.5px solid var(--border);
+    background: white; color: var(--warm-500); font-size: 0.78rem; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: all 0.15s;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 1px; text-align: center; line-height: 1.2;
+  }
+  .diff-btn .diff-stars { font-size: 0.65rem; }
+  .diff-btn .diff-label { font-size: 0.68rem; }
+  .diff-btn:hover, .diff-btn:active {
+    background: var(--app-blue-soft); border-color: var(--app-blue); color: var(--app-blue);
+  }
+  .diff-btn.selected {
+    background: var(--app-blue-light); border-color: var(--app-blue); color: var(--app-blue);
+  }
+  .mode-start {
+    width: 100%; padding: 12px; font-size: 0.95rem; font-weight: 700;
+    background: var(--app-blue); color: white; border: none; border-radius: 12px;
+    cursor: pointer; font-family: inherit; transition: all 0.12s;
+  }
+  .mode-start:hover, .mode-start:active {
+    background: #5A9CD8; transform: scale(0.98);
+  }
+  .start-btn {
+    padding: 10px 20px; border: 2px solid var(--border);
+    border-radius: 12px; background: #fff;
+    font-size: 0.875rem; font-weight: 700; color: var(--warm-600);
+    cursor: pointer; font-family: inherit; transition: all 0.12s;
+  }
+  .start-btn:hover, .start-btn:active {
+    background: var(--app-blue-soft); border-color: var(--app-blue); color: var(--app-blue);
+  }
+
+  /* Blank items in fill-in-the-blank mode */
+  .pattern-item.blank {
+    border: 2.5px dashed var(--app-orange); background: var(--app-orange-soft);
+    color: var(--app-orange); font-size: 1.5rem; cursor: default;
+  }
+  .pattern-item.blank.active {
+    animation: pulse-blank 1.2s infinite;
+  }
+  .pattern-item.blank.filled {
+    border-style: solid; border-color: var(--app-green);
+    background: var(--app-green-light); animation: none;
+  }
+  @keyframes pulse-blank {
+    0%, 100% { border-color: var(--app-orange); box-shadow: 0 0 0 rgba(240,160,80,0); }
+    50% { border-color: var(--app-blue); box-shadow: 0 0 10px rgba(107,173,232,0.3); }
+  }
+
+  /* ===== Settings ===== */
+  .settings-section { width: 100%; margin-top: 6px; }
+  .setting-divider { border-top: 1.5px solid var(--border-light); padding-top: 18px; margin-top: 18px; }
+  .setting-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .setting-title { font-size: 0.875rem; font-weight: 600; color: var(--warm-700); }
+  .setting-title .badge { font-size: 0.7rem; font-weight: 400; color: var(--warm-400); margin-left: 6px; }
+  .setting-desc { font-size: 0.75rem; color: var(--warm-400); margin-top: 2px; margin-bottom: 8px; }
+
+  /* Toggle */
+  .toggle-track {
+    width: 48px; height: 28px; border-radius: 99px; position: relative;
+    background: #E0DAD0; border: none; cursor: pointer; flex-shrink: 0; transition: background 0.2s;
+  }
+  .toggle-track.on { background: #5BC886; }
+  .toggle-knob {
+    width: 22px; height: 22px; border-radius: 50%; background: #fff;
+    position: absolute; top: 3px; left: 3px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12); transition: transform 0.2s;
+  }
+  .toggle-track.on .toggle-knob { transform: translateX(20px); }
+
+  /* Impulse mode options */
+  .impulse-mode-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .impulse-mode-btn {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 8px; border-radius: 14px; border: 2px solid var(--border);
+    background: #fff; cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .impulse-mode-btn.selected { border-color: #C4AA82; background: #FAF5EE; }
+  .impulse-mode-icon { font-size: 1.2rem; margin-bottom: 2px; }
+  .impulse-mode-label { font-size: 0.8rem; font-weight: 700; color: var(--warm-700); }
+  .impulse-mode-desc { font-size: 0.65rem; color: var(--warm-400); margin-top: 1px; }
+
+  /* Delay buttons */
+  .delay-row { display: none; flex-wrap: wrap; gap: 4px; justify-content: center; }
+  .delay-row.show { display: flex; }
+  .imp-sec {
+    flex: 0 0 calc((100% - 16px) / 5); padding: 8px 0;
+    font-size: 0.75rem; font-weight: 600;
+    border-radius: 10px; border: 2px solid var(--border);
+    background: #fff; color: #8C8070;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.15s; text-align: center;
+  }
+  .imp-sec.active { border-color: #C4AA82; background: #FAF5EE; color: #7B6545; }
+
+  .impulse-details { display: none; margin-top: 8px; }
+  .impulse-details.show { display: block; }
+
+  .logout-btn {
+    background: none; border: 1.5px solid var(--border);
+    border-radius: 8px; padding: 6px 14px;
+    font-size: 0.75rem; font-weight: 600; color: var(--warm-400);
+    cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    transition: background 0.15s; margin-top: 20px;
+  }
+  .logout-btn:hover { background: var(--bg); }
+
+  /* ===== Play View ===== */
+  #play-view { width: 100%; display: flex; flex-direction: column; align-items: center;
+    min-height: 0; overflow-y: auto; }
+  .play-header { display: flex; align-items: center; gap: 12px; width: 100%; margin-bottom: 12px; }
+  .btn-home { width: 36px; height: 36px; border-radius: 10px; border: 2px solid #E8E2DA; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s; color: #8C8070; flex-shrink: 0; padding: 0; }
+  .play-middle { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .play-progress-label { font-size: 0.8rem; font-weight: 600; color: var(--warm-500); }
+  .play-progress-bar { width: 100%; height: 6px; background: var(--border-light); border-radius: 3px; overflow: hidden; }
+  .play-progress-fill {
+    height: 100%; border-radius: 3px; background: var(--app-red);
+    transition: width 0.3s ease, background 0.3s ease;
+  }
+  .play-score { font-size: 0.85rem; font-weight: 700; color: var(--app-green); flex-shrink: 0; }
+  .combo-badge { font-size: 0.8rem; font-weight: 700; color: var(--app-orange); min-height: 20px; }
+
+  /* Game container */
+  .game-container {
+    background: #fff; border: 2px solid var(--border);
+    border-radius: 20px; padding: 24px 18px; width: 100%;
+    display: flex; flex-direction: column; align-items: center;
+    position: relative;
+  }
+
+  /* Pattern sequence */
+  .pattern-label { font-size: 0.85rem; color: var(--warm-400); font-weight: 500; margin-bottom: 12px; }
+  .pattern-row {
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+    gap: 8px; margin-bottom: 20px;
+  }
+  .pattern-item {
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; border-radius: 12px;
+    background: var(--warm-100); border: 2px solid var(--border-light);
+  }
+  .pattern-item.question {
+    background: var(--app-blue-soft); border: 2.5px dashed var(--app-blue);
+    font-size: 1.5rem; font-weight: 900; color: var(--app-blue);
+  }
+
+  /* Pattern group (hint border box) */
+  .pattern-group {
+    display: flex; gap: 8px;
+    padding: 6px 8px;
+    border: 1.5px dashed var(--warm-300); border-radius: 12px;
+    opacity: 0.85;
+  }
+  .pattern-group:nth-child(even) { border-color: var(--warm-300); border-style: dashed; }
+  .mode-card { position: relative; }
+
+  /* Choices */
+  .choices-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; width: 280px; max-width: calc(100% - 32px);
+    margin: 12px auto 0; align-self: center; position: relative;
+  }
+  .choice-btn {
+    padding: 16px; border: 2.5px solid var(--border);
+    border-radius: 16px; background: #fff;
+    font-size: 2.2rem; cursor: pointer; font-family: inherit;
+    transition: all 0.1s; text-align: center;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .choice-btn:active:not(:disabled) { transform: scale(0.95); }
+  .choice-btn.correct {
+    border-color: var(--app-green); background: var(--app-green-light);
+    animation: popIn 0.35s ease;
+  }
+  .choice-btn.wrong {
+    border-color: var(--app-red); background: var(--app-red-light);
+    animation: shake 0.4s ease;
+  }
+  .choice-btn:disabled { pointer-events: none; opacity: 0.4; }
+  .choices-grid.chips-hidden .choice-btn { visibility: hidden; }
+  .choices-grid.chips-locked .choice-btn { pointer-events: none; opacity: 0.4; }
+
+  .reveal-btn-wrap {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center; z-index: 5;
+  }
+  .reveal-btn{display:block;width:100%;max-width:320px;margin:0 auto 12px;padding:14px 0;border-radius:14px;border:2px solid #C4AA82;background:#FAF5EE;color:#7B6545;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;}
+.reveal-btn:active{background:#F0E6D6;transform:scale(.98);}
+
+  .impulse-msg {
+    font-size: 0.95rem; font-weight: 600; color: var(--app-orange);
+    margin-top: 12px; min-height: 24px; text-align: center;
+    animation: pulse-count 1s ease infinite;
+  }
+
+  /* Complete overlay */
+  .complete-overlay {
+    position: relative; margin-top: 40px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px;
+  }
+  .complete-emoji { font-size: 56px; }
+  .complete-msg { font-size: 1.25rem; font-weight: 900; color: var(--warm-800); }
+  .complete-sub { font-size: 0.85rem; color: var(--warm-400); }
+  .next-btn {
+    margin-top: 8px; padding: 14px 36px;
+    border: none; border-radius: 12px;
+    background: var(--app-blue); color: #fff;
+    font-size: 1rem; font-weight: 700;
+    cursor: pointer; font-family: inherit; transition: transform 0.12s;
+  }
+  .next-btn:active { transform: scale(0.96); }
+
+  /* Wrong Notes */
+  .wrong-notes-btn {
+    width: 100%; padding: 14px 0; border-radius: 14px;
+    border: 2.5px solid #F07070; background: #FFF5F5; color: #F07070;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 1rem; font-weight: 700;
+    cursor: pointer; margin-top: 10px; transition: transform .1s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .wrong-notes-btn:active { transform: scale(.97); }
+  .wrong-notes-btn .badge {
+    background: #F07070; color: white; border-radius: 50%;
+    min-width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .75rem; font-weight: 700;
+  }
+  .wn-view { display: none; flex-direction: column; align-items: center; padding: 24px 20px; }
+  .wn-view.active { display: flex; }
+  .wn-header { text-align: center; margin-bottom: 20px; }
+  .wn-header h2 { font-size: 1.25rem; font-weight: 900; color: #4A4035; margin: 0 0 4px; }
+  .wn-header p { font-size: .85rem; color: #B8AD9E; margin: 0; }
+  .wn-list {
+    width: 100%; max-width: 400px;
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px;
+  }
+  .wn-chip {
+    padding: 8px 16px; border-radius: 10px;
+    background: #FFF5F5; border: 1.5px solid #F07070;
+    font-size: .9rem; font-weight: 700; color: #F07070;
+  }
+  .wn-empty { color: #B8AD9E; font-size: .9rem; margin: 40px 0; }
+  .wn-actions { display: flex; gap: 10px; width: 100%; max-width: 320px; }
+  .wn-actions button {
+    flex: 1; padding: 13px 0; border-radius: 12px;
+    font-family: 'Noto Sans KR', sans-serif; font-size: .9rem; font-weight: 700;
+    cursor: pointer; transition: transform .1s;
+  }
+  .wn-actions button:active { transform: scale(.97); }
+  .wn-btn-back { border: 2.5px solid #E8E2DA; background: white; color: #8C8070; }
+  .wn-btn-start { border: none; background: #F07070; color: white; box-shadow: 0 2px 8px rgba(240,112,112,.3); }
+  .wn-btn-clear {
+    border: 1.5px solid #E8E2DA; background: white; color: #B8AD9E;
+    padding: 8px 16px; border-radius: 8px; font-size: .75rem; font-weight: 600;
+    cursor: pointer; margin-top: 12px; font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  /* Feedback */
+  .feedback-float {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%,-50%) scale(0);
+    font-size: 64px; z-index: 100; pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .feedback-float.show { transform: translate(-50%,-50%) scale(1); }
+  .btn-next-q { display: block; width: 100%; max-width: 360px; margin: 16px auto 0; padding: 14px 0; border-radius: 16px; border: none; background: var(--warm-700); color: white; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; box-shadow: 0 2px 8px rgba(74,64,53,0.15); flex-shrink: 0; }
+  .btn-next-q:active { transform: scale(0.98); background: var(--warm-800); }
+
+  /* Animations */
+  @keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0.5; }
+    45% { transform: scale(1.15); opacity: 1; }
+    65% { transform: scale(0.92); }
+    80% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  @keyframes pulse-count {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.08); opacity: 0.7; }
+  }
+
+  /* Tablet & Desktop */
+  @media (min-width: 768px) {
+    body { align-items: center; padding: 32px; }
+    .app {
+      max-width: 560px; min-height: auto; border-radius: 32px;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+      padding: 44px 40px;
+    }
+    .login-view { min-height: auto; padding: 60px 40px; }
+    .pattern-item { width: 56px; height: 56px; font-size: 2.2rem; }
+  }
+
+  /* ===== Landscape Game Mode ===== */
+  .force-landscape {
+    position: fixed !important; top: 0; left: 0;
+    width: 100vh !important; height: 100vw !important;
+    transform: rotate(90deg); transform-origin: top left;
+    margin-left: 100vw; overflow: hidden;
+    z-index: 50; background: white;
+  }
+  .app:has(.landscape-game) {
+    max-width: 100%; width: 100%;
+  }
+  .landscape-game {
+    display: flex; flex-direction: column;
+    height: 100%; width: 100%;
+    padding: 8px 16px;
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    background: white;
+  }
+  .landscape-game .play-header { margin-bottom: 4px; gap: 8px; flex-shrink: 0; }
+  .landscape-game .btn-home { width: 36px; height: 36px; border-radius: 10px; border: 2px solid #E8E2DA; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s; color: #8C8070; flex-shrink: 0; padding: 0; }
+  .landscape-game .play-progress-label { font-size: 0.7rem; }
+  .landscape-game .play-score { font-size: 0.75rem; }
+  .landscape-game .combo-badge { font-size: 0.7rem; min-height: 14px; flex-shrink: 0; }
+  .landscape-game .game-container {
+    flex-direction: column; align-items: center; justify-content: center;
+    padding: 8px 16px; gap: 10px; flex: 1; overflow-y: auto;
+    width: 100%; max-width: 100%; min-height: 0;
+  }
+  .landscape-game .pattern-label { font-size: 0.75rem; margin-bottom: 4px; }
+  .landscape-game .pattern-row { gap: 4px; margin-bottom: 8px; flex-wrap: nowrap; width: 100%; justify-content: center; }
+  .landscape-game .pattern-item { width: min(36px, 5vw); height: min(36px, 5vw); font-size: min(1.4rem, 3.5vw); border-radius: 10px; flex-shrink: 1; min-width: 0; }
+  .landscape-game .pattern-item.question { font-size: min(1.1rem, 3vw); }
+  .landscape-game .pattern-item.blank { font-size: min(1.1rem, 3vw); }
+  /* Larger items for shorter cycles (2 or 3) in landscape — fewer items, more space */
+  .landscape-game[data-cycle="2"] .pattern-item,
+  .landscape-game[data-cycle="3"] .pattern-item { width: min(56px, 7.5vw); height: min(56px, 7.5vw); font-size: min(2rem, 5vw); }
+  .landscape-game[data-cycle="2"] .pattern-item.question,
+  .landscape-game[data-cycle="3"] .pattern-item.question { font-size: min(1.6rem, 4vw); }
+  .landscape-game[data-cycle="2"] .pattern-item.blank,
+  .landscape-game[data-cycle="3"] .pattern-item.blank { font-size: min(1.6rem, 4vw); }
+  .landscape-game[data-cycle="2"] .pattern-row,
+  .landscape-game[data-cycle="3"] .pattern-row { gap: 8px; }
+  .landscape-game[data-cycle="2"] .pattern-group,
+  .landscape-game[data-cycle="3"] .pattern-group { gap: 6px; padding: 5px 6px; }
+  .landscape-game .pattern-group { padding: 3px 4px; gap: 3px; border-radius: 10px; flex-shrink: 1; min-width: 0; }
+  .landscape-game .choices-grid {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 90px));
+    justify-content: center;
+    width: min(380px, calc(100% - 32px));
+    gap: 8px; margin: 0 auto; align-self: center;
+  }
+  .landscape-game .choice-btn { padding: 8px; font-size: 1.5rem; border-radius: 12px; }
+  .landscape-game .impulse-msg { font-size: 0.8rem; margin-top: 4px; min-height: 18px; }
+  .landscape-game .reveal-btn{display:block;width:100%;max-width:320px;margin:0 auto 12px;padding:14px 0;border-radius:14px;border:2px solid #C4AA82;background:#FAF5EE;color:#7B6545;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;}
+.reveal-btn:active{background:#F0E6D6;transform:scale(.98);}
+  .landscape-game .complete-overlay { margin-top: 10px; gap: 6px; }
+  .landscape-game .complete-emoji { font-size: 36px; }
+  .landscape-game .complete-msg { font-size: 1rem; }
+  .landscape-game .next-btn { padding: 10px 28px; font-size: 0.9rem; }
+
+  /* Splash Screen */
+  .splash-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: #FFFFFF;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    z-index: 9999; transition: opacity 0.5s ease-out;
+  }
+  .splash-overlay.fade-out { opacity: 0; pointer-events: none; }
+  .splash-logo { animation: splashFloat 2.4s ease-in-out infinite; margin-bottom: 24px; }
+  .splash-title { font-size: 2rem; font-weight: 900; letter-spacing: -0.025em; margin-bottom: 8px; }
+  .splash-subtitle { color: #B8B0A8; font-size: 0.9375rem; font-weight: 500; }
+  @keyframes splashFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  @media (max-width:380px) { .splash-title{font-size:1.5rem} }
+  @media (min-width:768px) { .splash-logo svg{width:160px;height:134px} .splash-title{font-size:2.5rem} .splash-subtitle{font-size:1.0625rem} }
+
+/* Hide share button/bubble when not logged in */
+body:not(.sm-loggedin) [title="공유하기"],
+body:not(.sm-loggedin) #share-bubble { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ══════ Splash Screen ══════ -->
+<div id="splash" class="splash-overlay">
+    <div class="splash-logo">
+        <svg viewBox="0 0 120 100" width="140" height="117" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+            <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+            <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+            <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+            <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+            <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+            <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+            <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+            <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+            <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+            <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+            <circle cx="101" cy="33" r="1" fill="white"/>
+            <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+            <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <h1 class="splash-title">
+        <span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">패턴 연습</span>
+    </h1>
+    <p class="splash-subtitle">규칙을 찾아 다음에 올 것을 맞혀보세요</p>
+</div>
+<script>
+setTimeout(function() {
+    var splash = document.getElementById("splash");
+    if (splash) { splash.classList.add("fade-out"); setTimeout(function() { splash.remove(); }, 500); }
+}, 3000);
+</script>
+
+<div class="app">
+
+    <!-- ══════════════ 로그인 화면 ══════════════ -->
+    <div id="login-view" class="login-view">
+        <div class="login-logo-area">
+            <svg viewBox="0 0 120 100" width="120" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+                <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+                <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+                <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+                <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+                <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+                <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity="0.35" transform="rotate(-15 42 26)"/>
+                <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity="0.2"/>
+                <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+                <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+                <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+                <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+                <circle cx="101" cy="33" r="1" fill="white"/>
+                <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity="0.4"/>
+                <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">패턴 연습</span></h1>
+            <p class="login-subtitle">규칙을 찾아 다음에 올 것을 맞혀보세요</p>
+        </div>
+          <p class="login-trial">가입하시고 하루 동안 모든 기능을<br>무료로 체험해보세요</p>
+<div class="login-buttons">
+            <button class="login-btn kakao" onclick="doLogin('kakao')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 1C4.477 1 0 4.477 0 8.667c0 2.7 1.753 5.072 4.393 6.413-.192.717-.694 2.6-.794 3.004-.124.497.182.49.383.356.158-.105 2.51-1.708 3.525-2.398.8.118 1.628.18 2.493.18 5.523 0 10-3.477 10-7.555C20 4.477 15.523 1 10 1z" fill="#191919"/></svg>
+                카카오로 시작하기
+            </button>
+            <button class="login-btn naver" onclick="doLogin('naver')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M13.57 10.684L6.066 0H0v20h6.43V9.316L13.934 20H20V0h-6.43v10.684z" fill="white"/></svg>
+                네이버로 시작하기
+            </button>
+            <button class="login-btn google" onclick="doLogin('google')">
+                <svg width="20" height="20" viewBox="0 0 48 48"><path d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" fill="#FFC107"/><path d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" fill="#FF3D00"/><path d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" fill="#4CAF50"/><path d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.001-.001 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" fill="#1976D2"/></svg>
+                Google로 시작하기
+            </button>
+            <button class="login-btn facebook" onclick="doLogin('facebook')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" fill="white"/></svg>
+                Facebook으로 시작하기
+            </button>
+        </div>
+    </div>
+
+<!-- Start View -->
+<div id="start-view" class="hidden" style="position:relative;">
+  <button onclick="shareApp()" style="position:absolute; top:0; right:0; background:white; border:2px solid #E8E2DA; border-radius:10px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#8C8070; z-index:10;" title="공유하기">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13"/>
+    </svg>
+  </button>
+  <div id="share-bubble" class="share-bubble" style="top:44px;">지금 지인에게 공유하시면<br>하루 무료 이용권을 드려요</div>
+  <div id="share-toast" style="display:block;position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#3A7D44;color:white;padding:12px 20px;border-radius:14px;font-size:0.85rem;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.25);transition:opacity 0.4s;opacity:0;pointer-events:none;white-space:nowrap;"></div>
+  <div class="brand">
+    <div class="turtle-svg">
+      <svg viewBox="0 0 120 100" width="90" height="75" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+        <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+        <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+        <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+        <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+        <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+        <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+        <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+        <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+        <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+        <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+        <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity="0.35" transform="rotate(-15 42 26)"/>
+        <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity="0.2"/>
+        <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+        <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+        <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+        <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+        <circle cx="101" cy="33" r="1" fill="white"/>
+        <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity="0.4"/>
+        <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">패턴 연습</span></h1>
+    <p class="brand-sub">규칙을 찾아 다음에 올 것을 맞혀보세요</p>
+  </div>
+
+
+  <!-- Mode 1: 구체물 (과일) -->
+  <div class="mode-card">
+    <h2>과일 패턴</h2>
+    <p class="desc">사과, 바나나, 포도, 수박으로 패턴을 찾아요</p>
+    <div class="mode-preview">
+      <span>🍎</span><span><svg viewBox="0 0 100 100" width="1em" height="1em"><defs><radialGradient id="wmgP" cx="40%" cy="35%"><stop offset="0%" stop-color="#A8D84A"/><stop offset="100%" stop-color="#6B9E2A"/></radialGradient><clipPath id="wmcP"><circle cx="50" cy="52" r="44"/></clipPath></defs><circle cx="50" cy="52" r="44" fill="url(#wmgP)"/><g clip-path="url(#wmcP)"><path d="M18 8 C22 25 14 40 20 55 C16 70 18 85 14 98" fill="none" stroke="#2D5A1E" stroke-width="6" opacity="0.55" stroke-linecap="round"/><path d="M35 5 C31 22 37 38 33 55 C37 72 31 85 28 100" fill="none" stroke="#2D5A1E" stroke-width="5" opacity="0.5" stroke-linecap="round"/><path d="M50 3 C54 20 46 38 52 55 C48 72 54 85 50 100" fill="none" stroke="#2D5A1E" stroke-width="6" opacity="0.55" stroke-linecap="round"/><path d="M65 5 C69 22 63 38 67 55 C63 72 69 85 72 100" fill="none" stroke="#2D5A1E" stroke-width="5" opacity="0.5" stroke-linecap="round"/><path d="M82 8 C78 25 86 40 80 55 C84 70 82 85 86 98" fill="none" stroke="#2D5A1E" stroke-width="6" opacity="0.55" stroke-linecap="round"/></g><circle cx="50" cy="52" r="44" fill="none" stroke="#4A7A20" stroke-width="2"/><ellipse cx="36" cy="30" rx="12" ry="7" fill="white" opacity="0.18" transform="rotate(-25 36 30)"/><circle cx="50" cy="6" r="3" fill="#5A7A30"/></svg></span><span>🍎</span><span><svg viewBox="0 0 100 100" width="1em" height="1em"><defs><radialGradient id="wmgP2" cx="40%" cy="35%"><stop offset="0%" stop-color="#A8D84A"/><stop offset="100%" stop-color="#6B9E2A"/></radialGradient><clipPath id="wmcP2"><circle cx="50" cy="52" r="44"/></clipPath></defs><circle cx="50" cy="52" r="44" fill="url(#wmgP2)"/><g clip-path="url(#wmcP2)"><path d="M18 8 C22 25 14 40 20 55 C16 70 18 85 14 98" fill="none" stroke="#2D5A1E" stroke-width="6" opacity="0.55" stroke-linecap="round"/><path d="M35 5 C31 22 37 38 33 55 C37 72 31 85 28 100" fill="none" stroke="#2D5A1E" stroke-width="5" opacity="0.5" stroke-linecap="round"/><path d="M50 3 C54 20 46 38 52 55 C48 72 54 85 50 100" fill="none" stroke="#2D5A1E" stroke-width="6" opacity="0.55" stroke-linecap="round"/><path d="M65 5 C69 22 63 38 67 55 C63 72 69 85 72 100" fill="none" stroke="#2D5A1E" stroke-width="5" opacity="0.5" stroke-linecap="round"/><path d="M82 8 C78 25 86 40 80 55 C84 70 82 85 86 98" fill="none" stroke="#2D5A1E" stroke-width="6" opacity="0.55" stroke-linecap="round"/></g><circle cx="50" cy="52" r="44" fill="none" stroke="#4A7A20" stroke-width="2"/><ellipse cx="36" cy="30" rx="12" ry="7" fill="white" opacity="0.18" transform="rotate(-25 36 30)"/><circle cx="50" cy="6" r="3" fill="#5A7A30"/></svg></span><span>🍎</span><span style="opacity:0.4;">❓</span>
+    </div>
+    <div class="mode-btns">
+      <div class="cycle-selector" id="cycle-fruit">
+        <span class="cycle-label">반복 주기</span>
+        <button class="cycle-btn selected" data-cycle="2" onclick="selectCycle('fruit',2)">2개</button>
+        <button class="cycle-btn" data-cycle="3" onclick="selectCycle('fruit',3)">3개</button>
+        <button class="cycle-btn" data-cycle="4" onclick="selectCycle('fruit',4)">4개</button>
+      </div>
+      <div class="diff-selector" id="diff-fruit">
+        <span class="cycle-label">난이도</span>
+        <button class="diff-btn selected" data-diff="1" onclick="selectDiff('fruit',1)"><span class="diff-stars">⭐</span><span class="diff-label">쉬움</span></button>
+        <button class="diff-btn" data-diff="2" onclick="selectDiff('fruit',2)"><span class="diff-stars">⭐⭐</span><span class="diff-label">보통</span></button>
+        <button class="diff-btn" data-diff="3" onclick="selectDiff('fruit',3)"><span class="diff-stars">⭐⭐⭐</span><span class="diff-label">어려움</span></button>
+      </div>
+      <button class="start-btn mode-start" onclick="startGame('fruit')">시작하기</button>
+    </div>
+  </div>
+
+  <!-- Mode 2: 색깔 패턴 -->
+  <div class="mode-card">
+    <h2>색깔 패턴</h2>
+    <p class="desc">빨강, 파랑, 노랑, 초록 원으로 패턴을 찾아요</p>
+    <div class="mode-preview">
+      <span>🟢</span><span>🔵</span><span>🟢</span><span>🔵</span><span>🟢</span><span style="opacity:0.4;">❓</span>
+    </div>
+    <div class="mode-btns">
+      <div class="cycle-selector" id="cycle-color">
+        <span class="cycle-label">반복 주기</span>
+        <button class="cycle-btn selected" data-cycle="2" onclick="selectCycle('color',2)">2개</button>
+        <button class="cycle-btn" data-cycle="3" onclick="selectCycle('color',3)">3개</button>
+        <button class="cycle-btn" data-cycle="4" onclick="selectCycle('color',4)">4개</button>
+      </div>
+      <div class="diff-selector" id="diff-color">
+        <span class="cycle-label">난이도</span>
+        <button class="diff-btn selected" data-diff="1" onclick="selectDiff('color',1)"><span class="diff-stars">⭐</span><span class="diff-label">쉬움</span></button>
+        <button class="diff-btn" data-diff="2" onclick="selectDiff('color',2)"><span class="diff-stars">⭐⭐</span><span class="diff-label">보통</span></button>
+        <button class="diff-btn" data-diff="3" onclick="selectDiff('color',3)"><span class="diff-stars">⭐⭐⭐</span><span class="diff-label">어려움</span></button>
+      </div>
+      <button class="start-btn mode-start" onclick="startGame('color')">시작하기</button>
+    </div>
+  </div>
+
+  <!-- Mode 3: 도형 패턴 (색 구분) -->
+  <div class="mode-card">
+    <h2>도형 패턴 (색 구분)</h2>
+    <p class="desc">원, 네모, 세모, 하트로 패턴을 찾아요</p>
+    <div class="mode-preview">
+      <span>🔵</span><span>🟨</span><span>🔵</span><span>🟨</span><span>🔵</span><span style="opacity:0.4;">❓</span>
+    </div>
+    <div class="mode-btns">
+      <div class="cycle-selector" id="cycle-shape">
+        <span class="cycle-label">반복 주기</span>
+        <button class="cycle-btn selected" data-cycle="2" onclick="selectCycle('shape',2)">2개</button>
+        <button class="cycle-btn" data-cycle="3" onclick="selectCycle('shape',3)">3개</button>
+        <button class="cycle-btn" data-cycle="4" onclick="selectCycle('shape',4)">4개</button>
+      </div>
+      <div class="diff-selector" id="diff-shape">
+        <span class="cycle-label">난이도</span>
+        <button class="diff-btn selected" data-diff="1" onclick="selectDiff('shape',1)"><span class="diff-stars">⭐</span><span class="diff-label">쉬움</span></button>
+        <button class="diff-btn" data-diff="2" onclick="selectDiff('shape',2)"><span class="diff-stars">⭐⭐</span><span class="diff-label">보통</span></button>
+        <button class="diff-btn" data-diff="3" onclick="selectDiff('shape',3)"><span class="diff-stars">⭐⭐⭐</span><span class="diff-label">어려움</span></button>
+      </div>
+      <button class="start-btn mode-start" onclick="startGame('shape')">시작하기</button>
+    </div>
+  </div>
+
+  <!-- Mode 4: 도형 패턴 (단색) -->
+  <div class="mode-card">
+    <h2>도형 패턴</h2>
+    <p class="desc">같은 색 원, 네모, 세모, 하트로 패턴을 찾아요</p>
+    <div class="mode-preview svg-aligned" style="gap:6px; align-items:center;">
+      <svg viewBox="0 0 100 100" width="1.18em" height="1.18em" style="display:block;"><circle cx="50" cy="50" r="46" fill="#5BC886"/></svg>
+      <svg viewBox="0 0 100 100" width="1.18em" height="1.18em" style="display:block;"><rect x="6" y="6" width="88" height="88" rx="14" fill="#5BC886"/></svg>
+      <svg viewBox="0 0 100 100" width="1.18em" height="1.18em" style="display:block;"><circle cx="50" cy="50" r="46" fill="#5BC886"/></svg>
+      <svg viewBox="0 0 100 100" width="1.18em" height="1.18em" style="display:block;"><rect x="6" y="6" width="88" height="88" rx="14" fill="#5BC886"/></svg>
+      <svg viewBox="0 0 100 100" width="1.18em" height="1.18em" style="display:block;"><circle cx="50" cy="50" r="46" fill="#5BC886"/></svg>
+      <svg viewBox="0 0 100 100" width="1.18em" height="1.18em" style="display:block; opacity:0.4;"><text x="50" y="50" text-anchor="middle" dominant-baseline="central" font-size="90">❓</text></svg>
+    </div>
+    <div class="mode-btns">
+      <div class="cycle-selector" id="cycle-shape-mono">
+        <span class="cycle-label">반복 주기</span>
+        <button class="cycle-btn selected" data-cycle="2" onclick="selectCycle('shape-mono',2)">2개</button>
+        <button class="cycle-btn" data-cycle="3" onclick="selectCycle('shape-mono',3)">3개</button>
+        <button class="cycle-btn" data-cycle="4" onclick="selectCycle('shape-mono',4)">4개</button>
+      </div>
+      <div class="diff-selector" id="diff-shape-mono">
+        <span class="cycle-label">난이도</span>
+        <button class="diff-btn selected" data-diff="1" onclick="selectDiff('shape-mono',1)"><span class="diff-stars">⭐</span><span class="diff-label">쉬움</span></button>
+        <button class="diff-btn" data-diff="2" onclick="selectDiff('shape-mono',2)"><span class="diff-stars">⭐⭐</span><span class="diff-label">보통</span></button>
+        <button class="diff-btn" data-diff="3" onclick="selectDiff('shape-mono',3)"><span class="diff-stars">⭐⭐⭐</span><span class="diff-label">어려움</span></button>
+      </div>
+      <button class="start-btn mode-start" onclick="startGame('shape-mono')">시작하기</button>
+    </div>
+  </div>
+
+  <!-- Wrong Notes Button -->
+  <button class="wrong-notes-btn" id="wrong-notes-btn" onclick="showWrongNotes()" style="display:none;">
+    오답노트 <span class="badge" id="wn-badge">0</span>
+  </button>
+
+  <!-- Settings -->
+  <div class="settings-section">
+    <div class="setting-divider">
+      <div class="setting-header">
+        <div>
+          <p class="setting-title">힌트 <span class="badge">반복 패턴 묶음 표시</span></p>
+          <p class="setting-desc">점선으로 패턴 반복 구간을 표시해요</p>
+        </div>
+        <button class="toggle-track" id="hint-toggle" onclick="toggleHint()" role="switch">
+          <span class="toggle-knob"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="setting-divider">
+      <div class="setting-header">
+        <div>
+          <p class="setting-title">음성 <span class="badge">정답/오답 음성 안내</span></p>
+        </div>
+        <button class="toggle-track" id="tts-toggle" onclick="toggleTTS()" role="switch">
+          <span class="toggle-knob"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="setting-divider">
+      <div class="setting-header">
+        <div>
+          <p class="setting-title">충동방지 <span class="badge">패턴 맞추기 모드</span></p>
+          <p class="setting-desc">생각할 시간을 줘요</p>
+        </div>
+        <button class="toggle-track" id="impulse-toggle" onclick="toggleImpulse()" role="switch">
+          <span class="toggle-knob"></span>
+        </button>
+      </div>
+      <div class="impulse-details" id="impulse-details">
+        <div class="impulse-mode-options">
+          <button class="impulse-mode-btn" data-mode="hide" onclick="setImpulseMode('hide')">
+            <span class="impulse-mode-icon">👀</span>
+            <span class="impulse-mode-label">보기 확인</span>
+            <span class="impulse-mode-desc">버튼을 누르면 보기가 나타나요</span>
+          </button>
+          <button class="impulse-mode-btn" data-mode="lock" onclick="setImpulseMode('lock')">
+            <span class="impulse-mode-icon">🔒</span>
+            <span class="impulse-mode-label">선택 잠금</span>
+            <span class="impulse-mode-desc">N초 동안 선택할 수 없어요</span>
+          </button>
+        </div>
+        <div class="delay-row" id="impulse-delay-row"></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="logout-btn" style="display:none" onclick="doLogout()">로그아웃</button>
+</div>
+
+<!-- Wrong Notes View -->
+<div id="wn-view" class="wn-view">
+  <div class="wn-header">
+    <h2>오답노트</h2>
+    <p>틀렸던 패턴을 다시 연습해요</p>
+  </div>
+  <div class="wn-list" id="wn-list"></div>
+  <div class="wn-actions">
+    <button class="wn-btn-back" onclick="showView('start')">돌아가기</button>
+    <button class="wn-btn-start" id="wn-start-btn" onclick="startWrongNotesPractice()">다시 풀기</button>
+  </div>
+  <button class="wn-btn-clear" id="wn-clear-btn" onclick="clearWrongNotes()">오답노트 비우기</button>
+</div>
+
+<!-- Play View -->
+<div id="play-view" class="hidden">
+  <div class="play-header">
+    <button class="btn-home" onclick="goHome()" title="홈">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-8 9 8M5 11v9a1 1 0 001 1h3m8 0h3a1 1 0 001-1v-9"/></svg>
+    </button>
+    <div class="play-middle">
+      <span class="play-progress-label" id="play-progress-label">0 / 10</span>
+      <div class="play-progress-bar"><div class="play-progress-fill" id="play-progress-fill" style="width:0%"></div></div>
+    </div>
+    <span class="play-score" id="play-score">0점</span>
+  </div>
+  <span class="combo-badge" id="combo-badge"></span>
+  <div class="game-container" id="game-container"></div>
+  <button class="btn-next-q" id="next-q-btn" style="display:none;" onclick="onNextQ()">다음 문제 →</button>
+</div>
+
+</div><!-- /.app -->
+
+<div class="feedback-float" id="feedback"></div>
+
+<script>
+// ===== Constants =====
+const STORAGE_KEY = 'slowmath_pattern_settings';
+const LOGIN_KEY = 'slowmath_pattern_login';
+const WN_KEY = 'slowmath_pattern_wrong';
+const TOTAL_QUESTIONS = 10;
+
+// Items
+const WATERMELON_SVG = '<svg viewBox="0 0 100 100" width="1em" height="1em" style="vertical-align:-0.1em;display:inline-block;"><defs><radialGradient id="wmg" cx="40%" cy="35%"><stop offset="0%" stop-color="#A8D84A"/><stop offset="100%" stop-color="#6B9E2A"/></radialGradient><clipPath id="wmc"><circle cx="50" cy="52" r="44"/></clipPath></defs><circle cx="50" cy="52" r="44" fill="url(#wmg)"/><g clip-path="url(#wmc)"><path d="M18 8 C22 25 14 40 20 55 C16 70 18 85 14 98" fill="none" stroke="#2D5A1E" stroke-width="6" opacity="0.55" stroke-linecap="round"/><path d="M35 5 C31 22 37 38 33 55 C37 72 31 85 28 100" fill="none" stroke="#2D5A1E" stroke-width="5" opacity="0.5" stroke-linecap="round"/><path d="M50 3 C54 20 46 38 52 55 C48 72 54 85 50 100" fill="none" stroke="#2D5A1E" stroke-width="6" opacity="0.55" stroke-linecap="round"/><path d="M65 5 C69 22 63 38 67 55 C63 72 69 85 72 100" fill="none" stroke="#2D5A1E" stroke-width="5" opacity="0.5" stroke-linecap="round"/><path d="M82 8 C78 25 86 40 80 55 C84 70 82 85 86 98" fill="none" stroke="#2D5A1E" stroke-width="6" opacity="0.55" stroke-linecap="round"/></g><circle cx="50" cy="52" r="44" fill="none" stroke="#4A7A20" stroke-width="2"/><ellipse cx="36" cy="30" rx="12" ry="7" fill="white" opacity="0.18" transform="rotate(-25 36 30)"/><circle cx="50" cy="6" r="3" fill="#5A7A30"/></svg>';
+const BANANA_SVG = '<svg viewBox="0 0 36 36" width="1em" height="1em" style="vertical-align:-0.1em;display:inline-block;"><path fill="#FFE8B6" d="M28 2c2.684-1.342 5 4 3 13-1.106 4.977-5 9-9 12s-11-1-7-5 8-7 10-13c1.304-3.912 1-6 3-7z"/><path fill="#FFD983" d="M31 8c0 3-1 9-4 13s-7 5-4 1 5-7 6-11 2-7 2-3z"/><path fill="#FFCC4D" d="M22 20c-.296.592 1.167-3.833-3-6-1.984-1.032-10 1-4 1 3 0 4 2 2 4-.291.292-.489.603-.622.912-.417.346-.873.709-1.378 1.088-2.263 1.697-5.84 4.227-10 7-3 2-4 3-4 4 0 3 9 3 14 1s10-7 10-7l4-4c-3-4-7-2-7-2z"/><path fill="#FFE8B6" d="M22 20s1.792-4.729-3-7c-4.042-1.916-8-1-11 1s-2 4-3 5 1 2 3 0 8.316-4.895 11-4c3 1 2 2.999 3 5z"/><path fill="#A6D388" d="M26 35h-4c-2 0-3 1-4 1s-2-2 0-2 4 0 5-1 5 2 3 2z"/><circle fill="#3E721D" cx="18" cy="35" r="1"/><path fill="#FFCC4D" d="M32.208 28S28 35 26 35h-4c-2 0 0-1 1-2s5 0 5-6c0-3 4.208 1 4.208 1z"/><path fill="#FFE8B6" d="M26 19c3 0 8 3 7 9s-5 7-7 7h-2c-2 0-1-1 0-2s4 0 4-6c0-3-4-7-6-7 0 0 2-1 4-1z"/><path fill="#FFD983" d="M17 21c3 0 5 1 3 3-1.581 1.581-6 5-10 6s-8 1-5-1 9.764-8 12-8z"/><path fill="#C1694F" d="M2 31c1 0 1 0 1 .667C3 32.333 3 33 2 33s-1-1.333-1-1.333S1 31 2 31z"/></svg>';
+const FRUIT_ITEMS = ['🍎', BANANA_SVG, '🍇', WATERMELON_SVG];
+const TRIANGLE_SVG = '<svg viewBox="0 0 100 100" width="0.9em" height="0.9em" style="vertical-align:-0.1em;display:inline-block;"><polygon points="50,8 95,98 5,98" fill="#5BC886" stroke="#3A9B6A" stroke-width="4"/></svg>';
+const SHAPE_ITEMS = ['🔵', '🟨', TRIANGLE_SVG, '❤️'];
+const COLOR_ITEMS = ['🔴', '🔵', '🟡', '🟢'];
+const MONO_GREEN = '#5BC886';
+const SHAPE_MONO_ITEMS = [
+  `<svg viewBox="0 0 100 100" width="1em" height="1em" style="vertical-align:-0.15em;display:inline-block;"><circle cx="50" cy="50" r="46" fill="${MONO_GREEN}"/></svg>`,
+  `<svg viewBox="0 0 100 100" width="1em" height="1em" style="vertical-align:-0.15em;display:inline-block;"><rect x="6" y="6" width="88" height="88" rx="14" fill="${MONO_GREEN}"/></svg>`,
+  `<svg viewBox="0 0 100 100" width="1em" height="1em" style="vertical-align:-0.15em;display:inline-block;"><polygon points="50,6 96,97 4,97" fill="${MONO_GREEN}"/></svg>`,
+  `<svg viewBox="0 0 100 100" width="1em" height="1em" style="vertical-align:-0.15em;display:inline-block;"><path d="M50 82 C20 62 8 48 8 32 C8 19 18 8 32 8 C40 8 47 13 50 18 C53 13 60 8 68 8 C82 8 92 19 92 32 C92 48 80 62 50 82Z" fill="${MONO_GREEN}"/></svg>`
+];
+
+// ===== State =====
+let settings = loadSettings();
+let currentMode = '';
+let currentCycle = 2;
+let currentDifficulty = 1;
+let showHint = false;
+let score = 0;
+let combo = 0;
+let questionNum = 0;
+let locked = false;
+let impulseTimer = null;
+let isWrongNotesPractice = false;
+let wrongNotes = loadWrongNotes();
+let selectedCycles = { fruit: 2, color: 2, shape: 2, 'shape-mono': 2 };
+let selectedDiffs = { fruit: 1, color: 1, shape: 1, 'shape-mono': 1 };
+// For fill-in-the-blank: track blanks and current blank index
+let blanks = []; // [{seqIdx, answer}]
+let currentBlankIdx = 0;
+let currentSequence = [];
+let currentUnit = [];
+
+// ===== Login =====
+function doLogin(provider) {
+  localStorage.setItem(LOGIN_KEY, provider);
+  const _sp=sessionStorage.getItem('_sp');if(_sp){sessionStorage.removeItem('_sp');startGame(...JSON.parse(_sp));return;}
+  document.querySelector('.logout-btn').style.display='';
+  showView('start');
+}
+function doLogout() {
+  localStorage.removeItem(LOGIN_KEY);
+  showView('login');
+}
+function checkLogin() {
+  showView(localStorage.getItem(LOGIN_KEY) ? 'start' : 'login');
+}
+
+function showView(name) {
+  document.getElementById('login-view').classList.toggle('hidden', name !== 'login');
+  document.getElementById('start-view').classList.toggle('hidden', name !== 'start');
+  document.getElementById('play-view').classList.toggle('hidden', name !== 'play');
+  const wnView = document.getElementById('wn-view');
+  wnView.classList.toggle('active', name === 'wn');
+  if (name !== 'wn') wnView.classList.remove('active');
+  if (name === 'start') { renderSettingsUI(); updateWrongNotesBadge(); }
+  const lb=document.querySelector('.logout-btn');if(lb)lb.style.display=name==='start'&&localStorage.getItem('slowmath_pattern_login')?'':'none';
+}
+
+// ===== Settings =====
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return {
+      tts: s?.tts ?? true,
+      impulse: s?.impulse ?? true,
+      impulseMode: s?.impulseMode ?? 'hide',
+      impulseDelay: s?.impulseDelay ?? 3,
+      hint: s?.hint ?? true,
+    };
+  } catch { return { tts: true, impulse: true, impulseMode: 'hide', impulseDelay: 3, hint: true }; }
+}
+function saveSettings() { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); }
+function toggleTTS() { settings.tts = !settings.tts; saveSettings(); renderSettingsUI(); }
+function toggleImpulse() { settings.impulse = !settings.impulse; saveSettings(); renderSettingsUI(); }
+function setImpulseMode(mode) { settings.impulseMode = mode; saveSettings(); renderSettingsUI(); }
+function setImpulseDelay(sec) { settings.impulseDelay = sec; saveSettings(); renderSettingsUI(); }
+
+function toggleHint() { settings.hint = !settings.hint; saveSettings(); renderSettingsUI(); }
+
+function renderSettingsUI() {
+  const hintEl = document.getElementById('hint-toggle');
+  if (hintEl) hintEl.classList.toggle('on', settings.hint);
+
+  const ttsEl = document.getElementById('tts-toggle');
+  const impEl = document.getElementById('impulse-toggle');
+  const detEl = document.getElementById('impulse-details');
+  const delayRow = document.getElementById('impulse-delay-row');
+
+  ttsEl.classList.toggle('on', settings.tts);
+  impEl.classList.toggle('on', settings.impulse);
+  detEl.classList.toggle('show', settings.impulse);
+
+  document.querySelectorAll('.impulse-mode-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.mode === settings.impulseMode);
+  });
+
+  delayRow.classList.toggle('show', settings.impulseMode === 'lock');
+  delayRow.innerHTML = '';
+  for (let i = 1; i <= 10; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'imp-sec' + (settings.impulseDelay === i ? ' active' : '');
+    btn.textContent = i + '초';
+    btn.onclick = () => setImpulseDelay(i);
+    delayRow.appendChild(btn);
+  }
+}
+
+// ===== TTS =====
+function speak(text) {
+  if (!settings.tts || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ko-KR'; u.rate = 0.9;
+  setTimeout(() => window.speechSynthesis.speak(u), 50);
+}
+
+// ===== Feedback =====
+function showFeedback(emoji) {
+  const el = document.getElementById('feedback');
+  el.textContent = emoji;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 600);
+}
+
+// ===== Helpers =====
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function getItems() {
+  if (currentMode === 'fruit') return FRUIT_ITEMS;
+  if (currentMode === 'color') return COLOR_ITEMS;
+  if (currentMode === 'shape-mono') return SHAPE_MONO_ITEMS;
+  return SHAPE_ITEMS;
+}
+
+// Generate a pattern unit of given cycle length using available items
+function generatePatternUnit(cycle, items) {
+  // Pick 'cycle' items from the pool, allowing repeats but ensuring not all same
+  const unit = [];
+  for (let i = 0; i < cycle; i++) {
+    unit.push(items[Math.floor(Math.random() * items.length)]);
+  }
+  // Ensure at least 2 different items in the unit
+  const unique = new Set(unit);
+  if (unique.size < 2) {
+    // Replace one random position with a different item
+    const currentItem = unit[0];
+    const others = items.filter(it => it !== currentItem);
+    const replaceIdx = Math.floor(Math.random() * cycle);
+    unit[replaceIdx] = others[Math.floor(Math.random() * others.length)];
+  }
+  return unit;
+}
+
+// ===== Navigation =====
+// ===== Landscape Orientation =====
+let orientationLocked = false;
+let useCssFallback = false;
+
+function applyForceLandscape() {
+  const gameView = document.getElementById('play-view');
+  useCssFallback = true;
+  if (window.innerHeight > window.innerWidth) {
+    gameView.classList.add('force-landscape');
+  }
+}
+
+function lockLandscape() {
+  const gameView = document.getElementById('play-view');
+  gameView.classList.add('landscape-game');
+
+  // 1) Try fullscreen + orientation lock (works on Chrome Android)
+  const el = document.documentElement;
+  const requestFs = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+  if (requestFs) {
+    requestFs.call(el).then(() => {
+      const so = screen.orientation;
+      if (so && so.lock) {
+        so.lock('landscape').then(() => {
+          orientationLocked = true;
+        }).catch(() => applyForceLandscape());
+      } else {
+        applyForceLandscape();
+      }
+    }).catch(() => {
+      // 2) Try orientation lock without fullscreen
+      const so = screen.orientation;
+      if (so && so.lock) {
+        so.lock('landscape').then(() => {
+          orientationLocked = true;
+        }).catch(() => applyForceLandscape());
+      } else {
+        applyForceLandscape();
+      }
+    });
+  } else {
+    const so = screen.orientation;
+    if (so && so.lock) {
+      so.lock('landscape').then(() => {
+        orientationLocked = true;
+      }).catch(() => applyForceLandscape());
+    } else {
+      applyForceLandscape();
+    }
+  }
+}
+
+function unlockLandscape() {
+  const gameView = document.getElementById('play-view');
+  gameView.classList.remove('landscape-game', 'force-landscape');
+  if (orientationLocked) {
+    const so = screen.orientation;
+    if (so && so.unlock) so.unlock();
+    orientationLocked = false;
+  }
+  useCssFallback = false;
+  // Exit fullscreen if active
+  const exitFs = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+  if (exitFs && document.fullscreenElement) exitFs.call(document);
+}
+
+window.addEventListener('resize', () => {
+  if (useCssFallback) {
+    const gameView = document.getElementById('play-view');
+    if (window.innerHeight > window.innerWidth) {
+      gameView.classList.add('force-landscape');
+    }
+    // Never remove here — requestFullscreen fires spurious resize events
+    // during transition that can briefly report wrong dimensions.
+    // Removal is handled exclusively in orientationchange.
+  }
+});
+
+window.addEventListener('orientationchange', () => {
+  if (useCssFallback) {
+    setTimeout(() => {
+      const gameView = document.getElementById('play-view');
+      if (window.innerHeight > window.innerWidth) {
+        gameView.classList.add('force-landscape');
+      } else {
+        gameView.classList.remove('force-landscape');
+      }
+    }, 150);
+  }
+});
+
+function goHome() {
+  if (impulseTimer) { clearInterval(impulseTimer); impulseTimer = null; }
+  isWrongNotesPractice = false;
+  unlockLandscape();
+  showView('start');
+
+if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
+}
+
+// toggleModeHint removed — now using global hint toggle
+
+function selectCycle(mode, cycle) {
+  selectedCycles[mode] = cycle;
+  const container = document.getElementById('cycle-' + mode);
+  if (container) {
+    container.querySelectorAll('.cycle-btn').forEach(b => {
+      b.classList.toggle('selected', parseInt(b.dataset.cycle) === cycle);
+    });
+  }
+}
+
+function selectDiff(mode, diff) {
+  selectedDiffs[mode] = diff;
+  const container = document.getElementById('diff-' + mode);
+  if (container) {
+    container.querySelectorAll('.diff-btn').forEach(b => {
+      b.classList.toggle('selected', parseInt(b.dataset.diff) === diff);
+    });
+  }
+}
+
+function startGame(mode, difficulty) {
+  if (!localStorage.getItem('slowmath_pattern_login')) { sessionStorage.setItem('_sp',JSON.stringify([mode,difficulty])); showView('login'); return; }
+    currentMode = mode;
+  currentCycle = selectedCycles[mode] || 2;
+  currentDifficulty = difficulty || selectedDiffs[mode] || 1;
+  showHint = !!settings.hint;
+  isWrongNotesPractice = false;
+  score = 0; combo = 0; questionNum = 0;
+  document.getElementById('play-view').dataset.cycle = currentCycle;
+  showView('play');
+  lockLandscape();
+  updateScoreUI();
+  nextQuestion();
+}
+
+function updateScoreUI() {
+  document.getElementById('play-score').textContent = score + '점';
+  document.getElementById('combo-badge').textContent = combo > 1 ? combo + '연속 정답!' : '';
+  updateProgress();
+}
+
+function updateProgress() {
+  const current = Math.min(questionNum, TOTAL_QUESTIONS);
+  document.getElementById('play-progress-label').textContent = `${current} / ${TOTAL_QUESTIONS}`;
+  const fill = document.getElementById('play-progress-fill');
+  const ratio = current / TOTAL_QUESTIONS;
+  fill.style.width = `${ratio * 100}%`;
+  if (ratio <= 0.33) fill.style.background = 'var(--app-red)';
+  else if (ratio <= 0.66) fill.style.background = 'var(--app-orange)';
+  else fill.style.background = 'var(--app-green)';
+}
+
+// ===== Game Logic =====
+function nextQuestion() {
+  document.getElementById('next-q-btn').style.display='none';
+  questionNum++;
+  locked = false;
+  if (impulseTimer) { clearInterval(impulseTimer); impulseTimer = null; }
+
+  if (questionNum > TOTAL_QUESTIONS) {
+    showComplete();
+    return;
+  }
+
+  updateScoreUI();
+
+  const items = getItems();
+  const cycle = currentCycle;
+  const unit = generatePatternUnit(cycle, items);
+  currentUnit = unit;
+
+  // Build 4 full cycles
+  const totalLen = cycle * 4;
+  const sequence = [];
+  for (let i = 0; i < totalLen; i++) {
+    sequence.push(unit[i % cycle]);
+  }
+  currentSequence = sequence;
+
+  // Determine blank positions based on difficulty
+  blanks = [];
+  if (currentDifficulty === 1) {
+    // 3rd cycle (index 2), random position within that cycle
+    const posInCycle = Math.floor(Math.random() * cycle);
+    const seqIdx = 2 * cycle + posInCycle;
+    blanks.push({ seqIdx, answer: sequence[seqIdx] });
+  } else if (currentDifficulty === 2) {
+    // Random cycle (0-3), random position
+    const whichCycle = Math.floor(Math.random() * 4);
+    const posInCycle = Math.floor(Math.random() * cycle);
+    const seqIdx = whichCycle * cycle + posInCycle;
+    blanks.push({ seqIdx, answer: sequence[seqIdx] });
+  } else {
+    // Two different cycles, each with one blank
+    const cycles = shuffle([0, 1, 2, 3]);
+    const c1 = cycles[0], c2 = cycles[1];
+    const pos1 = Math.floor(Math.random() * cycle);
+    const pos2 = Math.floor(Math.random() * cycle);
+    const idx1 = c1 * cycle + pos1;
+    const idx2 = c2 * cycle + pos2;
+    // Sort by position so we fill left to right
+    const b = [
+      { seqIdx: idx1, answer: sequence[idx1] },
+      { seqIdx: idx2, answer: sequence[idx2] }
+    ].sort((a, b) => a.seqIdx - b.seqIdx);
+    blanks = b;
+  }
+
+  currentBlankIdx = 0;
+  renderPattern();
+}
+
+function renderPattern() {
+  const gc = document.getElementById('game-container');
+  const cycle = currentCycle;
+  const sequence = currentSequence;
+  const totalLen = sequence.length;
+  const blankPositions = new Set(blanks.map(b => b.seqIdx));
+
+  const blankCount = blanks.length;
+  const filledCount = currentBlankIdx;
+  let label = '빈칸에 들어갈 것은?';
+  if (blankCount > 1 && filledCount < blankCount) {
+    label = `빈칸에 들어갈 것은? (${filledCount + 1}/${blankCount})`;
+  }
+
+  let patternHTML = `<div class="pattern-label">${label}</div><div class="pattern-row">`;
+
+  for (let i = 0; i < totalLen; i++) {
+    const isGroupStart = (i % cycle === 0);
+    const isGroupEnd = (i % cycle === cycle - 1);
+
+    if (showHint && isGroupStart) patternHTML += '<div class="pattern-group">';
+
+    if (blankPositions.has(i)) {
+      const blankIdx = blanks.findIndex(b => b.seqIdx === i);
+      if (blankIdx < currentBlankIdx) {
+        // Already filled
+        patternHTML += `<div class="pattern-item blank filled">${blanks[blankIdx].answer}</div>`;
+      } else if (blankIdx === currentBlankIdx) {
+        // Active blank
+        patternHTML += `<div class="pattern-item blank active" id="blank-active">?</div>`;
+      } else {
+        // Future blank
+        patternHTML += `<div class="pattern-item blank">?</div>`;
+      }
+    } else {
+      patternHTML += `<div class="pattern-item">${sequence[i]}</div>`;
+    }
+
+    if (showHint && isGroupEnd) patternHTML += '</div>';
+  }
+  // Close last group if not closed (when totalLen is not multiple of cycle)
+  if (showHint && totalLen % cycle !== 0) patternHTML += '</div>';
+
+  patternHTML += '</div>';
+
+  // Current blank's answer and choices
+  const currentBlank = blanks[currentBlankIdx];
+  const answer = currentBlank.answer;
+  // Only use items that actually appear in the current pattern
+  const unitItems = [...new Set(currentUnit)];
+  const wrongItems = shuffle(unitItems.filter(w => w !== answer));
+  const choices = shuffle([answer, ...wrongItems.slice(0, 3)]);
+  const answerChoiceIdx = choices.indexOf(answer);
+
+  gc.innerHTML = `
+    ${patternHTML}
+    <div class="choices-grid" id="choices-grid">
+      ${choices.map((c, i) => `<button class="choice-btn" data-idx="${i}">${c}</button>`).join('')}
+    </div>
+    <div class="impulse-msg" id="impulse-msg"></div>
+  `;
+
+  speak('빈칸에 들어갈 것은 무엇일까요?');
+
+  // Impulse prevention
+  const grid = document.getElementById('choices-grid');
+  const msgEl = document.getElementById('impulse-msg');
+
+  if (settings.impulse) {
+    if (settings.impulseMode === 'hide') {
+      grid.classList.add('chips-hidden');
+      const wrap = document.createElement('div');
+      wrap.className = 'reveal-btn-wrap';
+      const revealBtn = document.createElement('button');
+      revealBtn.className = 'reveal-btn';
+      revealBtn.textContent = '보기 확인';
+      revealBtn.addEventListener('click', () => {
+        grid.classList.remove('chips-hidden');
+        wrap.remove();
+      });
+      wrap.appendChild(revealBtn);
+      grid.appendChild(wrap);
+    } else {
+      grid.classList.add('chips-locked');
+      grid.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+      let countdown = settings.impulseDelay;
+      msgEl.textContent = `${countdown}초 동안 생각해 보세요`;
+      impulseTimer = setInterval(() => {
+        countdown--;
+        if (countdown > 0) {
+          msgEl.textContent = `${countdown}초 동안 생각해 보세요`;
+        } else {
+          clearInterval(impulseTimer); impulseTimer = null;
+          msgEl.textContent = '';
+          grid.classList.remove('chips-locked');
+          grid.querySelectorAll('.choice-btn').forEach(b => b.disabled = false);
+        }
+      }, 1000);
+    }
+  }
+
+  // Store pattern info for wrong notes
+  const patternKey = currentMode + '###' + currentUnit.join('') + '###' + currentCycle;
+
+  gc.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (locked) return;
+      locked = true;
+      const idx = parseInt(btn.dataset.idx);
+      if (idx === answerChoiceIdx) {
+        btn.classList.add('correct');
+        combo++;
+        score += 10 + (combo > 1 ? combo * 2 : 0);
+        showFeedback('🎉');
+        speak('정답이에요!');
+        if (isWrongNotesPractice) removeWrongNote(patternKey);
+        updateScoreUI();
+
+        // Fill in the blank with the correct answer
+        const blankEl = document.getElementById('blank-active');
+        if (blankEl) {
+          blankEl.innerHTML = answer;
+          blankEl.classList.remove('active');
+          blankEl.classList.add('filled');
+        }
+
+        // Check if there are more blanks to fill
+        currentBlankIdx++;
+        if (currentBlankIdx < blanks.length) {
+          setTimeout(() => {
+            locked = false;
+            renderPattern();
+          }, 700);
+        } else {
+          document.getElementById('next-q-btn').style.display='';
+        }
+      } else {
+        btn.classList.add('wrong');
+        btn.disabled = true;
+        combo = 0;
+        if (!isWrongNotesPractice) addWrongNote(patternKey);
+        showFeedback('😢');
+        speak('다시 해봐요.');
+        // Let user try again - unlock without advancing
+        locked = false;
+      }
+    });
+  });
+}
+
+function onNextQ() {
+  document.getElementById('next-q-btn').style.display = 'none';
+  nextQuestion();
+}
+
+function showComplete() {
+_smGameCompleted=true;
+  const gc = document.getElementById('game-container');
+  gc.innerHTML = `
+    <div class="complete-overlay">
+      <div class="complete-emoji">${score >= TOTAL_QUESTIONS * 10 ? '🏆' : '👏'}</div>
+      <div class="complete-msg">${TOTAL_QUESTIONS}문제 완료!</div>
+      <div class="complete-sub">${score}점</div>
+      <button class="next-btn" id="retry-btn">다시 하기</button>
+      <button class="next-btn" id="home-btn" style="margin-top:8px;background:var(--warm-200);color:var(--warm-700);">홈으로</button>
+    </div>
+  `;
+  speak('모두 풀었어요! 잘했어요!');
+  document.getElementById('retry-btn').addEventListener('click', () => {
+    if (isWrongNotesPractice) startWrongNotesPractice();
+    else startGame(currentMode, currentDifficulty);
+  });
+  document.getElementById('home-btn').addEventListener('click', goHome);
+}
+
+// ===== Wrong Notes =====
+function loadWrongNotes() {
+  try { return JSON.parse(localStorage.getItem(WN_KEY)) || []; }
+  catch { return []; }
+}
+function saveWrongNotes() { localStorage.setItem(WN_KEY, JSON.stringify(wrongNotes)); }
+
+function addWrongNote(key) {
+  if (!wrongNotes.includes(key)) { wrongNotes.push(key); saveWrongNotes(); }
+}
+function removeWrongNote(key) {
+  wrongNotes = wrongNotes.filter(k => k !== key);
+  saveWrongNotes();
+}
+
+function updateWrongNotesBadge() {
+  const btn = document.getElementById('wrong-notes-btn');
+  const badge = document.getElementById('wn-badge');
+  if (wrongNotes.length > 0) {
+    btn.style.display = 'flex';
+    badge.textContent = wrongNotes.length;
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+function showWrongNotes() {
+  const list = document.getElementById('wn-list');
+  if (wrongNotes.length === 0) {
+    list.innerHTML = '<div class="wn-empty">틀린 문제가 없어요!</div>';
+  } else {
+    list.innerHTML = wrongNotes.map(key => {
+      const parts = key.split('_');
+      const cycle = parts[parts.length - 1];
+      const pattern = parts[0];
+      return `<div class="wn-chip">${[...pattern].join(' ')} (${cycle}개 주기)</div>`;
+    }).join('');
+  }
+  showView('wn');
+}
+
+function startWrongNotesPractice() {
+  if (wrongNotes.length === 0) return;
+  isWrongNotesPractice = true;
+  score = 0; combo = 0; questionNum = 0;
+  currentDifficulty = 1;
+  // Use the mode from the first wrong note
+  const firstKey = wrongNotes[0];
+  if (firstKey.includes('###')) {
+    const parts = firstKey.split('###');
+    currentMode = parts[0];
+    currentCycle = parseInt(parts[2]);
+  } else {
+    // Legacy key format: detect from items
+    const items = firstKey.split('_')[0];
+    currentMode = FRUIT_ITEMS.some(f => items.includes(f)) ? 'fruit' : 'shape';
+    currentCycle = parseInt(firstKey.split('_').pop());
+  }
+  document.getElementById('play-view').dataset.cycle = currentCycle;
+  showView('play');
+  lockLandscape();
+  updateScoreUI();
+  nextQuestion();
+}
+
+function clearWrongNotes() {
+  wrongNotes = [];
+  saveWrongNotes();
+  showView('start');
+}
+
+// ===== Share =====
+function shareApp() {
+    var SHARE_KEY = 'slowmath_share_days';
+    var MAX_DAYS = 5;
+    var bubble = document.getElementById('share-bubble');
+    function onShared() {
+        var days = parseInt(localStorage.getItem(SHARE_KEY) || '0');
+        if (days < MAX_DAYS) { days = days + 1; localStorage.setItem(SHARE_KEY, days); }
+                if (bubble && days >= MAX_DAYS) { bubble.style.display = 'none'; }
+        var shareToast = document.getElementById('share-toast');
+        if (shareToast) {
+          shareToast.textContent = '하루 무료 이용권이 지급되었습니다!';
+          shareToast.style.opacity = '1';
+          clearTimeout(shareToast._t);
+          shareToast._t = setTimeout(function() { shareToast.style.opacity = '0'; }, 3000);
+        }
+    }
+    var title = document.title;
+    var url = location.href;
+    if (navigator.share) {
+        navigator.share({ title: title, url: url }).then(onShared).catch(function() {});
+    } else {
+        if (navigator.clipboard) { navigator.clipboard.writeText(url); }
+        alert('링크가 복사되었어요!');
+        onShared();
+    }
+}
+
+  /* ══ 공유 버블 초기화 ══ */
+  document.addEventListener('DOMContentLoaded', function() {
+    var days = parseInt(localStorage.getItem('slowmath_share_days') || '0');
+    if (days >= 5) { var b = document.getElementById('share-bubble'); if (b) b.style.display = 'none'; }
+  });
+
+// ===== Init =====
+showView('start');
+
+// Share visibility: hide when logged out
+(function() {
+  var _SM_KEY = 'slowmath_pattern_login';
+  function _updateShareVis() {
+    document.body.classList.toggle('sm-loggedin', !!localStorage.getItem(_SM_KEY));
+  }
+  _updateShareVis();
+  ['socialLogin','socialLogout','goLogin'].forEach(function(fn) {
+    if (typeof window[fn] === 'function') {
+      var _orig = window[fn];
+      window[fn] = function() { _orig.apply(this, arguments); _updateShareVis(); };
+    }
+  });
+})();
+</script>
+
+<!-- ====== App Recommendation Popup ====== -->
+<div id="sm-reco-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.52);z-index:500;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">
+  <div style="background:#FFFDF8;border-radius:24px;padding:28px 22px 22px;max-width:270px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.18);animation:_smPop .32s cubic-bezier(.34,1.56,.64,1) both;">
+    <div style="font-size:0.72rem;font-weight:700;color:#C4AA82;letter-spacing:.08em;margin-bottom:14px;">도움이 될만한 앱을 소개드려요!</div>
+    <div id="sm-reco-emoji" style="font-size:2.75rem;margin-bottom:10px;line-height:1;"></div>
+    <div id="sm-reco-title" style="font-size:1.15rem;font-weight:900;color:#4A4035;margin-bottom:8px;"></div>
+    <div id="sm-reco-desc" style="font-size:0.84rem;color:#7B6545;line-height:1.65;margin-bottom:20px;"></div>
+    <a id="sm-reco-link" href="#" style="display:block;background:#6BADE8;color:#fff;border-radius:14px;padding:15px 0;font-size:0.975rem;font-weight:700;text-decoration:none;font-family:inherit;margin-bottom:10px;box-shadow:0 4px 12px rgba(107,173,232,.3);">바로 해보기 →</a>
+    <button onclick="document.getElementById('sm-reco-overlay').style.display='none'" style="background:none;border:none;color:#C4AA82;font-size:0.84rem;cursor:pointer;font-family:inherit;padding:6px;">다음에 할게요</button>
+  </div>
+</div>
+<style>@keyframes _smPop{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}</style>
+
+<script>
+/* ====== App Recommendation ====== */
+var _smGameCompleted = false;
+var _SM_RECO = [
+  {title:'숫자 익히기',emoji:'🔢',url:'https://sprit6487.github.io/slowmath_number/',desc:'숫자를 순서대로 배워보세요'},
+  {title:'색깔 익히기',emoji:'🌈',url:'https://sprit6487.github.io/slowmath_color/',desc:'여러가지 색깔을 익혀보아요'}
+];
+function _showRecoPopup() {
+  if (!_SM_RECO.length) return;
+  var item = _SM_RECO[Math.floor(Math.random() * _SM_RECO.length)];
+  document.getElementById('sm-reco-emoji').textContent = item.emoji;
+  document.getElementById('sm-reco-title').textContent = item.title;
+  document.getElementById('sm-reco-desc').innerHTML = item.desc;
+  document.getElementById('sm-reco-link').href = item.url;
+  document.getElementById('sm-reco-overlay').style.display = 'flex';
+}
+</script>
+</body>
+</html>

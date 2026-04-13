@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>느린아이 비교하기 기초 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --warm-700:#4A4035;--warm-800:#2E261D;
+  --warm-400:#B8AD9E;--warm-500:#8C8070;--warm-600:#6B5F50;
+  --border:#E8E2DA;--border-light:#F0ECE6;
+  --blue:#6BADE8;--orange:#F0A050;--green:#5BC886;--red:#F07070;
+  --bg:#F5F1EB;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dvh;display:flex;justify-content:center;align-items:flex-start;user-select:none;-webkit-tap-highlight-color:transparent;color:var(--warm-700);}
+.hidden{display:none!important;}
+.app{width:100%;max-width:480px;min-height:100dvh;background:#fff;padding:24px 20px;padding-top:max(24px,env(safe-area-inset-top));padding-bottom:max(24px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;}
+@media(min-width:768px){body{align-items:center;padding:32px;}.app{max-width:560px;min-height:auto;border-radius:32px;box-shadow:0 8px 48px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);padding:44px 40px;}}
+
+        /* ── Login View ── */
+        .login-view {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          flex: 1;
+          min-height: 100dvh;
+          padding: 40px 20px;
+        }
+
+        .login-logo-area {
+          text-align: center;
+          margin-bottom: 48px;
+        }
+
+        .login-logo-area svg {
+          display: block;
+          margin: 0 auto;
+        }
+
+        .login-logo-area h1 {
+          font-size: clamp(1.8rem, 6vw, 2.25rem);
+          font-weight: 900;
+          letter-spacing: -0.025em;
+          margin-top: 8px;
+          white-space: nowrap;
+        }
+
+        .login-subtitle {
+          color: #B8AD9E;
+          font-size: 0.9375rem;
+          margin-top: 4px;
+        }
+
+          @keyframes floatBubble {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+.login-trial {
+    position: relative;
+    background: #FFF8F0;
+    border: 1.5px solid #EDD080;
+    border-radius: 14px;
+    padding: 9px 16px;
+    font-size: 0.78rem;
+    color: #7B6545;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+    line-height: 1.4;
+    box-shadow: 0 4px 14px rgba(220,160,50,.18);
+    animation: floatBubble 2.8s ease-in-out infinite;
+    align-self: center;
+}
+.login-trial::before {
+    content: '';
+    position: absolute;
+    bottom: -9px; left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top: 8px solid #EDD080;
+    border-bottom: 0;
+}
+.login-trial::after {
+    content: '';
+    position: absolute;
+    bottom: -7px; left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top: 7px solid #FFF8F0;
+    border-bottom: 0;
+    z-index: 1;
+}
+  .login-buttons {
+          width: 100%;
+          max-width: 240px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .login-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+          padding: 16px 20px;
+          border-radius: 14px;
+          font-size: 1rem;
+          font-weight: 700;
+          font-family: inherit;
+          line-height: 1.2;
+          border: none;
+          cursor: pointer;
+          transition: transform 0.1s;
+        }
+        .login-btn:active { transform: scale(0.97); }
+        .login-btn svg { flex-shrink: 0; }
+        .login-btn.kakao { background: #FEE500; color: #191919; }
+        .login-btn.naver { background: #03C75A; color: #FFFFFF; }
+        .login-btn.google { background: #FFFFFF; color: #444444; border: 1.5px solid #DADCE0; }
+        .login-btn.facebook { background: #1877F2; color: #FFFFFF; }
+
+/* ── Start View ── */
+#start-view{width:100%;display:flex;flex-direction:column;align-items:center;}
+.brand{display:flex;flex-direction:column;align-items:center;margin-bottom:20px;position:relative;width:100%;}
+.brand h1{font-size:1.6rem;font-weight:900;letter-spacing:-.025em;margin-top:8px;}
+.brand-sub{font-size:.8rem;color:var(--warm-400);margin-top:6px;margin-bottom:0;font-weight:500;}
+.share-btn{position:absolute;top:0;right:0;background:#fff;border:2px solid var(--border);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--warm-500);}
+.share-bubble{position:absolute;right:0;background:#FFF8F0;border:1.5px solid #EDD080;border-radius:12px;padding:8px 12px;font-size:0.55rem;color:#7B6545;font-weight:600;box-shadow:0 4px 12px rgba(220,160,50,.18);z-index:20;animation:floatBubble 2.8s ease-in-out infinite;line-height:1.5;text-align:right;max-width:200px;}
+.share-bubble::before{content:'';position:absolute;top:-8px;right:10px;border:4px solid transparent;border-bottom:7px solid #EDD080;border-top:0;}
+.share-bubble::after{content:'';position:absolute;top:-6px;right:11px;border:3px solid transparent;border-bottom:6px solid #FFF8F0;border-top:0;z-index:1;}
+@media (max-width:768px){.share-bubble{font-size:0.60rem;max-width:170px;padding:7px 10px;}}
+@media (max-width:480px){.share-bubble{font-size:0.62rem;max-width:165px;padding:7px 9px;}}
+
+/* Mode Cards */
+.mode-grid{width:100%;display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.mode-card{background:#fff;border:2px solid var(--border);border-radius:20px;padding:14px 16px 12px;width:100%;}
+.mode-card-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.mode-preview-wrap{width:76px;height:52px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.mode-info{flex:1;text-align:left;}
+.mode-title{font-size:1rem;font-weight:700;color:var(--warm-700);margin-bottom:2px;}
+.mode-desc{font-size:.72rem;color:var(--warm-400);}
+.mode-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mode-btn{flex:1;padding:10px 0;border:2px solid var(--border);border-radius:10px;background:#fff;font-family:inherit;font-size:.72rem;font-weight:700;color:var(--warm-600);cursor:pointer;transition:all .12s;text-align:center;}
+.mode-btn:hover,.mode-btn:active{background:#EEF6FD;border-color:var(--blue);color:var(--blue);}
+
+/* ── Settings ── */
+.settings-section{width:100%;border-top:1.5px solid var(--border-light);padding-top:16px;margin-top:4px;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.setting-label{font-size:.875rem;font-weight:600;color:var(--warm-700);}
+.setting-desc{font-size:.75rem;color:var(--warm-400);margin-top:2px;}
+.toggle-track{width:48px;height:28px;border-radius:99px;position:relative;background:#E0DAD0;border:none;cursor:pointer;flex-shrink:0;transition:background .2s;}
+.toggle-track.on{background:#5BC886;}
+.toggle-knob{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:transform .2s;}
+.toggle-track.on .toggle-knob{transform:translateX(20px);}
+.impulse-mode-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.impulse-mode-btn{display:flex;flex-direction:column;align-items:center;padding:10px 8px;border-radius:14px;border:2px solid var(--border);background:#fff;cursor:pointer;transition:all .15s;font-family:inherit;}
+.impulse-mode-btn.selected{border-color:#C4AA82;background:#FAF5EE;}
+.impulse-mode-icon{font-size:1.2rem;margin-bottom:2px;}
+.impulse-mode-label{font-size:.8rem;font-weight:700;color:var(--warm-700);}
+.impulse-mode-desc{font-size:.65rem;color:var(--warm-400);margin-top:1px;}
+.imp-sec-row{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;}
+.imp-sec{flex:0 0 calc((100% - 16px)/5);padding:8px 0;font-size:.7rem;font-weight:600;border-radius:10px;border:2px solid var(--border);background:#fff;color:#8C8070;cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;}
+.imp-sec.active{border-color:#C4AA82;background:#FAF5EE;color:#7B6545;}
+#impulse-details{display:none;}
+.logout-btn{background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 14px;font-size:.75rem;font-weight:600;color:var(--warm-400);cursor:pointer;font-family:inherit;margin-top:20px;display:none;}
+.logout-btn:hover{background:var(--bg);}
+
+/* ── Play View ── */
+#play-view{width:100%;display:flex;flex-direction:column;align-items:center;}
+.play-header{display:flex;align-items:center;gap:12px;width:100%;margin-bottom:14px;}
+.btn-home{width:36px;height:36px;border-radius:10px;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--warm-500);flex-shrink:0;padding:0;}
+.play-middle{flex:1;display:flex;flex-direction:column;gap:4px;}
+.play-progress-label{font-size:.8rem;font-weight:600;color:var(--warm-500);}
+.play-progress-bar{width:100%;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden;}
+.play-progress-fill{height:100%;border-radius:3px;background:var(--blue);transition:width .3s;}
+.play-score{font-size:.85rem;font-weight:700;color:var(--green);flex-shrink:0;}
+.game-container{background:#fff;border:2px solid var(--border);border-radius:20px;padding:16px 10px 14px;width:100%;display:flex;flex-direction:column;align-items:center;}
+.question-prompt{font-size:1.3rem;font-weight:900;color:var(--warm-700);text-align:center;margin-bottom:14px;line-height:1.3;}
+
+/* Scene area */
+.scene-area{width:100%;margin-bottom:14px;display:flex;justify-content:center;}
+.scene-area svg{max-height:190px;width:100%;}
+
+/* Item cards */
+.compare-row{display:flex;gap:6px;justify-content:center;width:100%;margin-bottom:12px;}
+.item-card{flex:1;border:2px solid var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;background:#FDFCFA;min-width:0;cursor:pointer;transition:border-color .15s,background .15s,transform .1s;overflow:hidden;}
+.item-card:hover{border-color:var(--blue);background:#EEF6FD;}
+.item-card:active{transform:scale(.96);}
+.item-card.card-correct{border-color:#5BC886!important;background:#D4F5E0!important;}
+.item-card.card-wrong{border-color:#F07070!important;background:#FDE8E8!important;opacity:.6;}
+.item-card.card-locked{pointer-events:none;}
+.item-visual{display:flex;align-items:center;justify-content:center;width:100%;min-height:80px;}
+.item-visual svg{width:100%!important;height:auto!important;display:block;}
+
+.feedback{font-size:1rem;font-weight:700;text-align:center;padding:8px 0;min-height:38px;}
+.feedback.correct{color:#5BC886;}
+.feedback.wrong{color:#F07070;}
+
+.btn-next-q{display:block;width:100%;max-width:360px;margin:6px auto 0;padding:14px 0;border-radius:16px;border:none;background:#4A4035;color:#fff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(74,64,53,.15);transition:background .15s,transform .1s;}
+.btn-next-q:active{transform:scale(.98);background:#2E261D;}
+
+.reveal-btn{display:block;width:100%;max-width:320px;margin:0 auto 12px;padding:14px 0;border-radius:14px;border:2px solid #C4AA82;background:#FAF5EE;color:#7B6545;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;}
+.reveal-btn:active{background:#F0E6D6;transform:scale(.98);}
+.delay-countdown{text-align:center;font-size:1.5rem;font-weight:900;color:#C4AA82;padding:12px 0;animation:pulse-count 1s ease infinite;}
+#impulse-area{width:100%;}
+
+/* Result View */
+#result-view{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:40px 0;}
+.complete-overlay{position:relative;margin-top:40px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.complete-emoji{font-size:56px;}
+.complete-msg{font-size:1.25rem;font-weight:900;color:#4A4035;}
+.complete-sub{font-size:.85rem;color:#B8AD9E;}
+.next-btn{margin-top:8px;padding:14px 36px;border:none;border-radius:12px;background:#6BADE8;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .12s;}
+.next-btn:active{transform:scale(.96);}
+
+/* Splash */
+.splash-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;transition:opacity .5s ease-out;}
+.splash-overlay.fade-out{opacity:0;pointer-events:none;}
+.splash-logo{animation:splashFloat 2.4s ease-in-out infinite;margin-bottom:24px;}
+.splash-title{font-size:2rem;font-weight:900;letter-spacing:-.025em;margin-bottom:8px;}
+.splash-subtitle{color:#B8B0A8;font-size:.9375rem;font-weight:500;}
+@keyframes splashFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@media(max-width:380px){.splash-title{font-size:1.5rem}}
+@media(min-width:768px){.splash-logo svg{width:160px;height:134px}.splash-title{font-size:2.5rem}.splash-subtitle{font-size:1.0625rem}}
+@keyframes popIn{0%{transform:scale(.8);opacity:.5}45%{transform:scale(1.15)}65%{transform:scale(.92)}80%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes pulse-count{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.7}}
+
+/* Hide share button/bubble when not logged in */
+body:not(.sm-loggedin) [title="공유하기"],
+body:not(.sm-loggedin) #share-bubble { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ══════ Splash Screen ══════ -->
+<div id="splash" class="splash-overlay">
+    <div class="splash-logo">
+        <svg viewBox="0 0 120 100" width="140" height="117" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+            <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+            <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+            <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+            <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+            <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+            <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+            <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+            <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+            <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+            <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+            <circle cx="101" cy="33" r="1" fill="white"/>
+            <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+            <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <h1 class="splash-title">
+        <span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">비교하기 기초 2</span>
+    </h1>
+    <p class="splash-subtitle">비교하는 연습을 해보아요</p>
+</div>
+<script>
+setTimeout(function() {
+    var splash = document.getElementById("splash");
+    if (splash) { splash.classList.add("fade-out"); setTimeout(function() { splash.remove(); }, 500); }
+}, 3000);
+</script>
+
+<div class="app">
+
+    <!-- ══════════════ 로그인 화면 ══════════════ -->
+    <div id="login-view" class="login-view">
+        <div class="login-logo-area">
+            <svg viewBox="0 0 120 100" width="120" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+                <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+                <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+                <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+                <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+                <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+                <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity="0.35" transform="rotate(-15 42 26)"/>
+                <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity="0.2"/>
+                <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+                <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+                <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+                <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+                <circle cx="101" cy="33" r="1" fill="white"/>
+                <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity="0.4"/>
+                <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">비교하기 기초 2</span></h1>
+            <p class="login-subtitle">비교하는 연습을 해보아요</p>
+        </div>
+          <p class="login-trial">가입하시고 하루 동안 모든 기능을<br>무료로 체험해보세요</p>
+<div class="login-buttons">
+            <button class="login-btn kakao" onclick="socialLogin('kakao')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 1C4.477 1 0 4.477 0 8.667c0 2.7 1.753 5.072 4.393 6.413-.192.717-.694 2.6-.794 3.004-.124.497.182.49.383.356.158-.105 2.51-1.708 3.525-2.398.8.118 1.628.18 2.493.18 5.523 0 10-3.477 10-7.555C20 4.477 15.523 1 10 1z" fill="#191919"/></svg>
+                카카오로 시작하기
+            </button>
+            <button class="login-btn naver" onclick="socialLogin('naver')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M13.57 10.684L6.066 0H0v20h6.43V9.316L13.934 20H20V0h-6.43v10.684z" fill="white"/></svg>
+                네이버로 시작하기
+            </button>
+            <button class="login-btn google" onclick="socialLogin('google')">
+                <svg width="20" height="20" viewBox="0 0 48 48"><path d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" fill="#FFC107"/><path d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" fill="#FF3D00"/><path d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" fill="#4CAF50"/><path d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.001-.001 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" fill="#1976D2"/></svg>
+                Google로 시작하기
+            </button>
+            <button class="login-btn facebook" onclick="socialLogin('facebook')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" fill="white"/></svg>
+                Facebook으로 시작하기
+            </button>
+        </div>
+    </div>
+
+<!-- ══ 시작 화면 ══ -->
+<div id="start-view" class="hidden">
+  <div class="brand">
+    <button class="share-btn" onclick="shareApp()" title="공유하기">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+    </button>
+    <div id="share-bubble" class="share-bubble" style="top:44px;">지금 지인에게 공유하시면<br>하루 무료 이용권을 드려요</div>
+    <div id="share-toast" style="display:block;position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#3A7D44;color:white;padding:12px 20px;border-radius:14px;font-size:0.85rem;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.25);transition:opacity 0.4s;opacity:0;pointer-events:none;white-space:nowrap;"></div>
+    <svg viewBox="0 0 120 100" width="90" height="75" fill="none">
+      <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+      <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+      <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+      <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+      <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+      <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+      <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+      <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+      <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+      <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+      <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+      <circle cx="101" cy="33" r="1" fill="white"/>
+      <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+      <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">비교하기 기초 2</span></h1>
+    <p class="brand-sub">비교하는 연습을 해보아요</p>
+  </div>
+
+  <div class="mode-grid">
+    <!-- 위/아래 -->
+    <div class="mode-card">
+      <div class="mode-card-top">
+        <div class="mode-preview-wrap">
+          <svg viewBox="0 0 76 56" width="76" height="52" fill="none">
+            <circle cx="38" cy="12" r="10" fill="#6BADE8" opacity=".85"/>
+            <line x1="8" y1="28" x2="68" y2="28" stroke="#E8E2DA" stroke-width="1.5" stroke-dasharray="5 4"/>
+            <rect x="26" y="36" width="24" height="18" rx="3" fill="#F0A050" opacity=".85"/>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <div class="mode-title">위에 있어요 / 아래에 있어요</div>
+          <div class="mode-desc">어디에 있는지 비교해요</div>
+        </div>
+      </div>
+      <div class="mode-btns">
+        <button class="mode-btn" onclick="startGame('up_down','a')">위에 있어요</button>
+        <button class="mode-btn" onclick="startGame('up_down','b')">아래에 있어요</button>
+        <button class="mode-btn" onclick="startGame('up_down','mix')">2개 비교</button>
+        <button class="mode-btn" onclick="startGame('up_down','mix3')">3개 비교</button>
+      </div>
+    </div>
+    <!-- 안/밖 -->
+    <div class="mode-card">
+      <div class="mode-card-top">
+        <div class="mode-preview-wrap">
+          <svg viewBox="0 0 76 56" width="76" height="52" fill="none">
+            <rect x="28" y="6" width="42" height="44" rx="8" fill="#FAF5EE" stroke="#C8B898" stroke-width="2" stroke-dasharray="7 4"/>
+            <circle cx="49" cy="28" r="10" fill="#5BC886" opacity=".85"/>
+            <circle cx="10" cy="28" r="7" fill="#C080D0" opacity=".85"/>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <div class="mode-title">안에 있어요 / 밖에 있어요</div>
+          <div class="mode-desc">안과 밖을 비교해요</div>
+        </div>
+      </div>
+      <div class="mode-btns">
+        <button class="mode-btn" onclick="startGame('in_out','a')">안에 있어요</button>
+        <button class="mode-btn" onclick="startGame('in_out','b')">밖에 있어요</button>
+        <button class="mode-btn" onclick="startGame('in_out','mix')">2개 비교</button>
+        <button class="mode-btn" onclick="startGame('in_out','mix3')">3개 비교</button>
+      </div>
+    </div>
+    <!-- 앞/뒤 -->
+    <div class="mode-card">
+      <div class="mode-card-top">
+        <div class="mode-preview-wrap">
+          <svg viewBox="0 0 76 56" width="76" height="52" fill="none">
+            <defs>
+              <mask id="prev-fb-mask">
+                <rect width="76" height="56" fill="white"/>
+                <circle cx="28" cy="36" r="12" fill="black"/>
+              </mask>
+            </defs>
+            <circle cx="40" cy="25" r="12" fill="#F07070" mask="url(#prev-fb-mask)"/>
+            <circle cx="28" cy="36" r="12" fill="#6BADE8"/>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <div class="mode-title">앞에 있어요 / 뒤에 있어요</div>
+          <div class="mode-desc">앞과 뒤를 비교해요</div>
+        </div>
+      </div>
+      <div class="mode-btns">
+        <button class="mode-btn" onclick="startGame('front_back','a')">앞에 있어요</button>
+        <button class="mode-btn" onclick="startGame('front_back','b')">뒤에 있어요</button>
+        <button class="mode-btn" onclick="startGame('front_back','mix')">2개 비교</button>
+        <button class="mode-btn" onclick="startGame('front_back','mix3')">3개 비교</button>
+      </div>
+    </div>
+    <!-- 높아요/낮아요 -->
+    <div class="mode-card">
+      <div class="mode-card-top">
+        <div class="mode-preview-wrap">
+          <svg viewBox="0 0 76 56" width="76" height="52" fill="none">
+            <circle cx="18" cy="17" r="12" fill="#F0A050" opacity=".9"/>
+            <line x1="6" y1="31" x2="30" y2="31" stroke="#C8B898" stroke-width="2" stroke-linecap="round"/>
+            <polygon points="58,12 50,36 66,36" fill="#6BADE8" opacity=".9"/>
+            <line x1="46" y1="40" x2="70" y2="40" stroke="#C8B898" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <div class="mode-title">높아요 / 낮아요</div>
+          <div class="mode-desc">위치의 높낮이를 비교해요</div>
+        </div>
+      </div>
+      <div class="mode-btns">
+        <button class="mode-btn" onclick="startGame('high_low','a')">높아요</button>
+        <button class="mode-btn" onclick="startGame('high_low','b')">낮아요</button>
+        <button class="mode-btn" onclick="startGame('high_low','mix')">2개 비교</button>
+        <button class="mode-btn" onclick="startGame('high_low','mix3')">3개 비교</button>
+      </div>
+    </div>
+    <!-- 왼쪽/오른쪽 -->
+    <div class="mode-card">
+      <div class="mode-card-top">
+        <div class="mode-preview-wrap">
+          <svg viewBox="0 0 76 56" width="76" height="52" fill="none">
+            <line x1="38" y1="4" x2="38" y2="52" stroke="#C8B898" stroke-width="1.5" stroke-dasharray="5 3"/>
+            <circle cx="18" cy="28" r="10" fill="#F07070" opacity=".85"/>
+            <polygon points="58,10 49,32 67,32" fill="#5BC886" opacity=".85"/>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <div class="mode-title">왼쪽에 있어요 / 오른쪽에 있어요</div>
+          <div class="mode-desc">왼쪽과 오른쪽을 비교해요</div>
+        </div>
+      </div>
+      <div class="mode-btns">
+        <button class="mode-btn" onclick="startGame('left_right','a')">왼쪽에 있어요</button>
+        <button class="mode-btn" onclick="startGame('left_right','b')">오른쪽에 있어요</button>
+        <button class="mode-btn" onclick="startGame('left_right','mix')">2개 비교</button>
+        <button class="mode-btn" onclick="startGame('left_right','mix3')">3개 비교</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 설정 -->
+  <div class="settings-section">
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">음성</div>
+        <div class="setting-desc">정답/오답 음성 안내</div>
+      </div>
+      <button id="tts-toggle" onclick="toggleTTS()" class="toggle-track on"><span class="toggle-knob"></span></button>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">충동방지</div>
+        <div class="setting-desc">생각할 시간을 줘요</div>
+      </div>
+      <button id="impulse-toggle" onclick="toggleImpulse()" class="toggle-track on"><span class="toggle-knob"></span></button>
+    </div>
+    <div id="impulse-details">
+      <div class="impulse-mode-options">
+        <button class="impulse-mode-btn selected" onclick="setImpulseMode('hide')" data-mode="hide">
+          <span class="impulse-mode-icon">👀</span>
+          <span class="impulse-mode-label">보기 확인</span>
+          <span class="impulse-mode-desc">버튼을 누르면 보기가 나타나요</span>
+        </button>
+        <button class="impulse-mode-btn" onclick="setImpulseMode('lock')" data-mode="lock">
+          <span class="impulse-mode-icon">🔒</span>
+          <span class="impulse-mode-label">선택 잠금</span>
+          <span class="impulse-mode-desc">N초 동안 선택할 수 없어요</span>
+        </button>
+      </div>
+      <div class="imp-sec-row" id="impulse-delay-row">
+        <button onclick="setImpulseDelay(1)" class="imp-sec">1초</button>
+        <button onclick="setImpulseDelay(2)" class="imp-sec">2초</button>
+        <button onclick="setImpulseDelay(3)" class="imp-sec">3초</button>
+        <button onclick="setImpulseDelay(4)" class="imp-sec">4초</button>
+        <button onclick="setImpulseDelay(5)" class="imp-sec active">5초</button>
+        <button onclick="setImpulseDelay(6)" class="imp-sec">6초</button>
+        <button onclick="setImpulseDelay(7)" class="imp-sec">7초</button>
+        <button onclick="setImpulseDelay(8)" class="imp-sec">8초</button>
+        <button onclick="setImpulseDelay(9)" class="imp-sec">9초</button>
+        <button onclick="setImpulseDelay(10)" class="imp-sec">10초</button>
+      </div>
+    </div>
+  </div>
+  <button class="logout-btn" id="logout-btn" onclick="logout()">로그아웃</button>
+</div>
+
+<!-- ══ 게임 화면 ══ -->
+<div id="play-view" class="hidden">
+  <div class="play-header">
+    <button onclick="goHome()" class="btn-home" title="홈">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-8 9 8M5 11v9a1 1 0 001 1h3m8 0h3a1 1 0 001-1v-9"/></svg>
+    </button>
+    <div class="play-middle">
+      <div class="play-progress-label" id="q-label">1 / 10</div>
+      <div class="play-progress-bar"><div class="play-progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="play-score" id="play-score">0점</div>
+  </div>
+  <div class="game-container">
+    <div class="question-prompt" id="question-prompt"></div>
+    <div class="scene-area" id="scene-area"></div>
+    <div class="compare-row" id="compare-row"></div>
+    <div class="feedback" id="feedback"></div>
+    <div id="impulse-area"></div>
+    <button class="btn-next-q hidden" id="next-q-btn" onclick="onNextQ()">다음 문제 →</button>
+  </div>
+</div>
+
+<!-- ══ 결과 화면 ══ -->
+<div id="result-view" class="hidden">
+  <div class="complete-overlay" style="position:relative;margin-top:40px;">
+    <div class="complete-emoji" id="result-emoji">🏆</div>
+    <div class="complete-msg" id="result-msg"></div>
+    <div class="complete-sub" id="result-detail"></div>
+    <button class="next-btn" id="result-retry-btn">다시 하기</button>
+    <button class="next-btn" onclick="goHome()" style="margin-top:8px;background:#EDE8E0;color:#8C8070;">홈으로</button>
+  </div>
+</div>
+
+</div><!-- .app -->
+
+<script>
+/* ══ 상수 ══ */
+const SHAPES = ['circle','square','triangle','star','heart'];
+const COLORS = ['#F07070','#F0A050','#EDD050','#5BC886','#6BADE8','#4A7CD0','#C080D0'];
+const Q_PER_GAME = 10;
+
+const CONCEPTS = {
+  up_down:    { nameA:'위에 있어요', nameB:'아래에 있어요',   qA:'위에 있는 것은?',    qB:'아래에 있는 것은?',
+                qA3:'가장 위에 있는 것은?', qB3:'가장 아래에 있는 것은?', qMid3:'가운데에 있는 것은?' },
+  in_out:     { nameA:'안에 있어요', nameB:'밖에 있어요',     qA:'안에 있는 것은?',    qB:'밖에 있는 것은?',
+                qA3:'안에 있는 것은?', qB3:'밖에 있는 것은?', qMid3:null },
+  front_back: { nameA:'앞에 있어요', nameB:'뒤에 있어요',     qA:'앞에 있는 것은?',    qB:'뒤에 있는 것은?',
+                qA3:'가장 앞에 있는 것은?', qB3:'가장 뒤에 있는 것은?', qMid3:'가운데에 있는 것은?' },
+  high_low:   { nameA:'높아요',      nameB:'낮아요',           qA:'높이 있는 것은?',    qB:'낮게 있는 것은?',
+                qA3:'가장 높이 있는 것은?', qB3:'가장 낮게 있는 것은?', qMid3:'가운데에 있는 것은?' },
+  left_right: { nameA:'왼쪽에 있어요', nameB:'오른쪽에 있어요', qA:'왼쪽에 있는 것은?', qB:'오른쪽에 있는 것은?',
+                qA3:'가장 왼쪽에 있는 것은?', qB3:'가장 오른쪽에 있는 것은?', qMid3:'가운데에 있는 것은?' },
+};
+
+/* ══ 상태 ══ */
+let curConcept, curType, curQuestions, qIdx, score, curQ, locked;
+let ttsOn = true, impulsePrevention = true, impulseMode = 'hide', impulseDelay = 5;
+let delayTimer = null;
+
+/* ══ 뷰 전환 ══ */
+function showView(id) {
+  ['login-view','start-view','play-view','result-view'].forEach(v =>
+    document.getElementById(v).classList.toggle('hidden', v !== id)
+  );
+  const lb = document.getElementById('logout-btn');
+  if (lb) lb.style.display = id === 'start-view' && localStorage.getItem('slowmath_comparing2_login') ? 'block' : 'none';
+}
+
+/* ══ 로그인 ══ */
+function socialLogin(provider) {
+  localStorage.setItem('slowmath_comparing2_login', provider);
+  const _sp = sessionStorage.getItem('_sp');
+  if (_sp) { sessionStorage.removeItem('_sp'); startGame(...JSON.parse(_sp)); return; }
+  showView('start-view');
+}
+function logout() {
+  localStorage.removeItem('slowmath_comparing2_login');
+  showView('login-view');
+}
+function goHome() {
+  if (delayTimer) { clearInterval(delayTimer); delayTimer = null; }
+  showView('start-view');
+
+if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
+}
+
+/* ══ 설정 ══ */
+function saveSettings() {
+  localStorage.setItem('slowmath_comparing2_settings', JSON.stringify(
+    { ttsOn, impulsePrevention, impulseMode, impulseDelay }
+  ));
+}
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('slowmath_comparing2_settings'));
+    if (!s) return;
+    if (s.ttsOn !== undefined) ttsOn = s.ttsOn;
+    if (s.impulsePrevention !== undefined) impulsePrevention = s.impulsePrevention;
+    if (s.impulseMode) impulseMode = s.impulseMode;
+    if (s.impulseDelay) impulseDelay = s.impulseDelay;
+  } catch(e) {}
+}
+function applySettingsUI() {
+  document.getElementById('tts-toggle').classList.toggle('on', ttsOn);
+  document.getElementById('impulse-toggle').classList.toggle('on', impulsePrevention);
+  document.getElementById('impulse-details').style.display = impulsePrevention ? 'block' : 'none';
+  document.querySelectorAll('.impulse-mode-btn').forEach(b =>
+    b.classList.toggle('selected', b.dataset.mode === impulseMode)
+  );
+  document.getElementById('impulse-delay-row').style.display = impulseMode === 'lock' ? '' : 'none';
+  document.querySelectorAll('.imp-sec').forEach(b =>
+    b.classList.toggle('active', parseInt(b.textContent) === impulseDelay)
+  );
+}
+function toggleTTS() {
+  ttsOn = !ttsOn;
+  document.getElementById('tts-toggle').classList.toggle('on', ttsOn);
+  saveSettings();
+}
+function toggleImpulse() {
+  impulsePrevention = !impulsePrevention;
+  document.getElementById('impulse-toggle').classList.toggle('on', impulsePrevention);
+  document.getElementById('impulse-details').style.display = impulsePrevention ? 'block' : 'none';
+  saveSettings();
+}
+function setImpulseMode(mode) {
+  impulseMode = mode;
+  document.querySelectorAll('.impulse-mode-btn').forEach(b =>
+    b.classList.toggle('selected', b.dataset.mode === mode)
+  );
+  document.getElementById('impulse-delay-row').style.display = mode === 'lock' ? '' : 'none';
+  saveSettings();
+}
+function setImpulseDelay(s) {
+  impulseDelay = s;
+  document.querySelectorAll('.imp-sec').forEach(b =>
+    b.classList.toggle('active', parseInt(b.textContent) === s)
+  );
+  saveSettings();
+}
+
+/* ══ 공유 ══ */
+function shareApp() {
+  var SHARE_KEY = 'slowmath_share_days';
+  var MAX_DAYS = 5;
+  var bubble = document.getElementById('share-bubble');
+  function onShared() {
+    var days = parseInt(localStorage.getItem(SHARE_KEY) || '0');
+    if (days < MAX_DAYS) { days = days + 1; localStorage.setItem(SHARE_KEY, days); }
+        if (bubble && days >= MAX_DAYS) { bubble.style.display = 'none'; }
+    var shareToast = document.getElementById('share-toast');
+    if (shareToast) {
+      shareToast.textContent = '하루 무료 이용권이 지급되었습니다!';
+      shareToast.style.opacity = '1';
+      clearTimeout(shareToast._t);
+      shareToast._t = setTimeout(function() { shareToast.style.opacity = '0'; }, 3000);
+    }
+  }
+  var title = document.title;
+  var url = location.href;
+  if (navigator.share) {
+    navigator.share({title: title, url: url}).then(onShared).catch(function(){});
+  } else {
+    if (navigator.clipboard) { navigator.clipboard.writeText(url); }
+    alert('링크가 복사되었어요!');
+    onShared();
+  }
+}
+
+  /* ══ 공유 버블 초기화 ══ */
+  document.addEventListener('DOMContentLoaded', function() {
+    var days = parseInt(localStorage.getItem('slowmath_share_days') || '0');
+    if (days >= 5) { var b = document.getElementById('share-bubble'); if (b) b.style.display = 'none'; }
+  });
+
+/* ══ SVG 도형 그리기 ══ */
+function shapeAt(shape, cx, cy, r, color, filled=true) {
+  const sw = Math.max(2.5, r * 0.17);
+  switch(shape) {
+    case 'circle':
+      return filled
+        ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" opacity=".9"/>`
+        : `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" opacity=".9"/>`;
+    case 'square': {
+      const s = r * 1.75;
+      return filled
+        ? `<rect x="${cx-s/2}" y="${cy-s/2}" width="${s}" height="${s}" rx="3" fill="${color}" opacity=".9"/>`
+        : `<rect x="${cx-s/2}" y="${cy-s/2}" width="${s}" height="${s}" rx="3" fill="none" stroke="${color}" stroke-width="${sw}" opacity=".9"/>`;
+    }
+    case 'triangle': {
+      const h = r * 1.9, pts = `${cx},${cy-h*.5} ${cx-h*.55},${cy+h*.5} ${cx+h*.55},${cy+h*.5}`;
+      return filled
+        ? `<polygon points="${pts}" fill="${color}" opacity=".9"/>`
+        : `<polygon points="${pts}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linejoin="round" opacity=".9"/>`;
+    }
+    case 'star': {
+      let pts = '';
+      for (let i = 0; i < 10; i++) {
+        const a = (i * 36 - 90) * Math.PI / 180, rad = i % 2 === 0 ? r : r * .4;
+        pts += `${cx+Math.cos(a)*rad},${cy+Math.sin(a)*rad} `;
+      }
+      return filled
+        ? `<polygon points="${pts.trim()}" fill="${color}" opacity=".9"/>`
+        : `<polygon points="${pts.trim()}" fill="none" stroke="${color}" stroke-width="${Math.max(2,sw*.8)}" stroke-linejoin="round" opacity=".9"/>`;
+    }
+    case 'heart': {
+      const d = `M${cx},${cy+r} C${cx-r*.4},${cy+r*.5} ${cx-r},${cy+r*.05} ${cx-r},${cy-r*.25} C${cx-r},${cy-r*.78} ${cx-r*.35},${cy-r*.95} ${cx},${cy-r*.48} C${cx+r*.35},${cy-r*.95} ${cx+r},${cy-r*.78} ${cx+r},${cy-r*.25} C${cx+r},${cy+r*.05} ${cx+r*.4},${cy+r*.5} ${cx},${cy+r}Z`;
+      return filled
+        ? `<path d="${d}" fill="${color}" opacity=".9"/>`
+        : `<path d="${d}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linejoin="round" opacity=".9"/>`;
+    }
+  }
+  return '';
+}
+
+/* ══ 장면 렌더링 ══ */
+function renderScene(conceptId, a, b) {
+  const r = 36;
+  switch(conceptId) {
+    case 'up_down': {
+      // A = 위, B = 아래
+      const cxA = 120 + rnd(40), cxB = 120 + rnd(40);
+      return `<svg viewBox="0 0 280 210" width="100%" style="max-height:220px">
+        <line x1="25" y1="105" x2="255" y2="105" stroke="#E8E2DA" stroke-width="1.5" stroke-dasharray="8 5"/>
+        ${shapeAt(a.shape, cxA, 62, r, a.color)}
+        ${shapeAt(b.shape, cxB, 152, r, b.color)}
+      </svg>`;
+    }
+    case 'in_out': {
+      // viewBox 320 폭으로 확장 — 박스: x88-232, y32-176 (r=36, 삼각형 기준 여백 10px 확보)
+      const outsidePositions = [[44, 104], [276, 104], [160, 218]];
+      const outsidePos = outsidePositions[Math.floor(Math.random()*3)];
+      const inCx = 134 + rnd(50), inCy = 78 + rnd(50);
+      return `<svg viewBox="0 0 320 258" width="100%" style="max-height:220px">
+        <rect x="88" y="32" width="144" height="144" rx="18" fill="#FAF5EE" stroke="#C8B898" stroke-width="2.5" stroke-dasharray="10 6"/>
+        ${shapeAt(a.shape, inCx, inCy, r, a.color)}
+        ${shapeAt(b.shape, outsidePos[0], outsidePos[1], r, b.color)}
+      </svg>`;
+    }
+    case 'front_back': {
+      // A = 앞, B = 뒤  — mask로 앞 도형 영역을 뒤 도형에서 잘라냄
+      const offset = 36 + rnd(8);
+      const cxB = 155, cyB = 95, cxA = cxB - offset, cyA = cyB + 14;
+      return `<svg viewBox="0 0 280 210" width="100%" style="max-height:220px">
+        <defs>
+          <filter id="fsh">
+            <feDropShadow dx="4" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.25)"/>
+          </filter>
+          <mask id="back-mask">
+            <rect width="280" height="210" fill="white"/>
+            ${shapeAt(a.shape, cxA, cyA, r, 'black', true)}
+          </mask>
+        </defs>
+        <g mask="url(#back-mask)">${shapeAt(b.shape, cxB, cyB, r, b.color)}</g>
+        <g filter="url(#fsh)">${shapeAt(a.shape, cxA, cyA, r, a.color)}</g>
+      </svg>`;
+    }
+    case 'high_low': {
+      // A = 높아요, B = 낮아요
+      const pW = 82, lHalf = 38;
+      const highCy = 66, lowCy = 130;
+      const swap = Math.random() < 0.5;
+      const [aX, bX] = swap ? [162, 28] : [28, 162];
+      const aCx = aX + pW/2, bCx = bX + pW/2;
+      return `<svg viewBox="0 0 280 210" width="100%" style="max-height:220px">
+        ${shapeAt(a.shape, aCx, highCy, r, a.color)}
+        <line x1="${aCx-lHalf}" y1="${highCy+r+4}" x2="${aCx+lHalf}" y2="${highCy+r+4}" stroke="#C8B898" stroke-width="2.5" stroke-linecap="round"/>
+        ${shapeAt(b.shape, bCx, lowCy, r, b.color)}
+        <line x1="${bCx-lHalf}" y1="${lowCy+r+4}" x2="${bCx+lHalf}" y2="${lowCy+r+4}" stroke="#C8B898" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>`;
+    }
+    case 'left_right': {
+      // A = 왼쪽, B = 오른쪽
+      const cyA = 80 + rnd(50), cyB = 80 + rnd(50);
+      return `<svg viewBox="0 0 280 210" width="100%" style="max-height:220px">
+        <line x1="140" y1="20" x2="140" y2="190" stroke="#E8E2DA" stroke-width="1.5" stroke-dasharray="8 5"/>
+        ${shapeAt(a.shape, 72, cyA, r, a.color)}
+        ${shapeAt(b.shape, 208, cyB, r, b.color)}
+      </svg>`;
+    }
+  }
+  return '';
+}
+
+function renderShapeIcon(shape, color) {
+  return `<svg viewBox="0 0 80 80" width="52" height="52">${shapeAt(shape, 40, 40, 28, color)}</svg>`;
+}
+
+function shuffle3(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+/* ══ 3개 장면 렌더링 ══ */
+function renderScene3(conceptId, items, askWhich) {
+  const r = 36;
+  const a = items[0], b = items[1], mid = items[2];
+  switch(conceptId) {
+    case 'up_down': {
+      const cxA = 80+rnd(120), cxM = 80+rnd(120), cxB = 80+rnd(120);
+      return `<svg viewBox="0 0 280 270" width="100%" style="max-height:240px">
+        <line x1="25" y1="90" x2="255" y2="90" stroke="#E8E2DA" stroke-width="1.5" stroke-dasharray="8 5"/>
+        <line x1="25" y1="180" x2="255" y2="180" stroke="#E8E2DA" stroke-width="1.5" stroke-dasharray="8 5"/>
+        ${shapeAt(a.shape, cxA, 45, r, a.color)}
+        ${shapeAt(mid.shape, cxM, 135, r, mid.color)}
+        ${shapeAt(b.shape, cxB, 225, r, b.color)}
+      </svg>`;
+    }
+    case 'in_out': {
+      if (askWhich === 'a') {
+        const inCx = 142+rnd(40), inCy = 80+rnd(40);
+        return `<svg viewBox="0 0 320 270" width="100%" style="max-height:240px">
+          <rect x="88" y="32" width="144" height="144" rx="18" fill="#FAF5EE" stroke="#C8B898" stroke-width="2.5" stroke-dasharray="10 6"/>
+          ${shapeAt(a.shape, inCx, inCy, r, a.color)}
+          ${shapeAt(b.shape, 44, 104, r, b.color)}
+          ${shapeAt(mid.shape, 276, 104, r, mid.color)}
+        </svg>`;
+      } else {
+        return `<svg viewBox="0 0 320 270" width="100%" style="max-height:240px">
+          <rect x="88" y="32" width="144" height="144" rx="18" fill="#FAF5EE" stroke="#C8B898" stroke-width="2.5" stroke-dasharray="10 6"/>
+          ${shapeAt(a.shape, 124, 68, r, a.color)}
+          ${shapeAt(mid.shape, 196, 140, r, mid.color)}
+          ${shapeAt(b.shape, 44, 104, r, b.color)}
+        </svg>`;
+      }
+    }
+    case 'front_back': {
+      const bCx=175, bCy=82, mCx=150, mCy=102, aCx=125, aCy=122;
+      return `<svg viewBox="0 0 280 210" width="100%" style="max-height:220px">
+        <defs>
+          <filter id="fsh3"><feDropShadow dx="4" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.25)"/></filter>
+          <mask id="back-mask3">
+            <rect width="280" height="210" fill="white"/>
+            ${shapeAt(mid.shape, mCx, mCy, r, 'black', true)}
+            ${shapeAt(a.shape, aCx, aCy, r, 'black', true)}
+          </mask>
+          <mask id="mid-mask3">
+            <rect width="280" height="210" fill="white"/>
+            ${shapeAt(a.shape, aCx, aCy, r, 'black', true)}
+          </mask>
+        </defs>
+        <g mask="url(#back-mask3)">${shapeAt(b.shape, bCx, bCy, r, b.color)}</g>
+        <g mask="url(#mid-mask3)">${shapeAt(mid.shape, mCx, mCy, r, mid.color)}</g>
+        <g filter="url(#fsh3)">${shapeAt(a.shape, aCx, aCy, r, a.color)}</g>
+      </svg>`;
+    }
+    case 'high_low': {
+      const lHalf = 38;
+      const highCy=52, midCy=132, lowCy=212;
+      const [aX,midX,bX] = shuffle3([55,140,225]);
+      return `<svg viewBox="0 0 280 268" width="100%" style="max-height:268px">
+        ${shapeAt(a.shape, aX, highCy, r, a.color)}
+        <line x1="${aX-lHalf}" y1="${highCy+r+4}" x2="${aX+lHalf}" y2="${highCy+r+4}" stroke="#C8B898" stroke-width="2.5" stroke-linecap="round"/>
+        ${shapeAt(mid.shape, midX, midCy, r, mid.color)}
+        <line x1="${midX-lHalf}" y1="${midCy+r+4}" x2="${midX+lHalf}" y2="${midCy+r+4}" stroke="#C8B898" stroke-width="2.5" stroke-linecap="round"/>
+        ${shapeAt(b.shape, bX, lowCy, r, b.color)}
+        <line x1="${bX-lHalf}" y1="${lowCy+r+4}" x2="${bX+lHalf}" y2="${lowCy+r+4}" stroke="#C8B898" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>`;
+    }
+    case 'left_right': {
+      const cyA=80+rnd(60), cyM=80+rnd(60), cyB=80+rnd(60);
+      return `<svg viewBox="0 0 280 210" width="100%" style="max-height:220px">
+        <line x1="93" y1="20" x2="93" y2="190" stroke="#E8E2DA" stroke-width="1.5" stroke-dasharray="8 5"/>
+        <line x1="187" y1="20" x2="187" y2="190" stroke="#E8E2DA" stroke-width="1.5" stroke-dasharray="8 5"/>
+        ${shapeAt(a.shape, 46, cyA, r, a.color)}
+        ${shapeAt(mid.shape, 140, cyM, r, mid.color)}
+        ${shapeAt(b.shape, 234, cyB, r, b.color)}
+      </svg>`;
+    }
+  }
+  return '';
+}
+
+function rnd(n) { return Math.floor(Math.random() * n); }
+
+/* ══ 게임 시작 ══ */
+function startGame(conceptId, type) {
+  if (!localStorage.getItem('slowmath_comparing2_login')) {
+    sessionStorage.setItem('_sp', JSON.stringify([conceptId, type]));
+    showView('login-view');
+    return;
+  }
+  curConcept = conceptId;
+  curType = type;
+  score = 0; qIdx = 0;
+  curQuestions = buildQuestions(Q_PER_GAME);
+  showView('play-view');
+  renderQ();
+}
+
+function buildQuestions(n) {
+  const qs = [];
+  for (let i = 0; i < n; i++) {
+    if (curType === 'mix3') {
+      // ── 3개 비교 ──
+      const si = []; while(si.length < 3) { const s = rnd(SHAPES.length); if(!si.includes(s)) si.push(s); }
+      const SIMILAR_PAIRS3 = curConcept === 'front_back' ? [[4,5],[5,4]] : [];
+      const ci = []; let tries = 0;
+      while(ci.length < 3 && ++tries < 300) {
+        const col = rnd(COLORS.length);
+        if(!ci.includes(col) && !ci.some(x => SIMILAR_PAIRS3.some(([a,b]) => a===x && b===col))) ci.push(col);
+      }
+      const items = [
+        { shape: SHAPES[si[0]], color: COLORS[ci[0]] }, // a: A극단 위치
+        { shape: SHAPES[si[1]], color: COLORS[ci[1]] }, // b: B극단 위치
+        { shape: SHAPES[si[2]], color: COLORS[ci[2]] }, // mid: 가운데 위치
+      ];
+      const hasMid = !!CONCEPTS[curConcept].qMid3;
+      let askWhich;
+      if (!hasMid) {
+        askWhich = Math.random() < 0.5 ? 'a' : 'b';
+      } else {
+        const rv = Math.random();
+        askWhich = rv < 0.333 ? 'a' : rv < 0.667 ? 'b' : 'mid';
+      }
+      qs.push({ items, askWhich, isThree: true });
+    } else {
+      // ── 2개 비교 (기존) ──
+      let sA = rnd(SHAPES.length), sB;
+      do { sB = rnd(SHAPES.length); } while (sB === sA);
+      const SIMILAR_PAIRS = curConcept === 'front_back' ? [[4,5],[5,4]] : [];
+      let cA = rnd(COLORS.length), cB;
+      do { cB = rnd(COLORS.length); } while (
+        cB === cA || SIMILAR_PAIRS.some(([x,y]) => x===cA && y===cB)
+      );
+      const a = { shape: SHAPES[sA], color: COLORS[cA] };
+      const b = { shape: SHAPES[sB], color: COLORS[cB] };
+      let askA;
+      if (curType === 'a') askA = true;
+      else if (curType === 'b') askA = false;
+      else askA = Math.random() < 0.5;
+      qs.push({ a, b, askA });
+    }
+  }
+  return qs;
+}
+
+/* ══ 문제 렌더링 ══ */
+function renderQ() {
+  if (qIdx >= curQuestions.length) { showResult(); return; }
+  locked = false;
+  const q = curQuestions[qIdx];
+  curQ = q;
+
+  // 진행상황
+  document.getElementById('q-label').textContent = `${qIdx+1} / ${Q_PER_GAME}`;
+  document.getElementById('progress-fill').style.width = `${(qIdx/Q_PER_GAME)*100}%`;
+  document.getElementById('play-score').textContent = `${score}점`;
+
+  const concept = CONCEPTS[curConcept];
+  let qText, order;
+
+  if (q.isThree) {
+    // ── 3개 비교 ──
+    qText = q.askWhich === 'a' ? concept.qA3 : q.askWhich === 'b' ? concept.qB3 : concept.qMid3;
+    document.getElementById('scene-area').innerHTML = renderScene3(curConcept, q.items, q.askWhich);
+    order = shuffle3(['a','b','mid']);
+    const correctIdx3 = order.indexOf(q.askWhich);
+    curQ.order = order; curQ.correctIdx = correctIdx3;
+    const row3 = document.getElementById('compare-row');
+    row3.innerHTML = order.map((pos, i) => {
+      const item = q.items[pos === 'a' ? 0 : pos === 'b' ? 1 : 2];
+      return `<div class="item-card card-locked" id="card-${i}" onclick="selectCard(${i})">
+        <div class="item-visual">${renderShapeIcon(item.shape, item.color)}</div>
+      </div>`;
+    }).join('');
+  } else {
+    // ── 2개 비교 (기존) ──
+    qText = q.askA ? concept.qA : concept.qB;
+    document.getElementById('scene-area').innerHTML = renderScene(curConcept, q.a, q.b);
+    order = Math.random() < 0.5 ? ['a','b'] : ['b','a'];
+    const correctIdx = order.indexOf(q.askA ? 'a' : 'b');
+    curQ.order = order; curQ.correctIdx = correctIdx;
+    const row = document.getElementById('compare-row');
+    row.innerHTML = order.map((pos, i) => {
+      const item = pos === 'a' ? q.a : q.b;
+      return `<div class="item-card card-locked" id="card-${i}" onclick="selectCard(${i})">
+        <div class="item-visual">${renderShapeIcon(item.shape, item.color)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('question-prompt').textContent = qText;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('next-q-btn').classList.add('hidden');
+  document.getElementById('impulse-area').innerHTML = '';
+
+  if (impulsePrevention) {
+    applyImpulse();
+  } else {
+    document.querySelectorAll('.item-card').forEach(c => c.classList.remove('card-locked'));
+  }
+
+  if (ttsOn) speak(qText);
+}
+
+/* ══ 충동방지 (plusone 방식 동일 구현) ══ */
+function applyImpulse() {
+  const optArea = document.getElementById('compare-row');
+  const impulseArea = document.getElementById('impulse-area');
+  if (impulseMode === 'hide') {
+    optArea.style.visibility = 'hidden';
+    const revealBtn = document.createElement('button');
+    revealBtn.className = 'reveal-btn';
+    revealBtn.textContent = '보기 확인';
+    revealBtn.onclick = () => {
+      optArea.style.visibility = 'visible';
+      document.querySelectorAll('.item-card').forEach(b => b.classList.remove('card-locked'));
+      revealBtn.remove();
+    };
+    impulseArea.appendChild(revealBtn);
+  } else {
+    document.querySelectorAll('.item-card').forEach(b => b.classList.add('card-locked'));
+    let remaining = impulseDelay;
+    const cd = document.createElement('div');
+    cd.className = 'delay-countdown';
+    cd.textContent = remaining;
+    impulseArea.appendChild(cd);
+    delayTimer = setInterval(() => {
+      remaining--;
+      if (remaining <= 0) {
+        clearInterval(delayTimer);
+        delayTimer = null;
+        cd.remove();
+        document.querySelectorAll('.item-card').forEach(b => b.classList.remove('card-locked'));
+      } else {
+        cd.textContent = remaining;
+      }
+    }, 1000);
+  }
+}
+
+/* ══ 선택 ══ */
+function selectCard(idx) {
+  if (locked) return;
+  locked = true;
+  if (delayTimer) { clearInterval(delayTimer); delayTimer = null; }
+  document.getElementById('impulse-area').innerHTML = '';
+  document.getElementById('compare-row').style.visibility = 'visible';
+
+  const correct = idx === curQ.correctIdx;
+  const fb = document.getElementById('feedback');
+
+  if (correct) {
+    document.getElementById(`card-${curQ.correctIdx}`).classList.add('card-correct');
+    document.querySelectorAll('.item-card').forEach(c => c.classList.add('card-locked'));
+    score++;
+    fb.textContent = '정답!';
+    fb.className = 'feedback correct';
+    if (ttsOn) speak('정답');
+    document.getElementById('play-score').textContent = `${score}점`;
+    document.getElementById('next-q-btn').classList.remove('hidden');
+  } else {
+    document.getElementById(`card-${idx}`).classList.add('card-wrong card-locked');
+    locked = false;
+    fb.textContent = '다시 골라보세요';
+    fb.className = 'feedback wrong';
+    if (ttsOn) speak('다시 골라보세요');
+  }
+}
+
+function onNextQ() {
+  qIdx++;
+  renderQ();
+}
+
+/* ══ 결과 ══ */
+function showResult() {
+_smGameCompleted=true;
+  showView('result-view');
+  const total = Q_PER_GAME;
+  document.getElementById('result-emoji').textContent = score === total ? '🏆' : '👏';
+  document.getElementById('result-msg').textContent = total + '문제 완료!';
+  document.getElementById('result-detail').textContent = total + '문제 중 ' + score + '개 정답';
+  document.getElementById('result-retry-btn').onclick = () => startGame(curConcept, curType);
+}
+
+/* ══ TTS ══ */
+function speak(text) {
+  if (!ttsOn || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ko-KR'; u.rate = 0.9; u.pitch = 1.05;
+  window.speechSynthesis.speak(u);
+}
+
+/* ══ 초기화 ══ */
+window.addEventListener('DOMContentLoaded', () => {
+  // 스플래시
+  setTimeout(() => {
+    const s = document.getElementById('splash');
+    s.classList.add('fade-out');
+    setTimeout(() => { s.style.display = 'none'; }, 500);
+  }, 1400);
+
+  // 설정 불러오기
+  loadSettings();
+  applySettingsUI();
+
+  // 로그인 여부 무관하게 메인화면 표시 (게임 시작 시 로그인 요구)
+  showView('start-view');
+});
+
+// Share visibility: hide when logged out
+(function() {
+  var _SM_KEY = 'slowmath_comparing2_login';
+  function _updateShareVis() {
+    document.body.classList.toggle('sm-loggedin', !!localStorage.getItem(_SM_KEY));
+  }
+  _updateShareVis();
+  ['socialLogin','socialLogout','goLogin'].forEach(function(fn) {
+    if (typeof window[fn] === 'function') {
+      var _orig = window[fn];
+      window[fn] = function() { _orig.apply(this, arguments); _updateShareVis(); };
+    }
+  });
+})();
+</script>
+
+<!-- ====== App Recommendation Popup ====== -->
+<div id="sm-reco-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.52);z-index:500;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">
+  <div style="background:#FFFDF8;border-radius:24px;padding:28px 22px 22px;max-width:270px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.18);animation:_smPop .32s cubic-bezier(.34,1.56,.64,1) both;">
+    <div style="font-size:0.72rem;font-weight:700;color:#C4AA82;letter-spacing:.08em;margin-bottom:14px;">도움이 될만한 앱을 소개드려요!</div>
+    <div id="sm-reco-emoji" style="font-size:2.75rem;margin-bottom:10px;line-height:1;"></div>
+    <div id="sm-reco-title" style="font-size:1.15rem;font-weight:900;color:#4A4035;margin-bottom:8px;"></div>
+    <div id="sm-reco-desc" style="font-size:0.84rem;color:#7B6545;line-height:1.65;margin-bottom:20px;"></div>
+    <a id="sm-reco-link" href="#" style="display:block;background:#6BADE8;color:#fff;border-radius:14px;padding:15px 0;font-size:0.975rem;font-weight:700;text-decoration:none;font-family:inherit;margin-bottom:10px;box-shadow:0 4px 12px rgba(107,173,232,.3);">바로 해보기 →</a>
+    <button onclick="document.getElementById('sm-reco-overlay').style.display='none'" style="background:none;border:none;color:#C4AA82;font-size:0.84rem;cursor:pointer;font-family:inherit;padding:6px;">다음에 할게요</button>
+  </div>
+</div>
+<style>@keyframes _smPop{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}</style>
+
+<script>
+/* ====== App Recommendation ====== */
+var _smGameCompleted = false;
+var _SM_RECO = [
+  {title:'비교하기 기초',emoji:'⚖️',url:'https://sprit6487.github.io/slowmath_comparing/',desc:'여러가지 비교를 해보아요'},
+  {title:'세기',emoji:'🎲',url:'https://sprit6487.github.io/slowmath_dice/',desc:'손가락, 주사위, 카드를 세어보세요'},
+  {title:'모으기 연습',emoji:'🧮',url:'https://sprit6487.github.io/slowmath_combining/',desc:'수를 모으는 연습을 해보세요'}
+];
+function _showRecoPopup() {
+  if (!_SM_RECO.length) return;
+  var item = _SM_RECO[Math.floor(Math.random() * _SM_RECO.length)];
+  document.getElementById('sm-reco-emoji').textContent = item.emoji;
+  document.getElementById('sm-reco-title').textContent = item.title;
+  document.getElementById('sm-reco-desc').innerHTML = item.desc;
+  document.getElementById('sm-reco-link').href = item.url;
+  document.getElementById('sm-reco-overlay').style.display = 'flex';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>느린아이 숫자 매칭</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap');
+        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0; padding: 0;
+            background: #F5F1EB;
+            min-height: 100dvh;
+            display: flex; justify-content: center; align-items: flex-start;
+            user-select: none;
+        }
+        .app {
+            width: 100%; max-width: 480px;
+            min-height: 100dvh;
+            background: white;
+            padding: 24px 20px;
+            padding-top: max(24px, env(safe-area-inset-top));
+            padding-bottom: max(24px, env(safe-area-inset-bottom));
+            display: flex; flex-direction: column;
+        }
+        @media (min-width: 768px) {
+            body { align-items: center; padding: 32px; }
+            .app {
+                max-width: 560px; min-height: auto;
+                border-radius: 32px;
+                box-shadow: 0 8px 48px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+                padding: 44px 40px;
+            }
+        }
+        .hidden { display: none !important; }
+
+        /* ── 공통 ── */
+        .progress-track { height: 8px; border-radius: 99px; background: #F0ECE6; overflow: hidden; }
+        .progress-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #6BADE8, #5BC886); transition: width 0.5s ease; }
+        .feedback { text-align: center; font-size: 1.1rem; font-weight: 700; padding: 12px 0; min-height: 48px; }
+        .feedback.correct { color: #5BC886; }
+        .feedback.wrong { color: #F07070; }
+
+        /* ── Login View ── */
+        .login-view {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          flex: 1;
+          min-height: 100dvh;
+          padding: 80px 20px 40px;
+        }
+
+        .login-logo-area {
+          text-align: center;
+          margin-bottom: 48px;
+        }
+
+        .login-logo-area svg {
+          display: block;
+          margin: 0 auto;
+        }
+
+        .login-logo-area h1 {
+          font-size: clamp(1.8rem, 6vw, 2.25rem);
+          font-weight: 900;
+          letter-spacing: -0.025em;
+          margin-top: 8px;
+          white-space: nowrap;
+        }
+
+        .login-subtitle {
+          color: #B8AD9E;
+          font-size: 0.9375rem;
+          margin-top: 2px;
+        }
+
+          @keyframes floatBubble {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+.login-trial {
+    position: relative;
+    background: #FFF8F0;
+    border: 1.5px solid #EDD080;
+    border-radius: 14px;
+    padding: 9px 16px;
+    font-size: 0.78rem;
+    color: #7B6545;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+    line-height: 1.4;
+    box-shadow: 0 4px 14px rgba(220,160,50,.18);
+    animation: floatBubble 2.8s ease-in-out infinite;
+    align-self: center;
+}
+.login-trial::before {
+    content: '';
+    position: absolute;
+    bottom: -9px; left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top: 8px solid #EDD080;
+    border-bottom: 0;
+}
+.login-trial::after {
+    content: '';
+    position: absolute;
+    bottom: -7px; left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top: 7px solid #FFF8F0;
+    border-bottom: 0;
+    z-index: 1;
+}
+/* share bubble */
+.share-bubble{position:absolute;right:0;background:#FFF8F0;border:1.5px solid #EDD080;border-radius:12px;padding:8px 12px;font-size:0.55rem;color:#7B6545;font-weight:600;box-shadow:0 4px 12px rgba(220,160,50,.18);z-index:20;animation:floatBubble 2.8s ease-in-out infinite;line-height:1.5;text-align:right;max-width:200px;}
+.share-bubble::before{content:'';position:absolute;top:-8px;right:10px;border:4px solid transparent;border-bottom:7px solid #EDD080;border-top:0;}
+.share-bubble::after{content:'';position:absolute;top:-6px;right:11px;border:3px solid transparent;border-bottom:6px solid #FFF8F0;border-top:0;z-index:1;}
+@media (max-width:768px){.share-bubble{font-size:0.60rem;max-width:170px;padding:7px 10px;}}
+@media (max-width:480px){.share-bubble{font-size:0.62rem;max-width:165px;padding:7px 9px;}}
+  .login-buttons {
+          width: 100%;
+          max-width: 270px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .login-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+          padding: 16px 20px;
+          border-radius: 14px;
+          font-size: 1rem;
+          font-weight: 700;
+          font-family: inherit;
+          line-height: 1.2;
+          border: none;
+          cursor: pointer;
+          transition: transform 0.1s;
+        }
+        .login-btn:active { transform: scale(0.97); }
+        .login-btn svg { flex-shrink: 0; }
+        .login-btn.kakao { background: #FEE500; color: #191919; }
+        .login-btn.naver { background: #03C75A; color: #FFFFFF; }
+        .login-btn.google { background: #FFFFFF; color: #444444; border: 1.5px solid #DADCE0; }
+        .login-btn.facebook { background: #1877F2; color: #FFFFFF; }
+
+        /* ── 시작 화면 ── */
+        .start-view { display: none; flex-direction: column; align-items: center; flex: 1; padding-top: 24px; }
+        .start-header { display:flex; flex-direction:column; align-items:center; margin-bottom: 20px; }
+        .brand-sub{font-size:.8rem;color:#B8AD9E;margin-top:6px;margin-bottom:0;font-weight:500;}
+        .mode-card { border: 2.5px solid #E8E2DA; border-radius: 20px; padding: 20px; width: 100%; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s, border-color 0.15s; background: white; text-align: center; margin-bottom: 12px; }
+        .mode-card:active { transform: scale(0.97); }
+        .mode-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+        .mode-card .mode-icon { height: 56px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+        .mode-card .mode-title { font-size: 1.1rem; font-weight: 700; color: #4A4035; }
+        .mode-card .mode-desc { font-size: 0.8rem; color: #B8AD9E; margin-top: 4px; }
+
+        /* ── 모드 그룹 (아이콘 + 범위 버튼) ── */
+        .mode-group { width: 100%; margin-bottom: 12px; }
+        .mode-group-header { border: 2.5px solid #E8E2DA; border-bottom: none; border-radius: 20px 20px 0 0; padding: 16px 20px 12px; background: white; text-align: center; }
+        .mode-group-header .mode-icon { height: 56px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+        .mode-group-header .mode-title { font-size: 1.1rem; font-weight: 700; color: #4A4035; }
+        .mode-group-header .mode-desc { font-size: 0.8rem; color: #B8AD9E; margin-top: 4px; }
+        .range-buttons { display: flex; gap: 0; width: 100%; }
+        .range-btn { flex: 1; padding: 14px 8px; border: 2.5px solid #E8E2DA; background: white; font-family: 'Noto Sans KR', sans-serif; font-size: 0.95rem; font-weight: 700; color: #4A4035; cursor: pointer; transition: all 0.15s; text-align: center; }
+        .range-btn:first-child { border-radius: 0 0 0 20px; border-right-width: 1.25px; }
+        .range-btn:last-child { border-radius: 0 0 20px 0; border-left-width: 1.25px; }
+        .range-btn:active { transform: scale(0.97); }
+        .range-btn.fill-range { color: #B87A30; }
+        .range-btn.fill-range:hover { border-color: #F0A050; background: #FFF6ED; }
+        .range-btn.count-range { color: #2E8B57; }
+        .range-btn.count-range:hover { border-color: #5BC886; background: #EDFAF2; }
+
+        /* ── 모드 아이콘 애니메이션 ── */
+        /* 순서대로 채우기: 숫자 등장 → 해당 개수만큼 원 채움 (6초 사이클) */
+        /* 0-2s: 숫자1+원1개  |  2-4s: 숫자2+원2개  |  4-6s: 숫자3+원3개 */
+        .seq-icon { display: flex; align-items: center; gap: 6px; position: relative; }
+        .seq-icon .seq-arrow { color: #C8C0B4; font-size: 1rem; }
+        .seq-icon .seq-nums { position: relative; width: 28px; height: 36px; }
+        .seq-icon .seq-n { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 900; opacity: 0; }
+        .seq-icon .seq-n1 { color: #6BADE8; animation: shN1 6s ease infinite; }
+        .seq-icon .seq-n2 { color: #F0A050; animation: shN2 6s ease infinite; }
+        .seq-icon .seq-n3 { color: #5BC886; animation: shN3 6s ease infinite; }
+        .seq-icon .seq-box { width: 46px; height: 46px; border: 2px dashed #D8D2C8; border-radius: 10px; padding: 5px; position: relative; }
+        .seq-icon .seq-set { position: absolute; top: 5px; left: 5px; display: grid; grid-template-columns: repeat(3, 10px); grid-template-rows: repeat(3, 10px); gap: 3px; }
+        .seq-icon .seq-dot { width: 10px; height: 10px; border-radius: 50%; opacity: 0; transform: scale(0); }
+        .seq-set-1 .seq-dot { background: #6BADE8; animation: shD1 6s ease infinite; }
+        .seq-set-1 .seq-dot:nth-child(1) { animation-delay: 0.15s; }
+        .seq-set-2 .seq-dot { background: #F0A050; animation: shD2 6s ease infinite; }
+        .seq-set-2 .seq-dot:nth-child(1) { animation-delay: 0.15s; }
+        .seq-set-2 .seq-dot:nth-child(2) { animation-delay: 0.3s; }
+        .seq-set-3 .seq-dot { background: #5BC886; animation: shD3 6s ease infinite; }
+        .seq-set-3 .seq-dot:nth-child(1) { animation-delay: 0.15s; }
+        .seq-set-3 .seq-dot:nth-child(2) { animation-delay: 0.3s; }
+        .seq-set-3 .seq-dot:nth-child(3) { animation-delay: 0.45s; }
+
+        /* 랜덤으로 채우기: 숫자 등장 → 해당 개수만큼 원 채움 (6초 사이클) */
+        /* 0-2s: 숫자2+원2개  |  2-4s: 숫자4+원4개  |  4-6s: 숫자3+원3개 */
+        .shuffle-icon { display: flex; align-items: center; gap: 6px; position: relative; }
+        .shuffle-icon .shuf-arrow { color: #C8C0B4; font-size: 1rem; }
+
+        /* 숫자 영역 */
+        .shuffle-icon .shuf-nums { position: relative; width: 28px; height: 36px; }
+        .shuffle-icon .shuf-n { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 900; opacity: 0; }
+        .shuffle-icon .shuf-n1 { color: #6BADE8; animation: shN1 6s ease infinite; }
+        .shuffle-icon .shuf-n2 { color: #F0A050; animation: shN2 6s ease infinite; }
+        .shuffle-icon .shuf-n3 { color: #5BC886; animation: shN3 6s ease infinite; }
+        @keyframes shN1 { 0%,3% { opacity:0; transform:scale(0.5); } 5%,28% { opacity:1; transform:scale(1); } 31%,100% { opacity:0; transform:scale(0.5); } }
+        @keyframes shN2 { 0%,34% { opacity:0; transform:scale(0.5); } 37%,61% { opacity:1; transform:scale(1); } 64%,100% { opacity:0; transform:scale(0.5); } }
+        @keyframes shN3 { 0%,67% { opacity:0; transform:scale(0.5); } 70%,94% { opacity:1; transform:scale(1); } 97%,100% { opacity:0; transform:scale(0.5); } }
+
+        /* 원 박스: 3x3 그리드 */
+        .shuffle-icon .shuf-box { width: 46px; height: 46px; border: 2px dashed #D8D2C8; border-radius: 10px; padding: 5px; position: relative; }
+
+        /* 원 그룹: 각 세트가 동일 위치에서 3x3 그리드로 채움 */
+        .shuffle-icon .shuf-set { position: absolute; top: 5px; left: 5px; display: grid; grid-template-columns: repeat(3, 10px); grid-template-rows: repeat(3, 10px); gap: 3px; }
+        .shuffle-icon .shuf-dot { width: 10px; height: 10px; border-radius: 50%; opacity: 0; transform: scale(0); }
+
+        /* 세트1: 원2개 (파랑) 0~2s */
+        .shuf-set-1 .shuf-dot { background: #6BADE8; animation: shD1 6s ease infinite; }
+        .shuf-set-1 .shuf-dot:nth-child(1) { animation-delay: 0.15s; }
+        .shuf-set-1 .shuf-dot:nth-child(2) { animation-delay: 0.3s; }
+
+        /* 세트2: 원4개 (주황) 2~4s */
+        .shuf-set-2 .shuf-dot { background: #F0A050; animation: shD2 6s ease infinite; }
+        .shuf-set-2 .shuf-dot:nth-child(1) { animation-delay: 0.15s; }
+        .shuf-set-2 .shuf-dot:nth-child(2) { animation-delay: 0.3s; }
+        .shuf-set-2 .shuf-dot:nth-child(3) { animation-delay: 0.45s; }
+        .shuf-set-2 .shuf-dot:nth-child(4) { animation-delay: 0.6s; }
+
+        /* 세트3: 원3개 (초록) 4~6s */
+        .shuf-set-3 .shuf-dot { background: #5BC886; animation: shD3 6s ease infinite; }
+        .shuf-set-3 .shuf-dot:nth-child(1) { animation-delay: 0.15s; }
+        .shuf-set-3 .shuf-dot:nth-child(2) { animation-delay: 0.3s; }
+        .shuf-set-3 .shuf-dot:nth-child(3) { animation-delay: 0.45s; }
+
+        @keyframes shD1 {
+            0%,5% { opacity:0; transform:scale(0); }
+            10% { opacity:1; transform:scale(1.3); }
+            13%,28% { opacity:1; transform:scale(1); }
+            31%,100% { opacity:0; transform:scale(0); }
+        }
+        @keyframes shD2 {
+            0%,37% { opacity:0; transform:scale(0); }
+            42% { opacity:1; transform:scale(1.3); }
+            45%,61% { opacity:1; transform:scale(1); }
+            64%,100% { opacity:0; transform:scale(0); }
+        }
+        @keyframes shD3 {
+            0%,70% { opacity:0; transform:scale(0); }
+            75% { opacity:1; transform:scale(1.3); }
+            78%,94% { opacity:1; transform:scale(1); }
+            97%,100% { opacity:0; transform:scale(0); }
+        }
+
+        /* 세기: 원이 나타나고 ?→숫자 전환 */
+        .count-icon { display: flex; align-items: center; gap: 8px; }
+        .count-icon .ci-dots { display: flex; gap: 3px; }
+        .count-icon .ci-dot { width: 14px; height: 14px; border-radius: 50%; background: #6BADE8; opacity: 0; animation: ciDotIn 0.3s ease forwards; }
+        .count-icon .ci-dot:nth-child(1) { animation-delay: 0.2s; }
+        .count-icon .ci-dot:nth-child(2) { animation-delay: 0.4s; }
+        .count-icon .ci-dot:nth-child(3) { animation-delay: 0.6s; }
+        .count-icon .ci-dot:nth-child(4) { animation-delay: 0.8s; }
+        .count-icon .ci-eq { font-size: 1.1rem; font-weight: 700; color: #C8C0B4; opacity: 0; animation: seqFadeIn 0.3s ease forwards; animation-delay: 1s; }
+        .count-icon .ci-answer { font-size: 1.5rem; font-weight: 900; position: relative; width: 28px; height: 28px; }
+        .count-icon .ci-q { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #D8D2C8; animation: ciQOut 2.5s ease infinite; }
+        .count-icon .ci-n { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #5BC886; animation: ciNIn 2.5s ease infinite; }
+        @keyframes ciDotIn { 0% { opacity:0; transform:scale(0); } 60% { transform:scale(1.2); } 100% { opacity:1; transform:scale(1); } }
+        @keyframes ciQOut { 0%,40% { opacity:1; } 50%,80% { opacity:0; } 90%,100% { opacity:1; } }
+        @keyframes ciNIn { 0%,40% { opacity:0; transform:scale(0); } 50% { opacity:1; transform:scale(1.3); } 55%,80% { opacity:1; transform:scale(1); } 90%,100% { opacity:0; transform:scale(0); } }
+
+        /* ── 설정 (음성/충동방지) ── */
+        .settings-section { width: 100%; margin-top: 16px; padding-top: 16px; border-top: 1.5px solid #F0ECE6; }
+        .setting-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .setting-label { font-size: 0.875rem; font-weight: 600; color: #4A4035; }
+        .setting-desc { font-size: 0.75rem; color: #B8AD9E; margin-top: 2px; }
+        .toggle-track { width: 48px; height: 28px; border-radius: 99px; position: relative; background: #E0DAD0; transition: background 0.2s; cursor: pointer; flex-shrink: 0; border: none; outline: none; }
+        .toggle-track.on { background: #5BC886; }
+        .toggle-knob { width: 22px; height: 22px; border-radius: 50%; background: white; position: absolute; top: 3px; left: 3px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); transition: transform 0.2s; }
+        .toggle-track.on .toggle-knob { transform: translateX(20px); }
+
+        .impulse-mode-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .impulse-mode-btn { display: flex; flex-direction: column; align-items: center; padding: 10px 8px; border-radius: 14px; border: 2px solid #E8E2DA; background: white; cursor: pointer; transition: all 0.15s; }
+        .impulse-mode-btn.selected { border-color: #C4AA82; background: #FAF5EE; }
+        .impulse-mode-icon { font-size: 1.2rem; margin-bottom: 2px; }
+        .impulse-mode-label { font-size: 0.8rem; font-weight: 700; color: #4A4035; }
+        .impulse-mode-desc { font-size: 0.65rem; color: #B8AD9E; margin-top: 1px; }
+        .imp-sec-row { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+        .imp-sec { flex: 0 0 calc((100% - 16px) / 5); padding: 8px 0; font-size: 0.7rem; font-weight: 600; border-radius: 10px; border: 2px solid #E8E2DA; background: white; color: #8C8070; cursor: pointer; transition: all 0.15s; text-align: center; }
+        .imp-sec.active { border-color: #C4AA82; background: #FAF5EE; color: #7B6545; }
+
+        .logout-btn { background: none; border: 1.5px solid #E8E2DA; border-radius: 8px; padding: 6px 14px; font-size: 0.75rem; font-weight: 600; color: #B8AD9E; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; margin-top: 32px; }
+        .logout-btn:hover { background: #F5F1EB; }
+
+        /* ── 게임 공통 ── */
+        .game-view { display: none; flex-direction: column; flex: 1; }
+        .game-status { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .question-label { font-size: 0.875rem; font-weight: 600; color: #8C8070; }
+        .score-label { font-size: 0.875rem; font-weight: 700; color: #5BC886; }
+        .btn-home { width: 36px; height: 36px; border-radius: 10px; border: 2px solid #E8E2DA; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; color: #8C8070; flex-shrink: 0; }
+        .btn-home:active { background: #F5F1EB; }
+        .game-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .game-top-info { flex: 1; }
+
+        /* ── 채우기 모드 ── */
+        .number-display { text-align: center; margin-bottom: 20px; }
+        .number-display .number { font-size: 5rem; font-weight: 900; color: #4A4035; line-height: 1; }
+        .number-display .label { font-size: 1rem; font-weight: 600; color: #B8AD9E; margin-top: 4px; }
+        .drop-area { min-height: 160px; border: 2.5px dashed #D8D2C8; border-radius: 20px; background: #FDFCFA; padding: 16px; display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; align-content: start; justify-items: center; transition: background 0.18s, border-color 0.18s; margin-bottom: 24px; position: relative; }
+        .drop-area.drag-over { background: #D9EDFC; border-color: #6BADE8; border-style: solid; }
+        .drop-area .placed-circle { width: 100%; max-width: 36px; aspect-ratio: 1; border-radius: 50%; background: #6BADE8; box-shadow: 0 2px 8px rgba(107,173,232,0.25); animation: popIn 0.35s ease-out forwards; }
+        .drop-area .hint-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #C8C0B4; font-size: 0.9rem; font-weight: 500; pointer-events: none; }
+        .divider { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #E8E2DA; }
+        .divider span { font-size: 0.8rem; font-weight: 600; color: #B8AD9E; white-space: nowrap; }
+        .source-area { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; justify-items: center; padding: 12px 0; margin-bottom: 16px; }
+        .source-circle { width: 100%; max-width: 36px; aspect-ratio: 1; border-radius: 50%; background: #F0A050; cursor: grab; touch-action: none; box-shadow: 0 2px 6px rgba(240,160,80,0.3); transition: transform 0.1s, opacity 0.15s; }
+        .source-circle:active { cursor: grabbing; transform: scale(1.12); }
+        .source-circle.used { opacity: 0; pointer-events: none; transform: scale(0); transition: all 0.3s ease; }
+        .floating-circle { position: fixed; z-index: 9999; pointer-events: none; width: 40px; height: 40px; border-radius: 50%; background: #F0A050; transform: translate(-50%, -50%); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+        .check-btn { width: 100%; padding: 16px 0; border-radius: 16px; border: none; background: linear-gradient(135deg, #6BADE8, #5BC886); color: white; font-family: 'Noto Sans KR', sans-serif; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform 0.1s, opacity 0.15s; }
+        .check-btn:active { transform: scale(0.97); }
+        .check-btn:disabled { opacity: 0.45; cursor: default; }
+
+        /* ── 세기 모드 ── */
+        .count-dots-area { min-height: 160px; border: 2.5px solid #E8E2DA; border-radius: 20px; background: #FDFCFA; padding: 16px; display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; align-content: start; justify-items: start; margin-bottom: 24px; }
+        .count-dot { width: 100%; aspect-ratio: 1; max-width: 36px; border-radius: 50%; background: #6BADE8; box-shadow: 0 2px 8px rgba(107,173,232,0.25); animation: popIn 0.35s ease-out forwards; }
+        .count-label { text-align: center; font-size: 1rem; font-weight: 600; color: #B8AD9E; margin-bottom: 16px; }
+        .options-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+        .option-btn { padding: 14px 0; border-radius: 16px; border: 2.5px solid #E8E2DA; background: white; font-family: 'Noto Sans KR', sans-serif; font-size: 1.25rem; font-weight: 700; color: #4A4035; cursor: pointer; transition: transform 0.1s, border-color 0.15s, background 0.15s; }
+        .option-btn:active:not(:disabled) { transform: scale(0.95); }
+        .option-btn:disabled { cursor: default; }
+        .option-btn.correct { background: #D4F5E0 !important; border-color: #5BC886 !important; color: #1A7A3A !important; }
+        .option-btn.wrong { background: #FDE8E8 !important; border-color: #F07070 !important; color: #B91C1C !important; opacity: 0.5; }
+        .option-btn.locked { pointer-events: none; opacity: 0.45; }
+        .reveal-btn{display:block;width:100%;max-width:320px;margin:0 auto 12px;padding:14px 0;border-radius:14px;border:2px solid #C4AA82;background:#FAF5EE;color:#7B6545;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;}
+.reveal-btn:active{background:#F0E6D6;transform:scale(.98);}
+        .delay-countdown { text-align: center; font-size: 1.5rem; font-weight: 900; color: #C4AA82; padding: 16px 0; animation: pulse-count 1s ease infinite; }
+        @keyframes pulse-count { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.7; } }
+
+        /* ── 결과 ── */
+        .result-view { display: none; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; padding: 40px 0; }
+        .complete-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.95); border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 10; backdrop-filter: blur(4px); }
+        .complete-emoji { font-size: 56px; }
+        .complete-msg { font-size: 1.25rem; font-weight: 900; color: #4A4035; }
+        .complete-sub { font-size: 0.85rem; color: #B8AD9E; }
+        .next-btn { margin-top: 8px; padding: 14px 36px; border: none; border-radius: 12px; background: #6BADE8; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform 0.12s; }
+        .next-btn:active { transform: scale(0.96); }
+
+        /* ── 애니메이션 ── */
+        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 45% { transform: scale(1.3); opacity: 1; } 65% { transform: scale(0.9); } 80% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+
+        @media (min-width: 768px) {
+            .source-area { grid-template-columns: repeat(10, 40px); gap: 10px; }
+            .source-circle { width: 40px; height: 40px; }
+            .drop-area .placed-circle { width: 40px; height: 40px; }
+            .count-dot { max-width: 40px; }
+            .floating-circle { width: 44px; height: 44px; }
+            .number-display .number { font-size: 6rem; }
+        }
+
+        /* ── 오답노트 ── */
+        .wrong-notes-btn { width: 100%; padding: 14px 0; border-radius: 14px; border: 2.5px solid #F07070; background: #FFF5F5; color: #F07070; font-family: 'Noto Sans KR', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; transition: transform .1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .wrong-notes-btn:active { transform: scale(.97); }
+        .wrong-notes-btn .badge { background: #F07070; color: white; border-radius: 50%; min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; }
+        .wn-view { display: none; flex-direction: column; align-items: center; padding: 24px 20px; }
+        .wn-view.active { display: flex; }
+        .wn-header { text-align: center; margin-bottom: 20px; }
+        .wn-header h2 { font-size: 1.25rem; font-weight: 900; color: #4A4035; margin: 0 0 4px; }
+        .wn-header p { font-size: .85rem; color: #B8AD9E; margin: 0; }
+        .wn-list { width: 100%; max-width: 400px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
+        .wn-chip { padding: 8px 16px; border-radius: 10px; background: #FFF5F5; border: 1.5px solid #F07070; font-size: .9rem; font-weight: 700; color: #F07070; }
+        .wn-empty { color: #B8AD9E; font-size: .9rem; margin: 40px 0; }
+        .wn-actions { display: flex; gap: 10px; width: 100%; max-width: 320px; }
+        .wn-actions button { flex: 1; padding: 13px 0; border-radius: 12px; font-family: 'Noto Sans KR', sans-serif; font-size: .9rem; font-weight: 700; cursor: pointer; transition: transform .1s; }
+        .wn-actions button:active { transform: scale(.97); }
+        .wn-btn-back { border: 2.5px solid #E8E2DA; background: white; color: #8C8070; }
+        .wn-btn-start { border: none; background: #F07070; color: white; box-shadow: 0 2px 8px rgba(240,112,112,.3); }
+        .wn-btn-clear { border: 1.5px solid #E8E2DA; background: white; color: #B8AD9E; padding: 8px 16px; border-radius: 8px; font-size: .75rem; font-weight: 600; cursor: pointer; margin-top: 12px; font-family: 'Noto Sans KR', sans-serif; }
+    
+    /* ── Splash Screen ── */
+    .splash-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: #FFFFFF;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+        padding-bottom: 80px;
+    }
+    .splash-overlay.fade-out { opacity: 0; pointer-events: none; }
+    .splash-logo { animation: splashFloat 2.4s ease-in-out infinite; margin-bottom: 24px; }
+    .splash-title { font-size: 2rem; font-weight: 900; letter-spacing: -0.025em; margin-bottom: 8px; }
+    .splash-subtitle { color: #B8B0A8; font-size: 0.9375rem; font-weight: 500; }
+    @keyframes splashFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @media (max-width:380px) { .splash-title{font-size:1.5rem} }
+    @media (min-width:768px) { .splash-logo svg{width:160px;height:134px} .splash-title{font-size:2.5rem} .splash-subtitle{font-size:1.0625rem} }
+
+/* Hide share button/bubble when not logged in */
+body:not(.sm-loggedin) [title="공유하기"],
+body:not(.sm-loggedin) #share-bubble { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ══════ Splash Screen ══════ -->
+<div id="splash" class="splash-overlay">
+    <div class="splash-logo">
+        <svg viewBox="0 0 120 100" width="140" height="117" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+            <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+            <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+            <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+            <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+            <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+            <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+            <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+            <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+            <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+            <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+            <circle cx="101" cy="33" r="1" fill="white"/>
+            <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+            <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <h1 class="splash-title">
+        <span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">숫자 매칭</span>
+    </h1>
+    <p class="splash-subtitle">숫자를 보고, 동그라미를 옮겨보세요</p>
+</div>
+<script>
+setTimeout(function() {
+    var splash = document.getElementById("splash");
+    if (splash) { splash.classList.add("fade-out"); setTimeout(function() { splash.remove(); }, 500); }
+}, 3000);
+</script>
+
+<div class="app">
+
+    <!-- ══════════════ 로그인 화면 ══════════════ -->
+    <div id="login-view" class="login-view">
+        <div class="login-logo-area">
+            <svg viewBox="0 0 120 100" width="120" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+                <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+                <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+                <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+                <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+                <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+                <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity="0.35" transform="rotate(-15 42 26)"/>
+                <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity="0.2"/>
+                <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+                <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+                <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+                <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+                <circle cx="101" cy="33" r="1" fill="white"/>
+                <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity="0.4"/>
+                <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">숫자 매칭</span></h1>
+            <p class="login-subtitle">숫자를 보고, 동그라미를 옮겨보세요</p>
+        </div>
+          <p class="login-trial">가입하시고 하루 동안 모든 기능을<br>무료로 체험해보세요</p>
+<div class="login-buttons">
+            <button class="login-btn kakao" onclick="socialLogin('kakao')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 1C4.477 1 0 4.477 0 8.667c0 2.7 1.753 5.072 4.393 6.413-.192.717-.694 2.6-.794 3.004-.124.497.182.49.383.356.158-.105 2.51-1.708 3.525-2.398.8.118 1.628.18 2.493.18 5.523 0 10-3.477 10-7.555C20 4.477 15.523 1 10 1z" fill="#191919"/></svg>
+                카카오로 시작하기
+            </button>
+            <button class="login-btn naver" onclick="socialLogin('naver')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M13.57 10.684L6.066 0H0v20h6.43V9.316L13.934 20H20V0h-6.43v10.684z" fill="white"/></svg>
+                네이버로 시작하기
+            </button>
+            <button class="login-btn google" onclick="socialLogin('google')">
+                <svg width="20" height="20" viewBox="0 0 48 48"><path d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" fill="#FFC107"/><path d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" fill="#FF3D00"/><path d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" fill="#4CAF50"/><path d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.001-.001 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" fill="#1976D2"/></svg>
+                Google로 시작하기
+            </button>
+            <button class="login-btn facebook" onclick="socialLogin('facebook')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" fill="white"/></svg>
+                Facebook으로 시작하기
+            </button>
+        </div>
+    </div>
+
+    <!-- ══════════ 시작 화면 ══════════ -->
+    <div id="start-view" class="start-view" style="position:relative;">
+        <button onclick="shareApp()" style="position:absolute; top:0; right:0; background:white; border:2px solid #E8E2DA; border-radius:10px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#8C8070; z-index:10;" title="공유하기">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+        </button>
+        <div id="share-bubble" class="share-bubble" style="top:44px;">지금 지인에게 공유하시면<br>하루 무료 이용권을 드려요</div>
+        <div id="share-toast" style="display:block;position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#3A7D44;color:white;padding:12px 20px;border-radius:14px;font-size:0.85rem;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.25);transition:opacity 0.4s;opacity:0;pointer-events:none;white-space:nowrap;"></div>
+
+        <div class="start-header" style="margin-top:-10px;">
+            <svg viewBox="0 0 120 100" width="90" height="75" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; transform:translateY(-14px);">
+                <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+                <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+                <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+                <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+                <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+                <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+                <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity="0.35" transform="rotate(-15 42 26)"/>
+                <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity="0.2"/>
+                <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+                <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+                <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+                <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+                <circle cx="101" cy="33" r="1" fill="white"/>
+                <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity="0.4"/>
+                <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <h1 style="font-size:1.6rem; font-weight:900; letter-spacing:-.025em; margin:12px 0 0;">
+                <span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span>
+                <span style="color:#4A4035;">숫자 매칭</span>
+            </h1>
+            <p class="brand-sub">숫자를 보고, 동그라미를 옮겨보세요.</p>
+        </div>
+        <!-- 모드 선택 -->
+        <div style="width:100%;">
+            <div class="mode-card" onclick="startGame('sequential')">
+                <div class="mode-icon">
+                    <div class="seq-icon">
+                        <div class="seq-nums">
+                            <div class="seq-n seq-n1">1</div>
+                            <div class="seq-n seq-n2">2</div>
+                            <div class="seq-n seq-n3">3</div>
+                        </div>
+                        <div class="seq-arrow">→</div>
+                        <div class="seq-box">
+                            <div class="seq-set seq-set-1"><div class="seq-dot"></div></div>
+                            <div class="seq-set seq-set-2"><div class="seq-dot"></div><div class="seq-dot"></div></div>
+                            <div class="seq-set seq-set-3"><div class="seq-dot"></div><div class="seq-dot"></div><div class="seq-dot"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mode-title">순서대로 채우기</div>
+                <div class="mode-desc">1부터 20까지 순서대로 동그라미를 채워요</div>
+            </div>
+            <div class="mode-group">
+                <div class="mode-group-header">
+                    <div class="mode-icon">
+                        <div class="shuffle-icon">
+                            <div class="shuf-nums">
+                                <div class="shuf-n shuf-n1">2</div>
+                                <div class="shuf-n shuf-n2">4</div>
+                                <div class="shuf-n shuf-n3">3</div>
+                            </div>
+                            <div class="shuf-arrow">→</div>
+                            <div class="shuf-box">
+                                <div class="shuf-set shuf-set-1"><div class="shuf-dot"></div><div class="shuf-dot"></div></div>
+                                <div class="shuf-set shuf-set-2"><div class="shuf-dot"></div><div class="shuf-dot"></div><div class="shuf-dot"></div><div class="shuf-dot"></div></div>
+                                <div class="shuf-set shuf-set-3"><div class="shuf-dot"></div><div class="shuf-dot"></div><div class="shuf-dot"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mode-title">랜덤으로 채우기</div>
+                    <div class="mode-desc">랜덤 숫자를 보고 동그라미를 그만큼 옮겨요</div>
+                </div>
+                <div class="range-buttons">
+                    <button class="range-btn fill-range" onclick="startGame('fill', 1, 10)">1 ~ 10</button>
+                    <button class="range-btn fill-range" onclick="startGame('fill', 1, 20)">1 ~ 20</button>
+                </div>
+            </div>
+            <div class="mode-group">
+                <div class="mode-group-header">
+                    <div class="mode-icon">
+                        <div class="count-icon">
+                            <div class="ci-dots">
+                                <div class="ci-dot"></div>
+                                <div class="ci-dot"></div>
+                                <div class="ci-dot"></div>
+                                <div class="ci-dot"></div>
+                            </div>
+                            <div class="ci-eq">=</div>
+                            <div class="ci-answer">
+                                <div class="ci-q">?</div>
+                                <div class="ci-n">4</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mode-title">세기</div>
+                    <div class="mode-desc">랜덤 동그라미 개수를 세고 숫자를 골라요</div>
+                </div>
+                <div class="range-buttons">
+                    <button class="range-btn count-range" onclick="startGame('count', 1, 10)">1 ~ 10</button>
+                    <button class="range-btn count-range" onclick="startGame('count', 1, 20)">1 ~ 20</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 설정 -->
+        <div class="settings-section">
+            <!-- 음성 -->
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">음성</div>
+                    <div class="setting-desc">정답/오답 음성 안내</div>
+                </div>
+                <button id="tts-toggle" onclick="toggleTTS()" class="toggle-track on">
+                    <span class="toggle-knob"></span>
+                </button>
+            </div>
+
+            <!-- 충동방지 -->
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">충동방지 <span style="font-size:0.7rem; font-weight:400; color:#B8AD9E; margin-left:4px;">세기 모드</span></div>
+                    <div class="setting-desc">생각할 시간을 줘요</div>
+                </div>
+                <button id="impulse-toggle" onclick="toggleImpulse()" class="toggle-track on">
+                    <span class="toggle-knob"></span>
+                </button>
+            </div>
+            <div id="impulse-details">
+                <div class="impulse-mode-options">
+                    <button class="impulse-mode-btn selected" onclick="setImpulseMode('hide')" data-mode="hide">
+                        <span class="impulse-mode-icon">&#x1F440;</span>
+                        <span class="impulse-mode-label">보기 확인</span>
+                        <span class="impulse-mode-desc">버튼을 누르면 보기가 나타나요</span>
+                    </button>
+                    <button class="impulse-mode-btn" onclick="setImpulseMode('lock')" data-mode="lock">
+                        <span class="impulse-mode-icon">&#x1F512;</span>
+                        <span class="impulse-mode-label">선택 잠금</span>
+                        <span class="impulse-mode-desc">N초 동안 선택할 수 없어요</span>
+                    </button>
+                </div>
+                <div class="imp-sec-row" id="impulse-delay-row">
+                    <button onclick="setImpulseDelay(1)" class="imp-sec">1초</button>
+                    <button onclick="setImpulseDelay(2)" class="imp-sec">2초</button>
+                    <button onclick="setImpulseDelay(3)" class="imp-sec">3초</button>
+                    <button onclick="setImpulseDelay(4)" class="imp-sec">4초</button>
+                    <button onclick="setImpulseDelay(5)" class="imp-sec active">5초</button>
+                    <button onclick="setImpulseDelay(6)" class="imp-sec">6초</button>
+                    <button onclick="setImpulseDelay(7)" class="imp-sec">7초</button>
+                    <button onclick="setImpulseDelay(8)" class="imp-sec">8초</button>
+                    <button onclick="setImpulseDelay(9)" class="imp-sec">9초</button>
+                    <button onclick="setImpulseDelay(10)" class="imp-sec">10초</button>
+                </div>
+            </div>
+        </div>
+
+        <button id="wrong-notes-btn" class="wrong-notes-btn hidden" onclick="showWrongNotesView()">
+            오답노트 <span class="badge" id="wrong-notes-badge">0</span>
+        </button>
+
+        <button class="logout-btn" style="display:none" onclick="logout()">로그아웃</button>
+    </div>
+
+    <!-- ══════════ 오답노트 ══════════ -->
+    <div id="wn-view" class="wn-view">
+        <div class="wn-header">
+            <h2>오답노트</h2>
+            <p>틀렸던 문제를 다시 연습해요</p>
+        </div>
+        <div class="wn-list" id="wn-list"></div>
+        <div class="wn-actions">
+            <button class="wn-btn-back" onclick="goHome()">돌아가기</button>
+            <button class="wn-btn-start" id="wn-start-btn" onclick="startWrongNotesPractice()">연습 시작</button>
+        </div>
+        <button class="wn-btn-clear" id="wn-clear-btn" onclick="clearWrongNotes()">전체 삭제</button>
+    </div>
+
+    <!-- ══════════ 채우기 게임 ══════════ -->
+    <div id="fill-view" class="game-view">
+        <div class="game-top">
+            <button onclick="goHome()" class="btn-home" title="홈">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-8 9 8M5 11v9a1 1 0 001 1h3m8 0h3a1 1 0 001-1v-9"/></svg>
+            </button>
+            <div class="game-top-info">
+                <div class="game-status">
+                    <span class="question-label" id="fill-q-label">1 / 20</span>
+                    <span class="score-label" id="fill-score-label">0점</span>
+                </div>
+                <div class="progress-track"><div class="progress-bar" id="fill-progress" style="width:0%"></div></div>
+            </div>
+        </div>
+        <div class="number-display fade-in" id="fill-number-display">
+            <div class="number" id="fill-target">1</div>
+            <div class="label">이 숫자만큼 동그라미를 채우세요</div>
+        </div>
+        <div class="drop-area" id="drop-area">
+            <span class="hint-text" id="hint-text">여기에 동그라미를 놓으세요</span>
+        </div>
+        <div class="divider"><span>동그라미 <span id="source-count">20</span>개</span></div>
+        <div class="source-area" id="source-area"></div>
+        <div class="feedback" id="fill-feedback"></div>
+        <button class="check-btn" id="fill-check-btn" onclick="checkFillAnswer()" disabled>확인하기</button>
+    </div>
+
+    <!-- ══════════ 세기 게임 ══════════ -->
+    <div id="count-view" class="game-view">
+        <div class="game-top">
+            <button onclick="goHome()" class="btn-home" title="홈">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-8 9 8M5 11v9a1 1 0 001 1h3m8 0h3a1 1 0 001-1v-9"/></svg>
+            </button>
+            <div class="game-top-info">
+                <div class="game-status">
+                    <span class="question-label" id="count-q-label">1 / 20</span>
+                    <span class="score-label" id="count-score-label">0점</span>
+                </div>
+                <div class="progress-track"><div class="progress-bar" id="count-progress" style="width:0%"></div></div>
+            </div>
+        </div>
+        <div class="count-label fade-in" id="count-label-text">동그라미가 몇 개인가요?</div>
+        <div class="count-dots-area" id="count-dots-area"></div>
+        <div id="count-impulse-area"></div>
+        <div class="options-grid" id="count-options"></div>
+        <div class="feedback" id="count-feedback"></div>
+    </div>
+
+    <!-- ══════════ 결과 ══════════ -->
+    <div id="result-view" class="result-view">
+      <div class="complete-overlay" style="position:relative;margin-top:40px;">
+        <div class="complete-emoji" id="result-emoji">🏆</div>
+        <div class="complete-msg" id="result-msg"></div>
+        <div class="complete-sub" id="result-detail"></div>
+        <button class="next-btn" id="result-retry-btn">다시 하기</button>
+        <button class="next-btn" onclick="goHome()" style="margin-top:8px;background:#EDE8E0;color:#8C8070;">홈으로</button>
+      </div>
+    </div>
+
+</div>
+
+<script>
+/* ══════════ 상태 ══════════ */
+let gameMode = '';       // 'fill' | 'count'
+let currentQ = 0;
+let score = 0;
+let TOTAL = 20;
+let questions = [];
+let placedCount = 0;
+let countBusy = false;
+let countFirstAttemptWrong = false;
+let countTimer = null;
+let rangeMin = 1;
+let rangeMax = 20;
+let sourceCircleCount = 20;
+let isWrongNotesPractice = false;
+
+/* 설정 */
+let ttsEnabled = true;
+let impulsePrevention = true;
+let impulseMode = 'hide';  // 'hide' | 'lock'
+let impulseDelay = 5;
+
+function saveSettings() {
+    localStorage.setItem('slowmath_matching_settings', JSON.stringify({
+        ttsEnabled, impulsePrevention, impulseMode, impulseDelay
+    }));
+}
+function loadSettings() {
+    try {
+        const s = JSON.parse(localStorage.getItem('slowmath_matching_settings'));
+        if (!s) return;
+        if (typeof s.ttsEnabled === 'boolean') ttsEnabled = s.ttsEnabled;
+        if (typeof s.impulsePrevention === 'boolean') impulsePrevention = s.impulsePrevention;
+        if (s.impulseMode === 'hide' || s.impulseMode === 'lock') impulseMode = s.impulseMode;
+        if (typeof s.impulseDelay === 'number' && s.impulseDelay >= 1 && s.impulseDelay <= 10) impulseDelay = s.impulseDelay;
+    } catch(e) {}
+}
+function applySettingsUI() {
+    document.getElementById('tts-toggle').classList.toggle('on', ttsEnabled);
+    document.getElementById('impulse-toggle').classList.toggle('on', impulsePrevention);
+    document.getElementById('impulse-details').style.display = impulsePrevention ? '' : 'none';
+    document.querySelectorAll('.impulse-mode-btn').forEach(b => b.classList.toggle('selected', b.dataset.mode === impulseMode));
+    document.getElementById('impulse-delay-row').style.display = impulseMode === 'lock' ? '' : 'none';
+    document.querySelectorAll('.imp-sec').forEach((b, i) => b.classList.toggle('active', i + 1 === impulseDelay));
+}
+
+/* 드래그 */
+let dragging = false;
+let floatingEl = null;
+let dragSourceEl = null;
+let dragSourceIdx = null;
+let isDraggingPlaced = false;
+
+/* ══════════ 뷰 전환 ══════════ */
+const VIEWS = ['login-view','start-view','fill-view','count-view','result-view','wn-view'];
+function showView(id) {
+    VIEWS.forEach(v => {
+        const el = document.getElementById(v);
+        el.style.display = (v === id) ? 'flex' : 'none';
+    });
+    const lb=document.querySelector('.logout-btn');if(lb)lb.style.display=id==='start-view'&&localStorage.getItem('slowmath_login')?'':'none';
+}
+
+/* ══════════ 로그인 ══════════ */
+function socialLogin(provider) {
+    localStorage.setItem('slowmath_login', JSON.stringify({ provider, time: Date.now() }));
+    if (window.speechSynthesis) speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+    const _sp=sessionStorage.getItem('_sp');if(_sp){sessionStorage.removeItem('_sp');startGame(...JSON.parse(_sp));return;}
+    document.querySelector('.logout-btn').style.display='';
+    showView('start-view');
+}
+function logout() {
+    localStorage.removeItem('slowmath_login');
+    showView('login-view');
+}
+function goHome() {
+    if (countTimer) { clearInterval(countTimer); countTimer = null; }
+    isWrongNotesPractice = false;
+    updateWrongNotesBadge();
+    showView('start-view');
+
+if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
+}
+
+function shareApp() {
+    var SHARE_KEY = 'slowmath_share_days';
+    var MAX_DAYS = 5;
+    var bubble = document.getElementById('share-bubble');
+    function onShared() {
+        var days = parseInt(localStorage.getItem(SHARE_KEY) || '0');
+        if (days < MAX_DAYS) { days = days + 1; localStorage.setItem(SHARE_KEY, days); }
+                if (bubble && days >= MAX_DAYS) { bubble.style.display = 'none'; }
+        var shareToast = document.getElementById('share-toast');
+        if (shareToast) {
+          shareToast.textContent = '하루 무료 이용권이 지급되었습니다!';
+          shareToast.style.opacity = '1';
+          clearTimeout(shareToast._t);
+          shareToast._t = setTimeout(function() { shareToast.style.opacity = '0'; }, 3000);
+        }
+    }
+    var title = document.title;
+    var url = location.href;
+    if (navigator.share) {
+        navigator.share({ title: title, url: url }).then(onShared).catch(function() {});
+    } else {
+        if (navigator.clipboard) { navigator.clipboard.writeText(url); }
+        alert('링크가 복사되었어요!');
+        onShared();
+    }
+}
+
+  /* ══ 공유 버블 초기화 ══ */
+  document.addEventListener('DOMContentLoaded', function() {
+    var days = parseInt(localStorage.getItem('slowmath_share_days') || '0');
+    if (days >= 5) { var b = document.getElementById('share-bubble'); if (b) b.style.display = 'none'; }
+  });
+
+/* ══════════ TTS ══════════ */
+function toggleTTS() {
+    ttsEnabled = !ttsEnabled;
+    const t = document.getElementById('tts-toggle');
+    t.classList.toggle('on', ttsEnabled);
+    if (!ttsEnabled && window.speechSynthesis) speechSynthesis.cancel();
+    saveSettings();
+}
+function speak(text) {
+    if (!ttsEnabled || !window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ko-KR'; u.rate = 0.9;
+    setTimeout(() => speechSynthesis.speak(u), 50);
+}
+
+/* ══════════ 충동방지 ══════════ */
+function toggleImpulse() {
+    impulsePrevention = !impulsePrevention;
+    const t = document.getElementById('impulse-toggle');
+    t.classList.toggle('on', impulsePrevention);
+    document.getElementById('impulse-details').style.display = impulsePrevention ? '' : 'none';
+    saveSettings();
+}
+function setImpulseMode(mode) {
+    impulseMode = mode;
+    document.querySelectorAll('.impulse-mode-btn').forEach(b => b.classList.toggle('selected', b.dataset.mode === mode));
+    document.getElementById('impulse-delay-row').style.display = mode === 'lock' ? '' : 'none';
+    saveSettings();
+}
+function setImpulseDelay(sec) {
+    impulseDelay = sec;
+    document.querySelectorAll('.imp-sec').forEach((b, i) => b.classList.toggle('active', i + 1 === sec));
+    saveSettings();
+}
+
+/* ══════════ 문제 생성 ══════════ */
+function generateSequential() {
+    questions = [];
+    for (let i = 1; i <= 20; i++) questions.push(i);
+}
+function generateShuffled() {
+    generateSequential();
+    for (let i = 19; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [questions[i], questions[j]] = [questions[j], questions[i]];
+    }
+}
+function generateRanged(min, max) {
+    questions = [];
+    for (let i = min; i <= max; i++) questions.push(i);
+    for (let i = questions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [questions[i], questions[j]] = [questions[j], questions[i]];
+    }
+    TOTAL = questions.length;
+    rangeMin = min;
+    rangeMax = max;
+}
+
+/* ══════════ 게임 시작 ══════════ */
+function startGame(mode, min, max) {
+    if (!localStorage.getItem('slowmath_login')) { sessionStorage.setItem('_sp',JSON.stringify([mode,min,max])); showView('login-view'); return; }
+        isWrongNotesPractice = false;
+    gameMode = mode;
+    currentQ = 0;
+    score = 0;
+    if (mode === 'sequential') {
+        generateSequential();
+        rangeMin = 1;
+        rangeMax = 20;
+        sourceCircleCount = 20;
+        showView('fill-view');
+        document.getElementById('fill-score-label').textContent = '0점';
+        loadFillQuestion();
+    } else if (mode === 'fill') {
+        generateRanged(min, max);
+        sourceCircleCount = max;
+        showView('fill-view');
+        document.getElementById('fill-score-label').textContent = '0점';
+        loadFillQuestion();
+    } else {
+        generateRanged(min, max);
+        showView('count-view');
+        document.getElementById('count-score-label').textContent = '0점';
+        loadCountQuestion();
+    }
+}
+
+/* ════════════════════════════════════════════
+   채우기 모드
+   ════════════════════════════════════════════ */
+
+function renderSourceCircles() {
+    const area = document.getElementById('source-area');
+    area.innerHTML = '';
+    for (let i = 0; i < sourceCircleCount; i++) {
+        const c = document.createElement('div');
+        c.className = 'source-circle';
+        c.dataset.idx = i;
+        area.appendChild(c);
+    }
+}
+
+/* 좌표 */
+function getPos(e) {
+    if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+    return { x: e.clientX, y: e.clientY };
+}
+
+/* 전역 드래그 */
+function onDragStart(e) {
+    if (dragging) return;
+    const sourceEl = e.target.closest('.source-circle');
+    const placedEl = e.target.closest('.placed-circle');
+    if (sourceEl && !sourceEl.classList.contains('used')) {
+        e.preventDefault();
+        dragging = true;
+        isDraggingPlaced = false;
+        dragSourceEl = sourceEl;
+        dragSourceIdx = parseInt(sourceEl.dataset.idx);
+        const pos = getPos(e);
+        floatingEl = document.createElement('div');
+        floatingEl.className = 'floating-circle';
+        floatingEl.style.left = pos.x + 'px';
+        floatingEl.style.top = pos.y + 'px';
+        document.body.appendChild(floatingEl);
+        sourceEl.style.opacity = '0.3';
+    } else if (placedEl) {
+        e.preventDefault();
+        dragging = true;
+        isDraggingPlaced = true;
+        dragSourceEl = placedEl;
+        dragSourceIdx = parseInt(placedEl.dataset.sourceIdx);
+        const pos = getPos(e);
+        floatingEl = document.createElement('div');
+        floatingEl.className = 'floating-circle';
+        floatingEl.style.background = '#6BADE8';
+        floatingEl.style.left = pos.x + 'px';
+        floatingEl.style.top = pos.y + 'px';
+        document.body.appendChild(floatingEl);
+        placedEl.style.opacity = '0.3';
+    }
+}
+function onDragMove(e) {
+    if (!dragging || !floatingEl) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    floatingEl.style.left = pos.x + 'px';
+    floatingEl.style.top = pos.y + 'px';
+    const da = document.getElementById('drop-area');
+    if (!da) return;
+    const r = da.getBoundingClientRect();
+    da.classList.toggle('drag-over', pos.x >= r.left && pos.x <= r.right && pos.y >= r.top && pos.y <= r.bottom);
+}
+function onDragEnd(e) {
+    if (!dragging || !floatingEl) return;
+    const pos = getPos(e);
+    const da = document.getElementById('drop-area');
+    if (da) {
+        const r = da.getBoundingClientRect();
+        da.classList.remove('drag-over');
+        const insideDrop = pos.x >= r.left && pos.x <= r.right && pos.y >= r.top && pos.y <= r.bottom;
+        if (isDraggingPlaced) {
+            if (insideDrop) {
+                // drop area 안에 다시 놓으면 그대로 유지
+                if (dragSourceEl) dragSourceEl.style.opacity = '1';
+            } else {
+                // drop area 밖에 놓으면 제거하고 source circle 복원
+                if (dragSourceEl) dragSourceEl.remove();
+                placedCount--;
+                const srcEl = document.querySelectorAll('.source-circle')[dragSourceIdx];
+                if (srcEl) {
+                    srcEl.classList.remove('used');
+                    srcEl.style.opacity = '1';
+                }
+                document.getElementById('source-count').textContent = (20 - placedCount);
+                if (placedCount === 0) {
+                    document.getElementById('fill-check-btn').disabled = true;
+                    if (!da.querySelector('.hint-text') && da.querySelectorAll('.placed-circle').length === 0) {
+                        const hint = document.createElement('span');
+                        hint.className = 'hint-text';
+                        hint.id = 'hint-text';
+                        hint.textContent = '여기에 동그라미를 놓으세요';
+                        da.appendChild(hint);
+                    }
+                }
+            }
+        } else {
+            if (insideDrop) {
+                placeCircle(dragSourceIdx);
+            } else if (dragSourceEl) {
+                dragSourceEl.style.opacity = '1';
+            }
+        }
+    }
+    floatingEl.remove();
+    floatingEl = null;
+    dragging = false;
+    dragSourceEl = null;
+    dragSourceIdx = null;
+    isDraggingPlaced = false;
+}
+document.addEventListener('mousedown', onDragStart);
+document.addEventListener('mousemove', onDragMove);
+document.addEventListener('mouseup', onDragEnd);
+document.addEventListener('touchstart', onDragStart, { passive: false });
+document.addEventListener('touchmove', onDragMove, { passive: false });
+document.addEventListener('touchend', onDragEnd);
+
+function placeCircle(idx) {
+    const el = document.querySelectorAll('.source-circle')[idx];
+    if (!el || el.classList.contains('used')) return;
+    el.classList.add('used');
+    placedCount++;
+    const da = document.getElementById('drop-area');
+    const hint = document.getElementById('hint-text');
+    if (hint) hint.style.display = 'none';
+    const c = document.createElement('div');
+    c.className = 'placed-circle';
+    c.dataset.sourceIdx = idx;
+    da.appendChild(c);
+    document.getElementById('source-count').textContent = (sourceCircleCount - placedCount);
+    document.getElementById('fill-check-btn').disabled = false;
+}
+
+function loadFillQuestion() {
+    if (currentQ >= TOTAL) { showResult(); return; }
+    const target = questions[currentQ];
+    document.getElementById('fill-target').textContent = target;
+    document.getElementById('fill-q-label').textContent = (currentQ + 1) + ' / ' + TOTAL;
+    document.getElementById('fill-progress').style.width = (currentQ / TOTAL * 100) + '%';
+    document.getElementById('fill-feedback').textContent = '';
+    document.getElementById('fill-feedback').className = 'feedback';
+    document.getElementById('fill-check-btn').disabled = true;
+    placedCount = 0;
+    document.getElementById('drop-area').innerHTML = '<span class="hint-text" id="hint-text">여기에 동그라미를 놓으세요</span>';
+    const nd = document.getElementById('fill-number-display');
+    nd.classList.remove('fade-in'); void nd.offsetWidth; nd.classList.add('fade-in');
+    renderSourceCircles();
+    document.getElementById('source-count').textContent = sourceCircleCount;
+    speak(target + '');
+}
+
+function checkFillAnswer() {
+    const target = questions[currentQ];
+    const fb = document.getElementById('fill-feedback');
+    if (placedCount === target) {
+        score++;
+        fb.textContent = '정답! ' + target + '개를 정확히 채웠어요';
+        fb.className = 'feedback correct';
+        document.getElementById('fill-score-label').textContent = score + '점';
+        speak('정답! ' + target + '개');
+    } else {
+        fb.textContent = placedCount + '개를 놓았어요. 정답은 ' + target + '개예요';
+        fb.className = 'feedback wrong';
+        speak('오답. 정답은 ' + target + '개');
+        addWrongNote(target);
+    }
+    document.getElementById('fill-check-btn').disabled = true;
+    currentQ++;
+    setTimeout(loadFillQuestion, 1500);
+}
+
+/* ════════════════════════════════════════════
+   세기 모드
+   ════════════════════════════════════════════ */
+
+function loadCountQuestion() {
+    if (currentQ >= TOTAL) { showResult(); return; }
+    countBusy = false;
+    countFirstAttemptWrong = false;
+    const target = questions[currentQ];
+    document.getElementById('count-q-label').textContent = (currentQ + 1) + ' / ' + TOTAL;
+    document.getElementById('count-progress').style.width = (currentQ / TOTAL * 100) + '%';
+    document.getElementById('count-feedback').textContent = '';
+    document.getElementById('count-feedback').className = 'feedback';
+
+    /* 동그라미 표시 */
+    const dotsArea = document.getElementById('count-dots-area');
+    dotsArea.innerHTML = '';
+    for (let i = 0; i < target; i++) {
+        const d = document.createElement('div');
+        d.className = 'count-dot';
+        d.style.animationDelay = (i * 0.04) + 's';
+        dotsArea.appendChild(d);
+    }
+
+    /* 선택지 생성: 정답 포함 4개 */
+    const opts = generateOptions(target);
+    const optArea = document.getElementById('count-options');
+    optArea.innerHTML = '';
+    const impulseArea = document.getElementById('count-impulse-area');
+    impulseArea.innerHTML = '';
+
+    opts.forEach(n => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = n;
+        btn.onclick = () => pickCountAnswer(btn, n, target);
+        optArea.appendChild(btn);
+    });
+
+    speak('동그라미가 몇 개일까요?');
+
+    /* 충동방지 적용 */
+    if (impulsePrevention) {
+        if (impulseMode === 'hide') {
+            /* 보기 숨기기 */
+            optArea.style.visibility = 'hidden';
+            const revealBtn = document.createElement('button');
+            revealBtn.className = 'reveal-btn';
+            revealBtn.textContent = '보기 확인';
+            revealBtn.onclick = () => {
+                optArea.style.visibility = 'visible';
+                revealBtn.remove();
+            };
+            impulseArea.appendChild(revealBtn);
+        } else {
+            /* 선택 잠금 */
+            optArea.querySelectorAll('.option-btn').forEach(b => b.classList.add('locked'));
+            let remaining = impulseDelay;
+            const cd = document.createElement('div');
+            cd.className = 'delay-countdown';
+            cd.textContent = remaining;
+            impulseArea.appendChild(cd);
+            countTimer = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) {
+                    clearInterval(countTimer);
+                    countTimer = null;
+                    cd.remove();
+                    optArea.querySelectorAll('.option-btn').forEach(b => b.classList.remove('locked'));
+                } else {
+                    cd.textContent = remaining;
+                }
+            }, 1000);
+        }
+    }
+}
+
+function generateOptions(correct) {
+    const set = new Set([correct]);
+    while (set.size < 4) {
+        let n = correct + Math.floor(Math.random() * 7) - 3;
+        if (n >= rangeMin && n <= rangeMax && n !== correct) set.add(n);
+        // 범위 내에서 못 찾으면 범위 넓혀서라도 4개 채우기
+        if (set.size < 4 && n < rangeMin) {
+            let m = Math.floor(Math.random() * (rangeMax - rangeMin + 1)) + rangeMin;
+            if (m !== correct) set.add(m);
+        }
+    }
+    const arr = Array.from(set);
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function pickCountAnswer(btn, picked, target) {
+    if (countBusy) return;
+    if (countTimer) { clearInterval(countTimer); countTimer = null; }
+    document.getElementById('count-impulse-area').innerHTML = '';
+
+    const fb = document.getElementById('count-feedback');
+
+    if (picked === target) {
+        /* 정답 */
+        countBusy = true;
+        const allBtns = document.querySelectorAll('#count-options .option-btn');
+        allBtns.forEach(b => {
+            b.disabled = true;
+            b.classList.remove('locked');
+            if (parseInt(b.textContent) === target) b.classList.add('correct');
+        });
+
+        if (!countFirstAttemptWrong) {
+            score++;
+            document.getElementById('count-score-label').textContent = score + '점';
+            if (isWrongNotesPractice) removeWrongNote(target);
+        }
+        fb.textContent = '정답! ' + target + '개';
+        fb.className = 'feedback correct';
+        speak('정답! ' + target + '개');
+
+        currentQ++;
+        setTimeout(loadCountQuestion, 1500);
+    } else {
+        /* 오답: 해당 보기만 비활성화, 다시 고를 수 있음 */
+        countFirstAttemptWrong = true;
+        btn.classList.add('wrong');
+        btn.disabled = true;
+        fb.textContent = '다시 골라보세요';
+        fb.className = 'feedback wrong';
+        speak('다시 골라보세요');
+        addWrongNote(target);
+    }
+}
+
+/* ══════════ 결과 ══════════ */
+function showResult() {
+_smGameCompleted=true;
+    showView('result-view');
+    document.getElementById('result-emoji').textContent = score === TOTAL ? '🏆' : '👏';
+    document.getElementById('result-msg').textContent = TOTAL + '문제 완료!';
+    document.getElementById('result-detail').textContent = TOTAL + '문제 중 ' + score + '개 정답';
+    document.getElementById('result-retry-btn').onclick = function() { startGame(gameMode, rangeMin, rangeMax); };
+    speak(score + '개 맞았어요!');
+}
+
+/* ══════════ 오답노트 ══════════ */
+const WN_KEY = 'slowmath_matching_wrong_notes';
+
+function getWrongNotes() {
+    try {
+        const data = JSON.parse(localStorage.getItem(WN_KEY));
+        return Array.isArray(data) ? data : [];
+    } catch(e) { return []; }
+}
+function saveWrongNotes(notes) {
+    localStorage.setItem(WN_KEY, JSON.stringify(notes));
+}
+function addWrongNote(target) {
+    const notes = getWrongNotes();
+    if (!notes.some(n => n.target === target)) {
+        notes.push({ target });
+        saveWrongNotes(notes);
+    }
+    updateWrongNotesBadge();
+}
+function removeWrongNote(target) {
+    let notes = getWrongNotes();
+    notes = notes.filter(n => n.target !== target);
+    saveWrongNotes(notes);
+    updateWrongNotesBadge();
+}
+function clearWrongNotes() {
+    localStorage.removeItem(WN_KEY);
+    updateWrongNotesBadge();
+    showWrongNotesView();
+}
+function updateWrongNotesBadge() {
+    const notes = getWrongNotes();
+    const btn = document.getElementById('wrong-notes-btn');
+    const badge = document.getElementById('wrong-notes-badge');
+    if (notes.length > 0) {
+        btn.classList.remove('hidden');
+        badge.textContent = notes.length;
+    } else {
+        btn.classList.add('hidden');
+    }
+}
+function showWrongNotesView() {
+    showView('wn-view');
+    const notes = getWrongNotes();
+    const list = document.getElementById('wn-list');
+    list.innerHTML = '';
+    if (notes.length === 0) {
+        list.innerHTML = '<div class="wn-empty">틀린 문제가 없어요!</div>';
+        document.getElementById('wn-start-btn').disabled = true;
+        document.getElementById('wn-start-btn').style.opacity = '0.45';
+        document.getElementById('wn-clear-btn').style.display = 'none';
+    } else {
+        notes.sort((a, b) => a.target - b.target).forEach(n => {
+            const chip = document.createElement('div');
+            chip.className = 'wn-chip';
+            chip.textContent = '🔢 ' + n.target + '개';
+            list.appendChild(chip);
+        });
+        document.getElementById('wn-start-btn').disabled = false;
+        document.getElementById('wn-start-btn').style.opacity = '1';
+        document.getElementById('wn-clear-btn').style.display = '';
+    }
+}
+function startWrongNotesPractice() {
+    const notes = getWrongNotes();
+    if (notes.length === 0) return;
+    isWrongNotesPractice = true;
+    gameMode = 'count';
+    currentQ = 0;
+    score = 0;
+    questions = notes.map(n => n.target);
+    // shuffle
+    for (let i = questions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [questions[i], questions[j]] = [questions[j], questions[i]];
+    }
+    TOTAL = questions.length;
+    rangeMin = Math.min(...questions);
+    rangeMax = Math.max(...questions);
+    // Ensure rangeMin/rangeMax span at least 1-10 for good option generation
+    if (rangeMin > 1) rangeMin = 1;
+    if (rangeMax < 10) rangeMax = 10;
+    showView('count-view');
+    document.getElementById('count-score-label').textContent = '0점';
+    loadCountQuestion();
+}
+
+/* ══════════ 초기화 ══════════ */
+(function init() {
+    loadSettings();
+    applySettingsUI();
+    updateWrongNotesBadge();
+    showView('start-view');
+    if (window.speechSynthesis) {
+        speechSynthesis.getVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined)
+            speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+    }
+})();
+
+// ─── Splash Screen (3초 후 페이드아웃) ───
+setTimeout(function() {
+    var splash = document.getElementById("splash");
+    if (splash) { splash.classList.add("fade-out"); setTimeout(function() { splash.remove(); }, 500); }
+}, 3000);
+
+// Share visibility: hide when logged out
+(function() {
+  var _SM_KEY = 'slowmath_login';
+  function _updateShareVis() {
+    document.body.classList.toggle('sm-loggedin', !!localStorage.getItem(_SM_KEY));
+  }
+  _updateShareVis();
+  ['socialLogin','socialLogout','goLogin'].forEach(function(fn) {
+    if (typeof window[fn] === 'function') {
+      var _orig = window[fn];
+      window[fn] = function() { _orig.apply(this, arguments); _updateShareVis(); };
+    }
+  });
+})();
+</script>
+
+<!-- ====== App Recommendation Popup ====== -->
+<div id="sm-reco-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.52);z-index:500;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">
+  <div style="background:#FFFDF8;border-radius:24px;padding:28px 22px 22px;max-width:270px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.18);animation:_smPop .32s cubic-bezier(.34,1.56,.64,1) both;">
+    <div style="font-size:0.72rem;font-weight:700;color:#C4AA82;letter-spacing:.08em;margin-bottom:14px;">도움이 될만한 앱을 소개드려요!</div>
+    <div id="sm-reco-emoji" style="font-size:2.75rem;margin-bottom:10px;line-height:1;"></div>
+    <div id="sm-reco-title" style="font-size:1.15rem;font-weight:900;color:#4A4035;margin-bottom:8px;"></div>
+    <div id="sm-reco-desc" style="font-size:0.84rem;color:#7B6545;line-height:1.65;margin-bottom:20px;"></div>
+    <a id="sm-reco-link" href="#" style="display:block;background:#6BADE8;color:#fff;border-radius:14px;padding:15px 0;font-size:0.975rem;font-weight:700;text-decoration:none;font-family:inherit;margin-bottom:10px;box-shadow:0 4px 12px rgba(107,173,232,.3);">바로 해보기 →</a>
+    <button onclick="document.getElementById('sm-reco-overlay').style.display='none'" style="background:none;border:none;color:#C4AA82;font-size:0.84rem;cursor:pointer;font-family:inherit;padding:6px;">다음에 할게요</button>
+  </div>
+</div>
+<style>@keyframes _smPop{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}</style>
+
+<script>
+/* ====== App Recommendation ====== */
+var _smGameCompleted = false;
+var _SM_RECO = [
+  {title:'숫자 익히기',emoji:'🔢',url:'https://sprit6487.github.io/slowmath_number/',desc:'숫자를 순서대로 배워보세요'},
+  {title:'세기',emoji:'🎲',url:'https://sprit6487.github.io/slowmath_dice/',desc:'손가락, 주사위, 카드를 세어보세요'},
+  {title:'더하기 1',emoji:'1️⃣',url:'https://sprit6487.github.io/slowmath_plusone/',desc:'숫자에 1을 더해보세요!'}
+];
+function _showRecoPopup() {
+  if (!_SM_RECO.length) return;
+  var item = _SM_RECO[Math.floor(Math.random() * _SM_RECO.length)];
+  document.getElementById('sm-reco-emoji').textContent = item.emoji;
+  document.getElementById('sm-reco-title').textContent = item.title;
+  document.getElementById('sm-reco-desc').innerHTML = item.desc;
+  document.getElementById('sm-reco-link').href = item.url;
+  document.getElementById('sm-reco-overlay').style.display = 'flex';
+}
+</script>
+</body>
+</html>
