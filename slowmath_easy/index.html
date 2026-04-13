@@ -1,0 +1,2235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>느린아이 한 자리 덧셈</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0; padding: 0;
+            background: #F5F1EB;
+            min-height: 100dvh;
+            display: flex; justify-content: center; align-items: flex-start;
+            color: #4A4035;
+        }
+
+        .app {
+            width: 100%; max-width: 480px;
+            min-height: 100dvh;
+            background: white;
+            padding: 24px 20px;
+            padding-top: max(24px, env(safe-area-inset-top));
+            padding-bottom: max(24px, env(safe-area-inset-bottom));
+            display: flex; flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            body { align-items: center; padding: 32px; }
+            .app {
+                max-width: 560px;
+                min-height: auto;
+                border-radius: 32px;
+                box-shadow: 0 8px 48px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+                padding: 44px 40px;
+            }
+        }
+
+        /* ── 프로그레스 바 ── */
+        .progress-bar {
+            height: 8px; border-radius: 99px;
+            background: #F0ECE6; overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        .progress-fill {
+            height: 100%; border-radius: 99px;
+            background: linear-gradient(90deg, #6BADE8, #5BC886);
+            transition: width 0.5s ease;
+        }
+
+        /* ── 수식 숫자 ── */
+        .eq-num { font-size: 3rem; font-weight: 900; line-height: 1; }
+        .eq-op { font-size: 2rem; font-weight: 600; color: #C8C0B4; line-height: 1; }
+        @media (min-width: 768px) {
+            .eq-num { font-size: 3.5rem; }
+            .eq-op { font-size: 2.5rem; }
+        }
+
+        /* ── 선택지 버튼 ── */
+        .option-btn {
+            border: 2.5px solid #E8E2DA;
+            background: white;
+            border-radius: 16px;
+            font-weight: 700;
+            color: #4A4035;
+            transition: transform 0.1s, border-color 0.15s, background 0.15s;
+            cursor: pointer; user-select: none;
+        }
+        .option-btn:active:not(:disabled) { transform: scale(0.95); }
+        .option-btn:disabled { cursor: default; }
+        .correct-selected {
+            background: #D4F5E0 !important; border-color: #5BC886 !important; color: #1A7A3A !important;
+        }
+        .wrong-selected {
+            background: #FDE8E8 !important; border-color: #F07070 !important; color: #B91C1C !important;
+            opacity: 0.5;
+        }
+
+        /* ── 선택 그룹 ── */
+        .select-group {
+            display: flex; gap: 8px;
+        }
+        .select-group.vertical {
+            flex-direction: column;
+        }
+        .select-item {
+            flex: 1;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 2px solid #E8E2DA;
+            background: white;
+            color: #B8AD9E;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+            position: relative;
+        }
+        .select-item.active {
+            background: #FAF5EE;
+            border-color: #C4AA82;
+            color: #7B6545;
+        }
+        .select-item:not(.active):hover {
+            border-color: #D0C8BC;
+            color: #8C8070;
+        }
+
+
+        /* ── 섹션 라벨 ── */
+        .section-label {
+            font-size: 0.75rem; font-weight: 700;
+            color: #B8AD9E;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ── 딜레이 버튼 ── */
+        .delay-btn {
+            flex: 0 0 18%; padding: 8px 0;
+            border-radius: 10px;
+            border: 2px solid #E8E2DA;
+            background: white;
+            color: #8C8070;
+            font-weight: 600;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        .delay-btn.active {
+            background: #FAF5EE;
+            border-color: #C4AA82;
+            color: #7B6545;
+        }
+        .delay-btn:not(.active):hover {
+            border-color: #D0C8BC;
+            color: #8C8070;
+        }
+
+        /* ── 충동방지 모드 옵션 ── */
+        .impulse-mode-options {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+            margin-bottom: 10px;
+        }
+        .impulse-mode-btn {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 10px 8px;
+            border-radius: 14px;
+            border: 2px solid #E8E2DA;
+            background: white;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .impulse-mode-btn.selected { border-color: #C4AA82; background: #FAF5EE; }
+        .impulse-mode-icon { font-size: 1.2rem; margin-bottom: 2px; }
+        .impulse-mode-label { font-size: 0.8rem; font-weight: 700; color: #4A4035; }
+        .impulse-mode-desc { font-size: 0.65rem; color: #B8AD9E; margin-top: 1px; }
+
+        .reveal-btn {
+            display: block;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto 12px;
+            padding: 14px 0;
+            border-radius: 14px;
+            border: 2px solid #C4AA82;
+            background: #FAF5EE;
+            color: #7B6545;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        .reveal-btn:active {
+            background: #F0E6D6;
+            transform: scale(0.98);
+        }
+
+        /* ── 토글 ── */
+        .toggle-track {
+            width: 48px; height: 28px;
+            border-radius: 99px; position: relative;
+            background: #E0DAD0; transition: background 0.2s;
+            cursor: pointer; flex-shrink: 0;
+            border: none;
+        }
+        .toggle-track.on { background: #5BC886; }
+        .toggle-knob {
+            width: 22px; height: 22px;
+            border-radius: 50%; background: white;
+            position: absolute; top: 3px; left: 3px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+            transition: transform 0.2s;
+        }
+        .toggle-track.on .toggle-knob { transform: translateX(20px); }
+
+        /* ── 충동방지 모드 옵션 ── */
+        .impulse-mode-options {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+            margin-bottom: 10px;
+        }
+        .impulse-mode-btn {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 10px 8px;
+            border-radius: 14px;
+            border: 2px solid #E8E2DA;
+            background: white;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .impulse-mode-btn.selected { border-color: #C4AA82; background: #FAF5EE; }
+        .impulse-mode-icon { font-size: 1.2rem; margin-bottom: 2px; }
+        .impulse-mode-label { font-size: 0.8rem; font-weight: 700; color: #4A4035; }
+        .impulse-mode-desc { font-size: 0.65rem; color: #B8AD9E; margin-top: 1px; }
+        .chips-hidden { visibility: hidden; }
+        .chips-locked { pointer-events: none; opacity: 0.45; }
+
+        /* ── 키패드 ── */
+        .keypad-display {
+            font-size: 2.25rem; font-weight: 700;
+            border: 2.5px solid #E8E2DA;
+            border-radius: 16px; padding: 16px 0;
+            text-align: center; color: #D0C8BC;
+            margin-bottom: 12px; background: white;
+            transition: all 0.2s;
+        }
+        .keypad-display.has-input { border-color: #B8AD9E; color: #4A4035; }
+        .keypad-display.correct-input { border-color: #5BC886; background: #D4F5E0; color: #1A7A3A; }
+        .keypad-display.wrong-input { border-color: #F07070; background: #FDE8E8; color: #B91C1C; }
+
+        .keypad-btn {
+            border: 2.5px solid #E8E2DA; background: white;
+            border-radius: 14px; font-weight: 700; font-size: 1.25rem;
+            color: #4A4035; padding: 14px 0;
+            cursor: pointer; transition: transform 0.1s, background 0.1s;
+        }
+        .keypad-btn:active:not(:disabled) { transform: scale(0.95); background: #F5F1EB; }
+        .keypad-btn.confirm {
+            background: #4A4035; border-color: #4A4035; color: white;
+        }
+        .keypad-btn.confirm:active:not(:disabled) { background: #2E261D; }
+
+        /* ── 쓰기 캔버스 ── */
+        .write-canvas-wrap {
+            border: 2.5px solid #E8E2DA;
+            border-radius: 16px; overflow: hidden;
+            background: white; position: relative;
+            touch-action: none;
+        }
+        .write-canvas-wrap canvas {
+            display: block; width: 100%;
+            cursor: crosshair; touch-action: none;
+        }
+
+        /* ── 홈 버튼 ── */
+        .btn-home {
+            width: 36px; height: 36px; border-radius: 10px;
+            border: 2px solid #E8E2DA; background: white;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: background 0.15s;
+            font-size: 1rem; color: #8C8070;
+        }
+        .btn-home:active { background: #F5F1EB; }
+        @media (min-width: 768px) { .btn-home { width: 40px; height: 40px; } }
+
+        /* ── 피드백 ── */
+        .feedback { text-align: center; min-height: 28px; font-size: 0.9375rem; font-weight: 700; }
+        .feedback-green { color: #5BC886; }
+        .feedback-red { color: #F07070; }
+        .feedback-muted { color: #B8AD9E; }
+
+        /* ── 패스 버튼 ── */
+        .btn-pass {
+            color: #B8AD9E; font-size: 0.875rem; font-weight: 500;
+            text-decoration: underline; background: none; border: none;
+            cursor: pointer; padding: 8px 0;
+            transition: color 0.15s;
+        }
+        .btn-pass:hover { color: #6B5F50; }
+
+        /* ── 시작하기 버튼 ── */
+        .btn-start {
+            width: 100%; padding: 14px 0;
+            border-radius: 16px; border: none;
+            background: #4A4035; color: white;
+            font-size: 1.125rem; font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            box-shadow: 0 2px 8px rgba(74,64,53,0.15);
+        }
+        .btn-start:active { transform: scale(0.98); background: #2E261D; }
+
+      .btn-next-q { display: block; width: 100%; max-width: 360px; margin: 12px auto 0; padding: 14px 0; border-radius: 16px; border: none; background: #4A4035; color: white; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; box-shadow: 0 2px 8px rgba(74,64,53,0.15); }
+      .btn-next-q:active { transform: scale(0.98); background: #2E261D; }
+
+        /* ── 정보 버튼/툴팁 ── */
+        .info-btn {
+            width: 18px; height: 18px; border-radius: 50%;
+            background: #D8D2C8; color: #6B5F50;
+            font-size: 10px; border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: background 0.15s;
+        }
+        .info-btn:hover { background: #C8C0B4; }
+        .tooltip {
+            position: absolute; bottom: calc(100% + 8px);
+            left: 50%; transform: translateX(-50%);
+            padding: 8px 12px; border-radius: 10px;
+            background: #4A4035; color: white;
+            font-size: 0.75rem; white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            pointer-events: none;
+        }
+        .tooltip::after {
+            content: ''; position: absolute;
+            top: 100%; left: 50%; transform: translateX(-50%);
+            border: 5px solid transparent; border-top-color: #4A4035;
+        }
+
+        /* ── Login View ── */
+        .login-view {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          flex: 1;
+          min-height: 100dvh;
+          padding: 40px 20px;
+        }
+
+        .login-logo-area {
+          text-align: center;
+          margin-bottom: 48px;
+        }
+
+        .login-logo-area svg {
+          display: block;
+          margin: 0 auto;
+        }
+
+        .login-logo-area h1 {
+          font-size: clamp(1.8rem, 6vw, 2.25rem);
+          font-weight: 900;
+          letter-spacing: -0.025em;
+          margin-top: 8px;
+          white-space: nowrap;
+        }
+
+        .login-subtitle {
+          color: #B8AD9E;
+          font-size: 0.9375rem;
+          margin-top: 4px;
+        }
+
+          @keyframes floatBubble {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+.login-trial {
+    position: relative;
+    background: #FFF8F0;
+    border: 1.5px solid #EDD080;
+    border-radius: 14px;
+    padding: 9px 16px;
+    font-size: 0.78rem;
+    color: #7B6545;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+    line-height: 1.4;
+    box-shadow: 0 4px 14px rgba(220,160,50,.18);
+    animation: floatBubble 2.8s ease-in-out infinite;
+    align-self: center;
+}
+.login-trial::before {
+    content: '';
+    position: absolute;
+    bottom: -9px; left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top: 8px solid #EDD080;
+    border-bottom: 0;
+}
+.login-trial::after {
+    content: '';
+    position: absolute;
+    bottom: -7px; left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top: 7px solid #FFF8F0;
+    border-bottom: 0;
+    z-index: 1;
+}
+  .login-buttons {
+          width: 100%;
+          max-width: 320px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .login-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+          padding: 14px 20px;
+          border-radius: 12px;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          font-family: inherit;
+          line-height: 1.2;
+          border: none;
+          cursor: pointer;
+          transition: transform 0.1s;
+        }
+        .login-btn:active { transform: scale(0.97); }
+        .login-btn svg { flex-shrink: 0; }
+        .login-btn.kakao { background: #FEE500; color: #191919; }
+        .login-btn.naver { background: #03C75A; color: #FFFFFF; }
+        .login-btn.google { background: #FFFFFF; color: #444444; border: 1.5px solid #DADCE0; }
+        .login-btn.facebook { background: #1877F2; color: #FFFFFF; }
+
+        .logout-btn {
+          background: none;
+          border: 1.5px solid #E8E2DA;
+          border-radius: 8px;
+          padding: 6px 14px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #B8AD9E;
+          cursor: pointer;
+          font-family: 'Noto Sans KR', sans-serif;
+          transition: background 0.15s;
+        }
+        .logout-btn:hover { background: #F5F1EB; }
+
+        /* ── 페이드 인 ── */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+
+        /* ── 오답노트 ── */
+        .wrong-notes-btn { width: 100%; padding: 14px 0; border-radius: 14px; border: 2.5px solid #F07070; background: #FFF5F5; color: #F07070; font-family: 'Noto Sans KR', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; transition: transform .1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .wrong-notes-btn:active { transform: scale(.97); }
+        .wrong-notes-btn .badge { background: #F07070; color: white; border-radius: 50%; min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; }
+        .wn-view { display: none; flex-direction: column; align-items: center; padding: 24px 20px; }
+        .wn-view.active { display: flex; }
+        .wn-header { text-align: center; margin-bottom: 20px; }
+        .wn-header h2 { font-size: 1.25rem; font-weight: 900; color: #4A4035; margin: 0 0 4px; }
+        .wn-header p { font-size: .85rem; color: #B8AD9E; margin: 0; }
+        .wn-list { width: 100%; max-width: 400px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
+        .wn-chip { padding: 8px 16px; border-radius: 10px; background: #FFF5F5; border: 1.5px solid #F07070; font-size: .9rem; font-weight: 700; color: #F07070; }
+        .wn-empty { color: #B8AD9E; font-size: .9rem; margin: 40px 0; }
+        .wn-actions { display: flex; gap: 10px; width: 100%; max-width: 320px; }
+        .wn-actions button { flex: 1; padding: 13px 0; border-radius: 12px; font-family: 'Noto Sans KR', sans-serif; font-size: .9rem; font-weight: 700; cursor: pointer; transition: transform .1s; }
+        .wn-actions button:active { transform: scale(.97); }
+        .wn-btn-back { border: 2.5px solid #E8E2DA; background: white; color: #8C8070; }
+        .wn-btn-start { border: none; background: #F07070; color: white; box-shadow: 0 2px 8px rgba(240,112,112,.3); }
+        .wn-btn-clear { border: 1.5px solid #E8E2DA; background: white; color: #B8AD9E; padding: 8px 16px; border-radius: 8px; font-size: .75rem; font-weight: 600; cursor: pointer; margin-top: 12px; font-family: 'Noto Sans KR', sans-serif; }
+    
+    /* ── Splash Screen ── */
+    .splash-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: #FFFFFF;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+    }
+    .splash-overlay.fade-out { opacity: 0; pointer-events: none; }
+    .splash-logo { animation: splashFloat 2.4s ease-in-out infinite; margin-bottom: 24px; }
+    .splash-title { font-size: 2rem; font-weight: 900; letter-spacing: -0.025em; margin-bottom: 8px; }
+    .splash-subtitle { color: #B8B0A8; font-size: 0.9375rem; font-weight: 500; }
+    .brand-sub{font-size:.8rem;color:#B8AD9E;margin-top:6px;margin-bottom:0;font-weight:500;}
+    @keyframes splashFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @media (max-width:380px) { .splash-title{font-size:1.5rem} }
+    @media (min-width:768px) { .splash-logo svg{width:160px;height:134px} .splash-title{font-size:2.5rem} .splash-subtitle{font-size:1.0625rem} }
+    .complete-overlay { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 40px 0; }
+    .complete-emoji { font-size: 56px; }
+    .complete-msg { font-size: 1.25rem; font-weight: 900; color: #4A4035; }
+    .complete-sub { font-size: 0.85rem; color: #B8AD9E; }
+    .next-btn { margin-top: 8px; padding: 14px 36px; border: none; border-radius: 12px; background: #6BADE8; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform 0.12s; }
+    .next-btn:active { transform: scale(0.96); }
+/* share bubble */
+.share-bubble{position:absolute;right:0;background:#FFF8F0;border:1.5px solid #EDD080;border-radius:12px;padding:8px 12px;font-size:0.55rem;color:#7B6545;font-weight:600;box-shadow:0 4px 12px rgba(220,160,50,.18);z-index:20;animation:floatBubble 2.8s ease-in-out infinite;line-height:1.5;text-align:right;max-width:200px;}
+.share-bubble::before{content:'';position:absolute;top:-8px;right:10px;border:4px solid transparent;border-bottom:7px solid #EDD080;border-top:0;}
+.share-bubble::after{content:'';position:absolute;top:-6px;right:11px;border:3px solid transparent;border-bottom:6px solid #FFF8F0;border-top:0;z-index:1;}
+
+/* ── 보수 개념 힌트 ── */
+.complement-hint {
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #6B5F50;
+    background: #F0FBF4;
+    border: 2px dashed #5BC886;
+    border-radius: 14px;
+    padding: 10px 16px;
+    margin: -12px 0 12px;
+    line-height: 1.6;
+}
+.complement-hint .ch-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #5BC886;
+    letter-spacing: 0.06em;
+    display: block;
+    margin-bottom: 4px;
+}
+@media (min-width: 768px) {
+    .complement-hint { font-size: 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════ Splash Screen ══════ -->
+<div id="splash" class="splash-overlay">
+    <div class="splash-logo">
+        <svg viewBox="0 0 120 100" width="140" height="117" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+            <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+            <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+            <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+            <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+            <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+            <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+            <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+            <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+            <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+            <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+            <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+            <circle cx="101" cy="33" r="1" fill="white"/>
+            <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+            <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <h1 class="splash-title">
+        <span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">한 자리 덧셈</span>
+    </h1>
+    <p class="splash-subtitle">천천히 생각하고 풀어보세요</p>
+</div>
+<script>
+setTimeout(function() {
+    var splash = document.getElementById("splash");
+    if (splash) { splash.classList.add("fade-out"); setTimeout(function() { splash.remove(); }, 500); }
+}, 3000);
+</script>
+
+<div class="app">
+
+    <!-- ══════════════ 로그인 화면 ══════════════ -->
+    <div id="login-view" class="login-view">
+        <div class="login-logo-area">
+            <svg viewBox="0 0 120 100" width="120" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+                <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+                <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+                <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+                <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+                <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+                <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity="0.35" transform="rotate(-15 42 26)"/>
+                <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity="0.2"/>
+                <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+                <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+                <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+                <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+                <circle cx="101" cy="33" r="1" fill="white"/>
+                <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity="0.4"/>
+                <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">한 자리 덧셈</span></h1>
+            <p class="login-subtitle">천천히 생각하고 풀어보세요</p>
+        </div>
+          <p class="login-trial">가입하시고 하루 동안 모든 기능을<br>무료로 체험해보세요</p>
+<div class="login-buttons">
+            <button class="login-btn kakao" onclick="socialLogin('kakao')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 1C4.477 1 0 4.477 0 8.667c0 2.7 1.753 5.072 4.393 6.413-.192.717-.694 2.6-.794 3.004-.124.497.182.49.383.356.158-.105 2.51-1.708 3.525-2.398.8.118 1.628.18 2.493.18 5.523 0 10-3.477 10-7.555C20 4.477 15.523 1 10 1z" fill="#191919"/></svg>
+                카카오로 시작하기
+            </button>
+            <button class="login-btn naver" onclick="socialLogin('naver')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M13.57 10.684L6.066 0H0v20h6.43V9.316L13.934 20H20V0h-6.43v10.684z" fill="white"/></svg>
+                네이버로 시작하기
+            </button>
+            <button class="login-btn google" onclick="socialLogin('google')">
+                <svg width="20" height="20" viewBox="0 0 48 48"><path d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" fill="#FFC107"/><path d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" fill="#FF3D00"/><path d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" fill="#4CAF50"/><path d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.001-.001 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" fill="#1976D2"/></svg>
+                Google로 시작하기
+            </button>
+            <button class="login-btn facebook" onclick="socialLogin('facebook')">
+                <svg width="20" height="20" viewBox="0 0 20 20"><path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" fill="white"/></svg>
+                Facebook으로 시작하기
+            </button>
+        </div>
+    </div>
+
+    <!-- ══════════════ 시작 화면 ══════════════ -->
+    <div id="start-view" class="flex flex-col flex-1 hidden relative">
+        <button onclick="shareApp()" style="position:absolute; top:0; right:0; background:white; border:2px solid #E8E2DA; border-radius:10px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#8C8070; z-index:10;" title="공유하기">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+        </button>
+        <div id="share-bubble" class="share-bubble" style="top:44px;">지금 지인에게 공유하시면<br>하루 무료 이용권을 드려요</div>
+
+        <!-- 헤더 -->
+        <div class="text-center pt-0 pb-3">
+            <div class="inline-block mb-2">
+                <svg viewBox="0 0 120 100" width="90" height="75" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+                    <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+                    <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+                    <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+                    <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+                    <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+                    <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                    <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                    <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                    <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                    <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity="0.35"/>
+                    <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity="0.35" transform="rotate(-15 42 26)"/>
+                    <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity="0.2"/>
+                    <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+                    <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+                    <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+                    <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+                    <circle cx="101" cy="33" r="1" fill="white"/>
+                    <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity="0.4"/>
+                    <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h1 id="app-title" class="text-2xl font-black tracking-tight" style="font-size:1.6rem">
+                <span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">한 자리 덧셈</span>
+            </h1>
+            <p class="brand-sub">천천히 생각하고 풀어보세요</p>
+        </div>
+
+        <!-- 설정 영역 -->
+        <div class="flex flex-col gap-4 flex-1">
+            <!-- 단계 -->
+            <div>
+                <p class="section-label">단계</p>
+                <div class="select-group vertical">
+                    <button id="tab-5" onclick="selectTab(5)" class="select-item active">
+                        <div style="font-weight:700;font-size:1.1em;color:#4A4035;">1 부터 5</div>
+                        <div style="font-size:0.85em;color:#B8AD9E;margin-top:2px;">1 부터 5의 숫자만 나와요</div>
+                    </button>
+                    <button id="tab-big-easy" onclick="selectTab('bigEasy')" class="select-item">
+                        <div style="font-weight:700;font-size:1.1em;color:#4A4035;">1 부터 9</div>
+                        <div style="font-size:0.85em;color:#B8AD9E;margin-top:2px;">합이 10을 넘지 않고 큰 수가 먼저 나와요</div>
+                    </button>
+                    <button id="tab-10-limited" onclick="selectTab('10limited')" class="select-item">
+                        <div style="font-weight:700;font-size:1.1em;color:#4A4035;">1 부터 9</div>
+                        <div style="font-size:0.85em;color:#B8AD9E;margin-top:2px;">합이 10을 넘지 않고 큰 수 작은 수 랜덤으로 나와요</div>
+                    </button>
+                    <button id="tab-10" onclick="selectTab(10)" class="select-item">
+                        <div style="font-weight:700;font-size:1.1em;color:#4A4035;">1 부터 9</div>
+                        <div style="font-size:0.85em;color:#B8AD9E;margin-top:2px;">합이 10을 넘을 수 있어요</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 입력방식 -->
+            <div>
+                <p class="section-label">입력방식</p>
+                <div class="select-group mode-group">
+                    <button id="mode-select" onclick="selectMode('select')" class="select-item active">선택하기</button>
+                    <button id="mode-keypad" onclick="selectMode('keypad')" class="select-item">키패드 입력</button>
+                </div>
+            </div>
+
+            <!-- 시작 버튼 -->
+            <div>
+                <button onclick="startGame()" class="btn-start">시작하기</button>
+                <button id="wrong-notes-btn" class="wrong-notes-btn" onclick="showWrongNotesView()" style="display:none;">
+                    오답노트 <span id="wrong-notes-badge" class="badge">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 음성 설정 -->
+        <div class="mt-5 pt-5" style="border-top:1.5px solid #F0ECE6;">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold" style="color:#4A4035;">음성</p>
+                    <p class="text-xs mt-0.5" style="color:#B8AD9E;">정답/오답 음성 안내</p>
+                </div>
+                <button id="tts-toggle" onclick="toggleTTS()" role="switch" aria-checked="true"
+                        class="toggle-track on">
+                    <span id="tts-knob" class="toggle-knob"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 충동방지 -->
+        <div class="mt-5 pt-5" style="border-top:1.5px solid #F0ECE6;">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-semibold" style="color:#4A4035;">충동방지</p>
+                    <p id="impulse-desc" class="text-xs mt-0.5" style="color:#B8AD9E;">생각할 시간을 줘요</p>
+                </div>
+                <button id="impulse-toggle" onclick="toggleImpulsePrevention()" role="switch" aria-checked="true"
+                        class="toggle-track on">
+                    <span id="impulse-knob" class="toggle-knob"></span>
+                </button>
+            </div>
+            <div id="impulse-seconds" class="mt-3">
+                <div class="impulse-mode-options">
+                    <button class="impulse-mode-btn selected" onclick="setImpulseMode('hide')" data-mode="hide">
+                        <span class="impulse-mode-icon">👀</span>
+                        <span class="impulse-mode-label">보기 확인</span>
+                        <span class="impulse-mode-desc">버튼을 누르면 보기가 나타나요</span>
+                    </button>
+                    <button class="impulse-mode-btn" onclick="setImpulseMode('lock')" data-mode="lock">
+                        <span class="impulse-mode-icon">🔒</span>
+                        <span class="impulse-mode-label">선택 잠금</span>
+                        <span class="impulse-mode-desc">N초 동안 선택할 수 없어요</span>
+                    </button>
+                </div>
+                <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:6px;" id="impulse-delay-row">
+                    <button onclick="updateImpulseDelay(1)" class="delay-btn">1초</button>
+                    <button onclick="updateImpulseDelay(2)" class="delay-btn">2초</button>
+                    <button onclick="updateImpulseDelay(3)" class="delay-btn">3초</button>
+                    <button onclick="updateImpulseDelay(4)" class="delay-btn">4초</button>
+                    <button onclick="updateImpulseDelay(5)" class="delay-btn active">5초</button>
+                    <button onclick="updateImpulseDelay(6)" class="delay-btn">6초</button>
+                    <button onclick="updateImpulseDelay(7)" class="delay-btn">7초</button>
+                    <button onclick="updateImpulseDelay(8)" class="delay-btn">8초</button>
+                    <button onclick="updateImpulseDelay(9)" class="delay-btn">9초</button>
+                    <button onclick="updateImpulseDelay(10)" class="delay-btn">10초</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:24px;">
+            <button class="logout-btn" style="display:none" onclick="socialLogout()">로그아웃</button>
+        </div>
+    </div>
+
+    <!-- ══════════════ 오답노트 화면 ══════════════ -->
+    <div id="wrong-notes-view" class="wn-view">
+        <div class="wn-header">
+            <h2>오답노트</h2>
+            <p>틀렸던 문제들을 다시 풀어보세요</p>
+        </div>
+        <div id="wn-list" class="wn-list"></div>
+        <div class="wn-actions">
+            <button class="wn-btn-back" onclick="hideWrongNotesView()">돌아가기</button>
+            <button id="wn-start-btn" class="wn-btn-start" onclick="startWrongNotesPractice()">연습하기</button>
+        </div>
+        <button class="wn-btn-clear" onclick="clearWrongNotes()">오답노트 비우기</button>
+    </div>
+
+    <!-- ══════════════ 게임 화면 ══════════════ -->
+    <div id="play-view" class="hidden flex flex-col flex-1 fade-in">
+        <!-- 상단 바 -->
+        <div class="flex items-center gap-3 mb-2">
+            <button onclick="resetGame()" class="btn-home" title="홈">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-8 9 8M5 11v9a1 1 0 001 1h3m8 0h3a1 1 0 001-1v-9"/></svg>
+            </button>
+            <div class="flex-1">
+                <div class="flex justify-between items-center mb-1">
+                    <span id="question-number" class="text-xs font-medium" style="color:#B8AD9E;">문제 1 / 10</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill" style="width:10%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 수식 -->
+        <div class="flex items-center justify-center gap-4 my-6">
+            <span id="num1" class="eq-num" style="color:#6BADE8;">0</span>
+            <span class="eq-op">+</span>
+            <span id="num2" class="eq-num" style="color:#F0A050;">0</span>
+            <span class="eq-op">=</span>
+            <span class="eq-num" style="color:#D8D2C8;">?</span>
+        </div>
+
+        <!-- 보수 개념 힌트 -->
+        <div id="complement-hint" class="complement-hint hidden">
+            <span class="ch-label">힌트 — 10 만들기</span>
+            <span id="complement-hint-text"></span>
+        </div>
+
+        <!-- 선택지 (선택 모드) -->
+        <div id="options-grid" class="grid grid-cols-2 gap-3 mb-4"></div>
+
+        <!-- 키패드 (키패드 모드) -->
+        <div id="keypad-area" class="hidden mb-4">
+            <div id="keypad-display" class="keypad-display">?</div>
+            <div class="grid grid-cols-3 gap-2">
+                <button class="keypad-btn" onclick="appendKey('1')">1</button>
+                <button class="keypad-btn" onclick="appendKey('2')">2</button>
+                <button class="keypad-btn" onclick="appendKey('3')">3</button>
+                <button class="keypad-btn" onclick="appendKey('4')">4</button>
+                <button class="keypad-btn" onclick="appendKey('5')">5</button>
+                <button class="keypad-btn" onclick="appendKey('6')">6</button>
+                <button class="keypad-btn" onclick="appendKey('7')">7</button>
+                <button class="keypad-btn" onclick="appendKey('8')">8</button>
+                <button class="keypad-btn" onclick="appendKey('9')">9</button>
+                <button class="keypad-btn" onclick="deleteKey()">←</button>
+                <button class="keypad-btn" onclick="appendKey('0')">0</button>
+                <button id="keypad-confirm" class="keypad-btn confirm" onclick="submitKeypad()">✓</button>
+            </div>
+        </div>
+
+        <!-- 쓰기 (쓰기 모드) -->
+        <div id="write-area" class="hidden mb-4">
+            <div class="flex gap-3 mb-3">
+                <div class="flex-1 flex flex-col items-center gap-1.5">
+                    <div class="text-xs font-semibold" style="color:#B8AD9E;">십의 자리</div>
+                    <div class="write-canvas-wrap w-full">
+                        <canvas id="write-canvas-tens" width="120" height="160" style="aspect-ratio:3/4;"></canvas>
+                        <div id="write-result-overlay-tens" class="hidden absolute inset-0 flex items-center justify-center text-5xl font-bold pointer-events-none" style="background:rgba(255,255,255,0.85);"></div>
+                    </div>
+                </div>
+                <div class="flex-1 flex flex-col items-center gap-1.5">
+                    <div class="text-xs font-semibold" style="color:#B8AD9E;">일의 자리</div>
+                    <div class="write-canvas-wrap w-full">
+                        <canvas id="write-canvas-ones" width="120" height="160" style="aspect-ratio:3/4;"></canvas>
+                        <div id="write-result-overlay-ones" class="hidden absolute inset-0 flex items-center justify-center text-5xl font-bold pointer-events-none" style="background:rgba(255,255,255,0.85);"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button id="write-clear-btn" onclick="clearWriteCanvases()"
+                        class="option-btn flex-1 py-3 text-base" style="color:#8C8070;">
+                    지우기
+                </button>
+                <button id="write-confirm-btn" onclick="submitWrite()"
+                        class="py-3 text-base font-bold rounded-2xl border-none transition"
+                        style="flex:2; background:#4A4035; color:white; cursor:pointer;">
+                    확인
+                </button>
+            </div>
+            <div id="write-debug" class="hidden mt-3 p-3 rounded-xl text-xs font-mono" style="background:#F5F1EB; border:1.5px solid #EAE4DC;">
+                <div class="font-bold mb-2" style="color:#8C8070;">🔍 DEBUG</div>
+                <div id="debug-probs"></div>
+            </div>
+        </div>
+
+        <!-- 피드백 + 패스 -->
+        <div class="flex flex-col gap-2 mt-auto">
+            <p id="feedback" class="feedback"></p>
+            <button id="pass-btn" onclick="passQuestion()" class="btn-pass">이 문제 패스하기</button>
+        </div>
+        <button class="btn-next-q" id="next-q-btn" style="display:none;" onclick="onNextQ()">다음 문제 →</button>
+    </div>
+
+    <!-- ══════════════ 결과 화면 ══════════════ -->
+    <div id="result-view" class="hidden flex flex-col flex-1 fade-in">
+        <div class="complete-overlay">
+            <div class="complete-emoji" id="result-emoji">🏆</div>
+            <div class="complete-msg" id="result-msg">문제 완료!</div>
+            <div class="complete-sub" id="result-sub">0개 정답</div>
+            <button class="next-btn" onclick="resetGame()">다시 하기</button>
+            <button class="next-btn" onclick="resetGame()" style="background:#EDE8E0;color:#8C8070;">홈으로</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentQuestion = 1;
+    let perfectScore = 0;
+    let totalPassed = 0;
+    let num1, num2, correctAnswer;
+    let startTime;
+    let isProcessing = false;
+    let tryCount = 0;
+    let ttsEnabled = true;
+    let impulsePrevention = true;
+    let impulsePreventionTimer = null;
+    let impulseDelay = 5;
+    let impulseMode = 'hide'; // 'hide' = 보기 확인, 'lock' = 선택 잠금
+    let numberRange = 5;
+    let inputMode = 'select';
+
+    function saveSettings() {
+        localStorage.setItem('slowmath_easy_settings', JSON.stringify({
+            ttsEnabled, impulsePrevention, impulseMode, impulseDelay, numberRange, inputMode
+        }));
+    }
+    function loadSettings() {
+        try {
+            const s = JSON.parse(localStorage.getItem('slowmath_easy_settings'));
+            if (!s) return;
+            if (typeof s.ttsEnabled === 'boolean') ttsEnabled = s.ttsEnabled;
+            if (typeof s.impulsePrevention === 'boolean') impulsePrevention = s.impulsePrevention;
+            if (s.impulseMode === 'hide' || s.impulseMode === 'lock') impulseMode = s.impulseMode;
+            if (typeof s.impulseDelay === 'number' && s.impulseDelay >= 1 && s.impulseDelay <= 10) impulseDelay = s.impulseDelay;
+            if ([5, 10, '10limited', 'bigEasy'].includes(s.numberRange)) numberRange = s.numberRange;
+            if (['select', 'keypad'].includes(s.inputMode)) inputMode = s.inputMode;
+        } catch(e) {}
+    }
+    function applySettingsUI() {
+        document.getElementById('tts-toggle').classList.toggle('on', ttsEnabled);
+        const impulseToggle = document.getElementById('impulse-toggle');
+        if (impulsePrevention) {
+            impulseToggle.classList.add('on');
+            impulseToggle.setAttribute('aria-checked', 'true');
+            document.getElementById('impulse-seconds').classList.remove('hidden');
+        } else {
+            impulseToggle.classList.remove('on');
+            impulseToggle.setAttribute('aria-checked', 'false');
+            document.getElementById('impulse-seconds').classList.add('hidden');
+        }
+        document.querySelectorAll('.impulse-mode-btn').forEach(b => b.classList.toggle('selected', b.dataset.mode === impulseMode));
+        document.getElementById('impulse-delay-row').style.display = impulseMode === 'lock' ? 'grid' : 'none';
+        document.querySelectorAll('.delay-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.textContent === impulseDelay + '초');
+        });
+        selectTab(numberRange);
+        selectMode(inputMode);
+    }
+    let keypadInput = '';
+    let pendingKeypadClear = false;
+    let tesseractWorker = null;
+    let writeCanvases = { tens: null, ones: null };
+    let writeCtxs = { tens: null, ones: null };
+    let hasDrawn = { tens: false, ones: false };
+    let strokeCount = { tens: 0, ones: 0 };
+    let activeKey = null;
+    let isDrawing = false;
+    let writeMode = 'idle';
+    let usedQuestions = new Set();
+    let isWrongNotesPractice = false;
+    let wrongNotesQueue = [];
+
+    const startView = document.getElementById('start-view');
+    const playView = document.getElementById('play-view');
+    const resultView = document.getElementById('result-view');
+    const feedback = document.getElementById('feedback');
+    const optionsGrid = document.getElementById('options-grid');
+    const passBtn = document.getElementById('pass-btn');
+
+    function speak(text) {
+        if (!ttsEnabled || !window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        if (!text || text.trim() === "") return;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ko-KR';
+        utterance.rate = 1.1;
+        utterance.pitch = 1.0;
+        setTimeout(() => { window.speechSynthesis.speak(utterance); }, 50);
+    }
+
+    function setFeedback(text, type) {
+        feedback.textContent = text;
+        feedback.className = 'feedback';
+        if (type === 'green') feedback.classList.add('feedback-green');
+        else if (type === 'red') feedback.classList.add('feedback-red');
+        else if (type === 'muted') feedback.classList.add('feedback-muted');
+    }
+
+    function generateQuestion() {
+        if (impulsePreventionTimer) {
+            clearInterval(impulsePreventionTimer);
+            impulsePreventionTimer = null;
+        }
+        var oldReveal = document.getElementById('revealBtn');
+        if (oldReveal) oldReveal.remove();
+        isProcessing = false;
+        tryCount = 0;
+        passBtn.disabled = false;
+        passBtn.style.opacity = '';
+
+        do {
+            if (numberRange === 5) {
+                num1 = Math.floor(Math.random() * 5) + 1;
+                num2 = Math.floor(Math.random() * 5) + 1;
+            } else if (numberRange === 'bigEasy') {
+                num1 = Math.floor(Math.random() * 4) + 6; // 6, 7, 8, 9
+                const maxNum2 = 10 - num1;
+                num2 = Math.floor(Math.random() * maxNum2) + 1;
+            } else if (numberRange === '10limited') {
+                num1 = Math.floor(Math.random() * 9) + 1;
+                const maxNum2 = 10 - num1;
+                num2 = Math.floor(Math.random() * maxNum2) + 1;
+            } else {
+                num1 = Math.floor(Math.random() * 9) + 1;
+                num2 = Math.floor(Math.random() * 9) + 1;
+            }
+        } while (usedQuestions.has(`${num1}+${num2}`));
+        usedQuestions.add(`${num1}+${num2}`);
+        correctAnswer = num1 + num2;
+
+        document.getElementById('num1').innerText = num1;
+        document.getElementById('num2').innerText = num2;
+        document.getElementById('question-number').innerText = `문제 ${currentQuestion} / 10`;
+        document.getElementById('progress-fill').style.width = `${(currentQuestion / 10) * 100}%`;
+
+        setFeedback('', '');
+
+        if (inputMode === 'select') {
+            document.getElementById('options-grid').classList.remove('hidden');
+            document.getElementById('keypad-area').classList.add('hidden');
+            document.getElementById('write-area').classList.add('hidden');
+            createOptions();
+        } else if (inputMode === 'keypad') {
+            document.getElementById('options-grid').classList.add('hidden');
+            document.getElementById('keypad-area').classList.remove('hidden');
+            document.getElementById('write-area').classList.add('hidden');
+            keypadInput = '';
+            updateKeypadDisplay();
+            document.querySelectorAll('#keypad-area button').forEach(b => {
+                b.disabled = false; b.style.opacity = '';
+            });
+
+            if (impulsePrevention) {
+                if (impulseMode === 'hide') {
+                    document.querySelectorAll('#keypad-area button').forEach(b => {
+                        b.disabled = true; b.style.opacity = '0';
+                    });
+                    document.getElementById('keypad-display').style.opacity = '0';
+                    passBtn.disabled = true;
+                    const revealBtn = document.createElement('button');
+                    revealBtn.className = 'reveal-btn';
+                    revealBtn.id = 'revealBtn';
+                    revealBtn.textContent = '보기 확인';
+                    revealBtn.addEventListener('click', () => {
+                        document.querySelectorAll('#keypad-area button').forEach(b => {
+                            b.disabled = false; b.style.opacity = '';
+                        });
+                        document.getElementById('keypad-display').style.opacity = '';
+                        passBtn.disabled = false;
+                        revealBtn.remove();
+                        setFeedback('', '');
+                    });
+                    document.getElementById('keypad-area').parentNode.insertBefore(revealBtn, document.getElementById('keypad-area'));
+                } else {
+                    document.querySelectorAll('#keypad-area button').forEach(b => {
+                        b.disabled = true; b.style.opacity = '0.35';
+                    });
+                    passBtn.disabled = true;
+                    let countdown = impulseDelay;
+                    setFeedback(`${countdown}초 동안 생각해 보세요`, 'muted');
+                    impulsePreventionTimer = setInterval(() => {
+                        countdown--;
+                        if (countdown > 0) {
+                            setFeedback(`${countdown}초 동안 생각해 보세요`, 'muted');
+                        } else {
+                            clearInterval(impulsePreventionTimer);
+                            impulsePreventionTimer = null;
+                            document.querySelectorAll('#keypad-area button').forEach(b => {
+                                b.disabled = false; b.style.opacity = '';
+                            });
+                            passBtn.disabled = false;
+                            setFeedback('', '');
+                        }
+                    }, 1000);
+                }
+            }
+        } else if (inputMode === 'write') {
+            document.getElementById('options-grid').classList.add('hidden');
+            document.getElementById('keypad-area').classList.add('hidden');
+            document.getElementById('write-area').classList.remove('hidden');
+            initWriteCanvases();
+            clearWriteCanvases();
+            writeMode = 'idle';
+
+            if (impulsePrevention) {
+                const writeArea = document.getElementById('write-area');
+                const confirmBtn = document.getElementById('write-confirm-btn');
+                const clearBtn = document.getElementById('write-clear-btn');
+                if (impulseMode === 'hide') {
+                    confirmBtn.disabled = true; confirmBtn.style.opacity = '0';
+                    clearBtn.disabled = true; clearBtn.style.opacity = '0';
+                    document.querySelectorAll('.write-canvas-wrap').forEach(w => w.style.opacity = '0');
+                    writeMode = 'locked';
+                    passBtn.disabled = true;
+                    const revealBtn = document.createElement('button');
+                    revealBtn.className = 'reveal-btn';
+                    revealBtn.id = 'revealBtn';
+                    revealBtn.textContent = '보기 확인';
+                    revealBtn.addEventListener('click', () => {
+                        confirmBtn.disabled = false; confirmBtn.style.opacity = '';
+                        clearBtn.disabled = false; clearBtn.style.opacity = '';
+                        document.querySelectorAll('.write-canvas-wrap').forEach(w => w.style.opacity = '');
+                        writeMode = 'idle';
+                        passBtn.disabled = false;
+                        revealBtn.remove();
+                        setFeedback('', '');
+                    });
+                    document.getElementById('write-area').parentNode.insertBefore(revealBtn, document.getElementById('write-area'));
+                } else {
+                    confirmBtn.disabled = true; confirmBtn.style.opacity = '0.35';
+                    clearBtn.disabled = true; clearBtn.style.opacity = '0.35';
+                    writeMode = 'locked';
+                    passBtn.disabled = true;
+                    let countdown = impulseDelay;
+                    setFeedback(`${countdown}초 동안 생각해 보세요`, 'muted');
+                    impulsePreventionTimer = setInterval(() => {
+                        countdown--;
+                        if (countdown > 0) {
+                            setFeedback(`${countdown}초 동안 생각해 보세요`, 'muted');
+                        } else {
+                            clearInterval(impulsePreventionTimer);
+                            impulsePreventionTimer = null;
+                            confirmBtn.disabled = false; confirmBtn.style.opacity = '';
+                            clearBtn.disabled = false; clearBtn.style.opacity = '';
+                            writeMode = 'idle';
+                            passBtn.disabled = false;
+                            setFeedback('', '');
+                        }
+                    }, 1000);
+                }
+            }
+        }
+    }
+
+    function createOptions() {
+        optionsGrid.innerHTML = '';
+        if (typeof correctAnswer === 'undefined' || correctAnswer === null) {
+            correctAnswer = (Number(num1) || 1) + (Number(num2) || 1);
+        }
+        let options = [Number(correctAnswer)];
+        while (options.length < 4) {
+            let randomOpt = Math.floor(Math.random() * 10) + 1;
+            if (!options.includes(randomOpt)) options.push(randomOpt);
+        }
+        options.sort(() => Math.random() - 0.5);
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.innerText = String(opt);
+            btn.className = "option-btn py-5 text-2xl focus:outline-none";
+            btn.onclick = () => checkAnswer(opt, btn);
+            optionsGrid.appendChild(btn);
+        });
+
+        if (impulsePrevention) {
+            if (impulseMode === 'hide') {
+                const allButtons = optionsGrid.querySelectorAll('button');
+                allButtons.forEach(b => { b.disabled = true; b.style.opacity = '0'; });
+                passBtn.disabled = true;
+                const revealBtn = document.createElement('button');
+                revealBtn.className = 'reveal-btn';
+                revealBtn.id = 'revealBtn';
+                revealBtn.textContent = '보기 확인';
+                revealBtn.addEventListener('click', () => {
+                    allButtons.forEach(b => { b.disabled = false; b.style.opacity = ''; });
+                    passBtn.disabled = false;
+                    revealBtn.remove();
+                    setFeedback('', '');
+                });
+                optionsGrid.parentNode.insertBefore(revealBtn, optionsGrid);
+            } else {
+                const allButtons = optionsGrid.querySelectorAll('button');
+                allButtons.forEach(b => { b.disabled = true; b.style.opacity = '0.35'; });
+                passBtn.disabled = true;
+                let countdown = impulseDelay;
+                setFeedback(`${countdown}초 동안 생각해 보세요`, 'muted');
+                impulsePreventionTimer = setInterval(() => {
+                    countdown--;
+                    if (countdown > 0) {
+                        setFeedback(`${countdown}초 동안 생각해 보세요`, 'muted');
+                    } else {
+                        clearInterval(impulsePreventionTimer);
+                        impulsePreventionTimer = null;
+                        allButtons.forEach(b => { b.disabled = false; b.style.opacity = ''; });
+                        passBtn.disabled = false;
+                        setFeedback('', '');
+                    }
+                }, 1000);
+            }
+        }
+    }
+
+    function selectMode(mode) {
+        inputMode = mode;
+        const modeSelect = document.getElementById('mode-select');
+        const modeKeypad = document.getElementById('mode-keypad');
+        const modeWrite  = document.getElementById('mode-write');
+        [modeSelect, modeKeypad, modeWrite].forEach(btn => btn && btn.classList.remove('active'));
+        if (mode === 'select') modeSelect.classList.add('active');
+        else if (mode === 'keypad') modeKeypad.classList.add('active');
+        else {
+            if (modeWrite) modeWrite.classList.add('active');
+            loadTesseractWorker().catch(err => console.warn('Tesseract preload failed:', err));
+        }
+        saveSettings();
+    }
+
+    function appendKey(digit) {
+        if (keypadInput.length >= 2) return;
+        keypadInput += digit;
+        updateKeypadDisplay();
+    }
+
+    function deleteKey() {
+        keypadInput = keypadInput.slice(0, -1);
+        updateKeypadDisplay();
+    }
+
+    function updateKeypadDisplay() {
+        const display = document.getElementById('keypad-display');
+        if (keypadInput) {
+            display.innerText = keypadInput;
+            display.className = 'keypad-display has-input';
+        } else {
+            display.innerText = '?';
+            display.className = 'keypad-display';
+        }
+    }
+
+    function submitKeypad() {
+        if (!keypadInput || isProcessing) return;
+        const selected = parseInt(keypadInput);
+        tryCount++;
+
+        if (selected === parseInt(correctAnswer)) {
+            isProcessing = true;
+            passBtn.disabled = true;
+            passBtn.style.opacity = '0';
+            if (tryCount === 1) {
+                perfectScore++;
+                if (isWrongNotesPractice) removeWrongNote(num1, num2);
+            }
+
+            const display = document.getElementById('keypad-display');
+            display.className = 'keypad-display correct-input';
+            document.querySelectorAll('#keypad-area button').forEach(b => b.disabled = true);
+
+            setFeedback('정답입니다!', 'green');
+            speak('정답입니다.');
+            pendingKeypadClear = true;
+            document.getElementById('next-q-btn').style.display = '';
+        } else {
+            setFeedback('아니에요. 다시 해볼까요?', 'red');
+            const display = document.getElementById('keypad-display');
+            display.className = 'keypad-display wrong-input';
+            speak('아니에요.');
+            addWrongNote(num1, num2, correctAnswer);
+            setTimeout(() => {
+                keypadInput = '';
+                updateKeypadDisplay();
+                setFeedback('', '');
+            }, 800);
+        }
+    }
+
+    function toggleLimitedTooltip(e) {
+        e.stopPropagation();
+        const tooltip = document.getElementById('limited-tooltip');
+        tooltip.classList.toggle('hidden');
+        const hide = () => { tooltip.classList.add('hidden'); document.removeEventListener('click', hide); };
+        if (!tooltip.classList.contains('hidden')) document.addEventListener('click', hide);
+    }
+
+    function toggleBigEasyTooltip(e) {
+        e.stopPropagation();
+        const tooltip = document.getElementById('big-easy-tooltip');
+        tooltip.classList.toggle('hidden');
+        const hide = () => { tooltip.classList.add('hidden'); document.removeEventListener('click', hide); };
+        if (!tooltip.classList.contains('hidden')) document.addEventListener('click', hide);
+    }
+
+    function selectTab(range) {
+        numberRange = range;
+        const tab5 = document.getElementById('tab-5');
+        const tab10limited = document.getElementById('tab-10-limited');
+        const tab10 = document.getElementById('tab-10');
+        const tabBigEasy = document.getElementById('tab-big-easy');
+        [tab5, tab10limited, tab10, tabBigEasy].forEach(tab => tab.classList.remove('active'));
+        if (range === 5) tab5.classList.add('active');
+        else if (range === '10limited') tab10limited.classList.add('active');
+        else if (range === 'bigEasy') tabBigEasy.classList.add('active');
+        else tab10.classList.add('active');
+        saveSettings();
+    }
+
+    function toggleTTS() {
+        ttsEnabled = !ttsEnabled;
+        const tog = document.getElementById('tts-toggle');
+        tog.classList.toggle('on', ttsEnabled);
+        tog.setAttribute('aria-checked', ttsEnabled);
+        if (!ttsEnabled && window.speechSynthesis) window.speechSynthesis.cancel();
+        saveSettings();
+    }
+
+    function toggleImpulsePrevention() {
+        impulsePrevention = !impulsePrevention;
+        const toggle = document.getElementById('impulse-toggle');
+        const details = document.getElementById('impulse-seconds');
+        if (impulsePrevention) {
+            toggle.classList.add('on');
+            toggle.setAttribute('aria-checked', 'true');
+            details.classList.remove('hidden');
+        } else {
+            toggle.classList.remove('on');
+            toggle.setAttribute('aria-checked', 'false');
+            details.classList.add('hidden');
+        }
+        saveSettings();
+    }
+
+    function setImpulseMode(mode) {
+        impulseMode = mode;
+        document.querySelectorAll('.impulse-mode-btn').forEach(b => {
+            b.classList.toggle('selected', b.dataset.mode === mode);
+        });
+        document.getElementById('impulse-delay-row').style.display = mode === 'lock' ? 'grid' : 'none';
+        saveSettings();
+    }
+
+    function updateImpulseDelay(val) {
+        impulseDelay = parseInt(val);
+        document.querySelectorAll('.delay-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.delay-btn').forEach(btn => {
+            if (btn.textContent === val + '초') btn.classList.add('active');
+        });
+        saveSettings();
+    }
+
+    function startGame() {
+        if (!localStorage.getItem('slowmath_easy_login')) {
+            sessionStorage.setItem('_sp', JSON.stringify([]));
+            document.getElementById('start-view').classList.add('hidden');
+            document.getElementById('login-view').style.display = 'flex';
+            return;
+        }
+                if (window.speechSynthesis) {
+            const unlock = new SpeechSynthesisUtterance("");
+            window.speechSynthesis.speak(unlock);
+        }
+        currentQuestion = 1;
+        perfectScore = 0;
+        totalPassed = 0;
+        usedQuestions.clear();
+        startTime = Date.now();
+        startView.classList.add('hidden');
+        resultView.classList.add('hidden');
+        playView.classList.remove('hidden');
+        generateQuestion();
+        setTimeout(() => {
+            const descEl = document.getElementById('app-desc');
+            const descText = descEl ? descEl.innerText : '천천히 생각하고 풀어보세요';
+            speak(descText);
+        }, 100);
+    }
+
+    function checkAnswer(selected, btn) {
+        if (isProcessing) return;
+        tryCount++;
+        if (parseInt(selected) === parseInt(correctAnswer)) {
+            isProcessing = true;
+            if (impulsePreventionTimer) { clearInterval(impulsePreventionTimer); impulsePreventionTimer = null; }
+            optionsGrid.classList.remove('chips-hidden', 'chips-locked');
+            passBtn.disabled = true;
+            passBtn.style.opacity = '0';
+            if (tryCount === 1) {
+                perfectScore++;
+                if (isWrongNotesPractice) removeWrongNote(num1, num2);
+            }
+            const allButtons = optionsGrid.querySelectorAll('button');
+            allButtons.forEach(b => { b.disabled = true; b.style.cursor = 'default'; });
+            setFeedback('정답입니다!', 'green');
+            btn.classList.add('correct-selected');
+            speak("정답입니다.");
+            document.getElementById('next-q-btn').style.display = '';
+        } else {
+            btn.disabled = true;
+            btn.classList.add('wrong-selected');
+            setFeedback('아니에요. 다시 해볼까요?', 'red');
+            speak("아니에요.");
+            addWrongNote(num1, num2, correctAnswer);
+        }
+    }
+
+    function passQuestion() {
+        if (isProcessing) return;
+        totalPassed++;
+        speak("패스합니다.");
+        nextStep();
+    }
+
+    function nextStep() {
+        document.getElementById('next-q-btn').style.display = 'none';
+        if (currentQuestion < 10) {
+            currentQuestion++;
+            generateQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function onNextQ() {
+      document.getElementById('next-q-btn').style.display = 'none';
+      if (pendingKeypadClear) { keypadInput = ''; pendingKeypadClear = false; }
+      nextStep();
+    }
+
+    function getKoreanCount(num) {
+        const counts = ["영", "한", "두", "세", "네", "다섯", "여섯", "일곱", "여덟", "아홉", "열"];
+        return counts[num] || num;
+    }
+
+    function showResults() {
+        playView.classList.add('hidden');
+        resultView.classList.remove('hidden');
+        document.getElementById('result-emoji').textContent = perfectScore === 10 ? '🏆' : '👏';
+        document.getElementById('result-msg').textContent = '10문제 완료!';
+        document.getElementById('result-sub').textContent = '10문제 중 ' + perfectScore + '개 정답';
+        const korPerfect = getKoreanCount(perfectScore);
+        speak(`모든 연습이 끝났습니다. 한 번에 ${korPerfect} 문제를 맞혔네요.`);
+    }
+
+    function resetGame() {
+        if (impulsePreventionTimer) { clearInterval(impulsePreventionTimer); impulsePreventionTimer = null; }
+        const oldReveal = document.getElementById('revealBtn');
+        if (oldReveal) oldReveal.remove();
+        document.querySelectorAll('.chips-hidden, .chips-locked').forEach(el => {
+            el.classList.remove('chips-hidden', 'chips-locked');
+        });
+        resultView.classList.add('hidden');
+        playView.classList.add('hidden');
+        startView.classList.remove('hidden');
+    }
+
+    function shareApp() {
+        var SHARE_KEY = 'slowmath_share_days';
+        var MAX_DAYS = 5;
+        var bubble = document.getElementById('share-bubble');
+        function onShared() {
+            var days = parseInt(localStorage.getItem(SHARE_KEY) || '0');
+            if (days < MAX_DAYS) { days = days + 1; localStorage.setItem(SHARE_KEY, days); }
+            if (bubble) {
+                bubble.textContent = '하루 무료 이용권이 지급되었습니다! — 지금까지 ' + days + '일 지급되었어요.';
+                setTimeout(function() {
+                    bubble.innerHTML = days >= MAX_DAYS
+                        ? '무료 이용권을 최대 5일 모두 적립하셨어요! 🎉'
+                        : '지금 지인에게 공유하시면<br>하루 무료 이용권을 드려요';
+                }, 4000);
+            }
+        }
+        var title = document.title;
+        var url = location.href;
+        if (navigator.share) {
+            navigator.share({title: title, url: url}).then(onShared).catch(function(){});
+        } else {
+            if (navigator.clipboard) { navigator.clipboard.writeText(url); }
+            alert('링크가 복사되었어요!');
+            onShared();
+        }
+    }
+
+    if (window.speechSynthesis) {
+        speechSynthesis.getVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+        }
+    }
+
+    // ── 쓰기 모드 ──
+
+    async function loadTesseractWorker() {
+        if (tesseractWorker) return tesseractWorker;
+        tesseractWorker = await Tesseract.createWorker('eng');
+        await tesseractWorker.setParameters({
+            tessedit_char_whitelist: '0123456789',
+            tessedit_pageseg_mode: '10',
+        });
+        return tesseractWorker;
+    }
+
+    function initWriteCanvases() {
+        if (writeCanvases.tens) return;
+        const dpr = Math.max(window.devicePixelRatio || 1, 2);
+        for (const key of ['tens', 'ones']) {
+            const canvas = document.getElementById(`write-canvas-${key}`);
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = Math.round(rect.width * dpr);
+            canvas.height = Math.round(rect.height * dpr);
+            const ctx = canvas.getContext('2d');
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = Math.max(6, Math.round(canvas.width * 0.035));
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            writeCanvases[key] = canvas;
+            writeCtxs[key] = ctx;
+            clearSingleCanvas(key);
+            canvas.addEventListener('mousedown', (e) => writeStart(e, key));
+            canvas.addEventListener('mousemove', (e) => writeDraw(e, key));
+            canvas.addEventListener('mouseup', writeEnd);
+            canvas.addEventListener('mouseleave', writeEnd);
+            canvas.addEventListener('touchstart', (e) => writeTouchStart(e, key), { passive: false });
+            canvas.addEventListener('touchmove', writeTouchMove, { passive: false });
+            canvas.addEventListener('touchend', writeEnd);
+        }
+    }
+
+    function getCanvasPos(e, canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+    }
+
+    function writeStart(e, key) {
+        if (writeMode !== 'idle') return;
+        isDrawing = true; hasDrawn[key] = true; strokeCount[key]++; activeKey = key;
+        const pos = getCanvasPos(e, writeCanvases[key]);
+        writeCtxs[key].beginPath();
+        writeCtxs[key].moveTo(pos.x, pos.y);
+    }
+
+    function writeDraw(e, key) {
+        if (!isDrawing || writeMode !== 'idle' || activeKey !== key) return;
+        const pos = getCanvasPos(e, writeCanvases[key]);
+        writeCtxs[key].lineTo(pos.x, pos.y);
+        writeCtxs[key].stroke();
+    }
+
+    function writeEnd() {
+        if (!isDrawing) return;
+        isDrawing = false;
+        if (activeKey) writeCtxs[activeKey].closePath();
+        activeKey = null;
+    }
+
+    function writeTouchStart(e, key) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        writeStart({ clientX: touch.clientX, clientY: touch.clientY }, key);
+    }
+
+    function writeTouchMove(e) {
+        e.preventDefault();
+        if (!activeKey) return;
+        const touch = e.touches[0];
+        writeDraw({ clientX: touch.clientX, clientY: touch.clientY }, activeKey);
+    }
+
+    function clearSingleCanvas(key) {
+        const ctx = writeCtxs[key];
+        const canvas = writeCanvases[key];
+        if (!ctx) return;
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        hasDrawn[key] = false;
+        strokeCount[key] = 0;
+        const overlay = document.getElementById(`write-result-overlay-${key}`);
+        if (overlay) { overlay.classList.add('hidden'); overlay.style.color = ''; }
+    }
+
+    function clearWriteCanvases() {
+        clearSingleCanvas('tens');
+        clearSingleCanvas('ones');
+        writeMode = 'idle';
+        const confirmBtn = document.getElementById('write-confirm-btn');
+        const clearBtn = document.getElementById('write-clear-btn');
+        if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = '확인'; confirmBtn.style.opacity = ''; }
+        if (clearBtn) { clearBtn.disabled = false; clearBtn.style.opacity = ''; }
+    }
+
+    function getInkBoundingBox(ctx, canvas) {
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const w = canvas.width, h = canvas.height;
+        let minX = w, maxX = 0, minY = h, maxY = 0;
+        for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                const idx = (y * w + x) * 4;
+                if (imgData.data[idx] < 200 || imgData.data[idx+1] < 200 || imgData.data[idx+2] < 200) {
+                    if (x < minX) minX = x; if (x > maxX) maxX = x;
+                    if (y < minY) minY = y; if (y > maxY) maxY = y;
+                }
+            }
+        }
+        if (minX > maxX) return null;
+        const m = Math.max(8, Math.round(Math.max(w, h) * 0.02));
+        return { x1: Math.max(0, minX-m), y1: Math.max(0, minY-m), x2: Math.min(w, maxX+m), y2: Math.min(h, maxY+m) };
+    }
+
+    function buildTesseractCanvas(bbox, sourceCanvas) {
+        const srcW = bbox.x2 - bbox.x1, srcH = bbox.y2 - bbox.y1;
+        const targetH = 200;
+        const scale = targetH / srcH;
+        const scaledW = Math.round(srcW * scale);
+        const pad = 40;
+        const dstW = Math.max(scaledW + pad * 2, 120);
+        const dstH = targetH + pad * 2;
+        const offscreen = document.createElement('canvas');
+        offscreen.width = dstW; offscreen.height = dstH;
+        const ctx = offscreen.getContext('2d');
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, dstW, dstH);
+        const xOff = Math.round((dstW - scaledW) / 2);
+        ctx.drawImage(sourceCanvas, bbox.x1, bbox.y1, srcW, srcH, xOff, pad, scaledW, targetH);
+        const imgData = ctx.getImageData(0, 0, dstW, dstH);
+        for (let i = 0; i < imgData.data.length; i += 4) {
+            const v = imgData.data[i] < 180 ? 0 : 255;
+            imgData.data[i] = imgData.data[i+1] = imgData.data[i+2] = v;
+        }
+        ctx.putImageData(imgData, 0, 0);
+        return offscreen;
+    }
+
+    function prepareDigitImage(ctx, canvas, bbox, size = 80) {
+        const srcW = bbox.x2 - bbox.x1, srcH = bbox.y2 - bbox.y1;
+        const margin = Math.round(size * 0.1), inner = size - 2 * margin;
+        const scale = Math.min(inner / srcW, inner / srcH);
+        const dw = srcW * scale, dh = srcH * scale;
+        const offscreen = document.createElement('canvas');
+        offscreen.width = offscreen.height = size;
+        const oc = offscreen.getContext('2d');
+        oc.fillStyle = 'white';
+        oc.fillRect(0, 0, size, size);
+        oc.drawImage(canvas, bbox.x1, bbox.y1, srcW, srcH,
+                     margin + (inner - dw) / 2, margin + (inner - dh) / 2, dw, dh);
+        const imgData = oc.getImageData(0, 0, size, size);
+        const binary = new Uint8Array(size * size);
+        for (let i = 0; i < size * size; i++) {
+            binary[i] = imgData.data[i * 4] < 200 ? 1 : 0;
+        }
+        return binary;
+    }
+
+    function dilate(binary, size, iterations = 1) {
+        let src = binary;
+        for (let iter = 0; iter < iterations; iter++) {
+            const dst = new Uint8Array(size * size);
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x < size; x++) {
+                    if (src[y * size + x]) { dst[y * size + x] = 1; continue; }
+                    for (const [dy, dx] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+                        const ny = y + dy, nx = x + dx;
+                        if (ny >= 0 && ny < size && nx >= 0 && nx < size && src[ny * size + nx]) {
+                            dst[y * size + x] = 1; break;
+                        }
+                    }
+                }
+            }
+            src = dst;
+        }
+        return src;
+    }
+
+    function countHoles(binary, size, minHoleSize = 30) {
+        const bg = new Uint8Array(size * size);
+        const q = [];
+        for (let i = 0; i < size; i++) {
+            for (const y of [0, size - 1]) {
+                const idx = y * size + i;
+                if (!binary[idx] && !bg[idx]) { bg[idx] = 1; q.push(idx); }
+            }
+            for (const x of [0, size - 1]) {
+                const idx = i * size + x;
+                if (!binary[idx] && !bg[idx]) { bg[idx] = 1; q.push(idx); }
+            }
+        }
+        let qi = 0;
+        while (qi < q.length) {
+            const cur = q[qi++];
+            const cy = (cur / size) | 0, cx = cur % size;
+            for (const [dy, dx] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+                const nx = cx + dx, ny = cy + dy;
+                if (nx < 0 || nx >= size || ny < 0 || ny >= size) continue;
+                const ni = ny * size + nx;
+                if (binary[ni] || bg[ni]) continue;
+                bg[ni] = 1; q.push(ni);
+            }
+        }
+        const seen = new Uint8Array(size * size);
+        let holes = 0;
+        for (let i = 0; i < size * size; i++) {
+            if (!binary[i] && !bg[i] && !seen[i]) {
+                const hq = [i]; seen[i] = 1; let hqi = 0;
+                while (hqi < hq.length) {
+                    const cur = hq[hqi++];
+                    const cy = (cur / size) | 0, cx = cur % size;
+                    for (const [dy, dx] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+                        const nx = cx + dx, ny = cy + dy;
+                        if (nx < 0 || nx >= size || ny < 0 || ny >= size) continue;
+                        const ni = ny * size + nx;
+                        if (binary[ni] || seen[ni]) continue;
+                        seen[ni] = 1; hq.push(ni);
+                    }
+                }
+                if (hq.length >= minHoleSize) holes++;
+            }
+        }
+        return holes;
+    }
+
+    function analyzeHoles(binary, size, minHoleSize = 30) {
+        const bg = new Uint8Array(size * size);
+        const q = [];
+        for (let i = 0; i < size; i++) {
+            for (const y of [0, size - 1]) {
+                const idx = y * size + i;
+                if (!binary[idx] && !bg[idx]) { bg[idx] = 1; q.push(idx); }
+            }
+            for (const x of [0, size - 1]) {
+                const idx = i * size + x;
+                if (!binary[idx] && !bg[idx]) { bg[idx] = 1; q.push(idx); }
+            }
+        }
+        let qi = 0;
+        while (qi < q.length) {
+            const cur = q[qi++];
+            const cy = (cur / size) | 0, cx = cur % size;
+            for (const [dy, dx] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+                const nx = cx + dx, ny = cy + dy;
+                if (nx < 0 || nx >= size || ny < 0 || ny >= size) continue;
+                const ni = ny * size + nx;
+                if (binary[ni] || bg[ni]) continue;
+                bg[ni] = 1; q.push(ni);
+            }
+        }
+        const seen = new Uint8Array(size * size);
+        let count = 0, sumX = 0, sumY = 0, sumPx = 0;
+        for (let i = 0; i < size * size; i++) {
+            if (!binary[i] && !bg[i] && !seen[i]) {
+                const hq = [i]; seen[i] = 1; let hqi = 0, hx = 0, hy = 0;
+                while (hqi < hq.length) {
+                    const cur = hq[hqi++];
+                    const cy = (cur / size) | 0, cx = cur % size;
+                    hx += cx; hy += cy;
+                    for (const [dy, dx] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+                        const nx = cx + dx, ny = cy + dy;
+                        if (nx < 0 || nx >= size || ny < 0 || ny >= size) continue;
+                        const ni = ny * size + nx;
+                        if (binary[ni] || seen[ni]) continue;
+                        seen[ni] = 1; hq.push(ni);
+                    }
+                }
+                if (hq.length >= minHoleSize) {
+                    count++;
+                    sumX += hx; sumY += hy; sumPx += hq.length;
+                }
+            }
+        }
+        const holeCx = sumPx > 0 ? sumX / (sumPx * (size - 1)) : 0.5;
+        const holeCy = sumPx > 0 ? sumY / (sumPx * (size - 1)) : 0.5;
+        return { count, holeCx, holeCy };
+    }
+
+    function countRowInkSegments(binary, size, row) {
+        let segments = 0, inInk = false;
+        for (let x = 0; x < size; x++) {
+            const ink = binary[row * size + x] === 1;
+            if (ink && !inInk) { segments++; inInk = true; }
+            else if (!ink) { inInk = false; }
+        }
+        return segments;
+    }
+
+    function detectCrossing(binary, size) {
+        const upperEnd = Math.floor(size * 0.45);
+        const lowerStart = Math.floor(size * 0.60);
+        let upperTwo = 0, upperTotal = 0;
+        for (let y = 0; y < upperEnd; y++) {
+            const s = countRowInkSegments(binary, size, y);
+            if (s > 0) { upperTotal++; if (s >= 2) upperTwo++; }
+        }
+        let lowerOne = 0, lowerTotal = 0;
+        for (let y = lowerStart; y < size; y++) {
+            const s = countRowInkSegments(binary, size, y);
+            if (s > 0) { lowerTotal++; if (s === 1) lowerOne++; }
+        }
+        const upperRatio = upperTotal > 0 ? upperTwo / upperTotal : 0;
+        const lowerRatio = lowerTotal > 0 ? lowerOne / lowerTotal : 0;
+        return upperRatio >= 0.30 && lowerRatio >= 0.70;
+    }
+
+    function computeVerticalCentroid(binary, size) {
+        let totalInk = 0, weightedY = 0;
+        for (let y = 0; y < size; y++) {
+            for (let x = 0; x < size; x++) {
+                if (binary[y * size + x]) { totalInk++; weightedY += y; }
+            }
+        }
+        if (totalInk === 0) return 0.5;
+        return weightedY / (totalInk * (size - 1));
+    }
+
+    function computeHorizontalCentroid(binary, size) {
+        let totalInk = 0, weightedX = 0;
+        for (let y = 0; y < size; y++) {
+            for (let x = 0; x < size; x++) {
+                if (binary[y * size + x]) { totalInk++; weightedX += x; }
+            }
+        }
+        if (totalInk === 0) return 0.5;
+        return weightedX / (totalInk * (size - 1));
+    }
+
+    function isLikelyOne(bbox, ctx, canvas) {
+        const bw = bbox.x2 - bbox.x1, bh = bbox.y2 - bbox.y1;
+        if (bw < bh * 0.38) return true;
+        if (Math.max(bw, bh) < canvas.height * 0.05) return false;
+        const imgData = ctx.getImageData(bbox.x1, bbox.y1, bw, bh);
+        let ink = 0;
+        for (let i = 0; i < bw * bh; i++) {
+            if (imgData.data[i * 4] < 200) ink++;
+        }
+        return (ink / (bw * bh)) < 0.22;
+    }
+
+    function analyzeQuadrants(binary, size) {
+        const half = Math.floor(size / 2);
+        const area = half * half;
+        const ink = [0, 0, 0, 0];
+        for (let y = 0; y < size; y++) {
+            for (let x = 0; x < size; x++) {
+                if (!binary[y * size + x]) continue;
+                ink[(y >= half ? 2 : 0) + (x >= half ? 1 : 0)]++;
+            }
+        }
+        return { tl: ink[0] / area, tr: ink[1] / area, bl: ink[2] / area, br: ink[3] / area };
+    }
+
+    function classifyByQuadrants({ tl, tr, bl, br }, holes) {
+        const topAvg = (tl + tr) / 2;
+        const botAvg = (bl + br) / 2;
+        const leftAvg = (tl + bl) / 2;
+        const rightAvg = (tr + br) / 2;
+        if (holes === 0) {
+            if (topAvg > 0.20 && bl < 0.08 && topAvg > botAvg * 2.2) return 7;
+            if (rightAvg > 0.22 && leftAvg < 0.12 && rightAvg > leftAvg * 2.5) return 3;
+            if (tl > 0.22 && br > 0.22 && tl > tr * 1.3 && br > bl * 1.5 && bl < 0.15) return 5;
+            if (tr > 0.22 && bl > 0.22 && tr > tl * 1.3 && bl > br * 1.5 && br < 0.15) return 2;
+        }
+        return null;
+    }
+
+    async function recognizeSingleDigit(key) {
+        const canvas = writeCanvases[key];
+        const ctx = writeCtxs[key];
+        const bbox = getInkBoundingBox(ctx, canvas);
+        if (!bbox) return null;
+
+        const bw = bbox.x2 - bbox.x1, bh = bbox.y2 - bbox.y1;
+        const aspect = bw / bh;
+
+        // ── Phase 1: 고신뢰 토폴로지 숏컷 ──
+        if (aspect < 0.30 && bh > canvas.height * 0.15) return 1;
+
+        const SZ = 80;
+        const binary = prepareDigitImage(ctx, canvas, bbox, SZ);
+        const dilated = dilate(binary, SZ, 1);
+        const holes = countHoles(dilated, SZ, 50);
+        if (holes >= 2) return 8;
+
+        // ── Phase 2: Tesseract 주 인식 ──
+        const worker = await loadTesseractWorker();
+        const offscreen = buildTesseractCanvas(bbox, canvas);
+        const { data } = await worker.recognize(offscreen);
+        const raw = data.text.trim().replace(/[^0-9]/g, '');
+        const tDigit = raw.length > 0 ? parseInt(raw[0]) : null;
+        const tConf = data.confidence || 0;
+
+        // ── Phase 3: 토폴로지 검증/보정 ──
+        const holeInfo = analyzeHoles(dilated, SZ, 50);
+
+        if (holes === 1) {
+            const validOneHole = [0, 4, 6, 9];
+            if (validOneHole.includes(tDigit) && tConf > 65) return tDigit;
+            // 거짓 hole 보정: Tesseract가 no-hole 숫자를 인식하면 신뢰 (7→0 방지)
+            const noHoleDigits = [1, 2, 3, 5, 7];
+            if (noHoleDigits.includes(tDigit) && tConf > 55) return tDigit;
+            if (holeInfo.holeCy < 0.42) return 9;
+            if (holeInfo.holeCy > 0.58) return 6;
+            const isFour = strokeCount[key] >= 2 || detectCrossing(dilated, SZ);
+            return isFour ? 4 : 0;
+        }
+
+        if (holes === 0) {
+            const validNoHole = [1, 2, 3, 5, 7];
+            if (aspect < 0.38) return 1;
+            if (validNoHole.includes(tDigit) && tConf > 50) return tDigit;
+            const quads = analyzeQuadrants(dilated, SZ);
+            const quadResult = classifyByQuadrants(quads, 0);
+            if (quadResult !== null) return quadResult;
+            if (validNoHole.includes(tDigit)) return tDigit;
+        }
+
+        if (tDigit !== null && !isNaN(tDigit)) return tDigit;
+        return null;
+    }
+
+    function resetWriteButtons() {
+        const confirmBtn = document.getElementById('write-confirm-btn');
+        const clearBtn = document.getElementById('write-clear-btn');
+        if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = '확인'; confirmBtn.style.opacity = ''; }
+        if (clearBtn) { clearBtn.disabled = false; clearBtn.style.opacity = ''; }
+    }
+
+    async function submitWrite() {
+        if (isProcessing || writeMode !== 'idle') return;
+        if (!hasDrawn.tens && !hasDrawn.ones) {
+            setFeedback('숫자를 써보세요!', 'muted');
+            return;
+        }
+        writeMode = 'recognizing';
+        const confirmBtn = document.getElementById('write-confirm-btn');
+        const clearBtn = document.getElementById('write-clear-btn');
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = '인식 중...';
+        clearBtn.disabled = true;
+        clearBtn.style.opacity = '0.35';
+        setFeedback('인식 중...', 'muted');
+
+        try {
+            let tensDigit = 0;
+            if (hasDrawn.tens) {
+                const t = await recognizeSingleDigit('tens');
+                tensDigit = (t !== null) ? t : 0;
+            }
+            let onesDigit = null;
+            if (hasDrawn.ones) {
+                onesDigit = await recognizeSingleDigit('ones');
+            }
+            if (onesDigit === null) {
+                onesDigit = tensDigit;
+                tensDigit = 0;
+            }
+            const recognizedNumber = tensDigit * 10 + onesDigit;
+
+            if (hasDrawn.tens) {
+                const ov = document.getElementById('write-result-overlay-tens');
+                ov.textContent = String(tensDigit);
+                ov.classList.remove('hidden');
+            }
+            const ovOnes = document.getElementById('write-result-overlay-ones');
+            ovOnes.textContent = String(onesDigit);
+            ovOnes.classList.remove('hidden');
+
+            document.getElementById('write-debug').classList.remove('hidden');
+            document.getElementById('debug-probs').innerHTML =
+                `<div style="color:#8C8070">십: ${tensDigit} / 일: ${onesDigit}</div>
+                 <div style="color:#4A8FC2; font-weight:bold; font-size:1.125rem;">= ${recognizedNumber}</div>`;
+
+            tryCount++;
+
+            if (recognizedNumber === parseInt(correctAnswer)) {
+                isProcessing = true;
+                passBtn.disabled = true;
+                passBtn.style.opacity = '0';
+                if (tryCount === 1) {
+                    perfectScore++;
+                    if (isWrongNotesPractice) removeWrongNote(num1, num2);
+                }
+                ['write-result-overlay-tens', 'write-result-overlay-ones'].forEach(id => {
+                    const ov = document.getElementById(id);
+                    if (ov) ov.style.color = '#1A7A3A';
+                });
+                setFeedback('정답입니다!', 'green');
+                speak('정답입니다.');
+                setTimeout(() => { writeMode = 'done'; nextStep(); }, 1200);
+            } else {
+                ['write-result-overlay-tens', 'write-result-overlay-ones'].forEach(id => {
+                    const ov = document.getElementById(id);
+                    if (ov) ov.style.color = '#B91C1C';
+                });
+                setFeedback(`${recognizedNumber}? 아니에요. 다시 해볼까요?`, 'red');
+                speak('아니에요.');
+                addWrongNote(num1, num2, correctAnswer);
+                setTimeout(() => {
+                    writeMode = 'idle';
+                    clearWriteCanvases();
+                    setFeedback('', '');
+                }, 1200);
+            }
+        } catch (err) {
+            console.error('Recognition error:', err);
+            setFeedback('인식 오류가 발생했어요. 다시 써주세요.', 'red');
+            writeMode = 'idle';
+            resetWriteButtons();
+        }
+    }
+
+    // ---- Social Login ----
+    function socialLogin(provider) {
+        localStorage.setItem('slowmath_easy_login', JSON.stringify({
+            provider: provider,
+            loginTime: new Date().toISOString()
+        }));
+        const _sp = sessionStorage.getItem('_sp');
+        if (_sp) {
+            sessionStorage.removeItem('_sp');
+            document.getElementById('login-view').style.display = 'none';
+            startGame(...JSON.parse(_sp));
+            return;
+        }
+        document.getElementById('login-view').style.display = 'none';
+        document.getElementById('start-view').classList.remove('hidden');
+        document.querySelector('.logout-btn').style.display = localStorage.getItem('slowmath_easy_login') ? '' : 'none';
+    }
+
+    function socialLogout() {
+        localStorage.removeItem('slowmath_easy_login');
+        document.getElementById('start-view').classList.add('hidden');
+        document.getElementById('login-view').style.display = 'flex';
+    }
+
+    // ── 오답노트 ──
+    function getWrongNotes() {
+        try {
+            return JSON.parse(localStorage.getItem('slowmath_easy_wrong_notes')) || [];
+        } catch(e) { return []; }
+    }
+
+    function saveWrongNotes(notes) {
+        localStorage.setItem('slowmath_easy_wrong_notes', JSON.stringify(notes));
+    }
+
+    function addWrongNote(n1, n2, answer) {
+        const notes = getWrongNotes();
+        if (notes.some(n => n.num1 === n1 && n.num2 === n2)) return;
+        notes.push({ num1: n1, num2: n2, answer: answer });
+        saveWrongNotes(notes);
+        updateWrongNotesBadge();
+    }
+
+    function removeWrongNote(n1, n2) {
+        let notes = getWrongNotes();
+        notes = notes.filter(n => !(n.num1 === n1 && n.num2 === n2));
+        saveWrongNotes(notes);
+        updateWrongNotesBadge();
+    }
+
+    function updateWrongNotesBadge() {
+        const notes = getWrongNotes();
+        const btn = document.getElementById('wrong-notes-btn');
+        const badge = document.getElementById('wrong-notes-badge');
+        if (notes.length > 0) {
+            btn.style.display = 'flex';
+            badge.textContent = notes.length;
+        } else {
+            btn.style.display = 'none';
+        }
+    }
+
+    function showWrongNotesView() {
+        const notes = getWrongNotes();
+        const list = document.getElementById('wn-list');
+        list.innerHTML = '';
+        if (notes.length === 0) {
+            list.innerHTML = '<div class="wn-empty">틀린 문제가 없어요!</div>';
+            document.getElementById('wn-start-btn').style.display = 'none';
+        } else {
+            document.getElementById('wn-start-btn').style.display = '';
+            notes.forEach(n => {
+                const chip = document.createElement('span');
+                chip.className = 'wn-chip';
+                chip.textContent = `${n.num1} + ${n.num2} = ?`;
+                list.appendChild(chip);
+            });
+        }
+        startView.classList.add('hidden');
+        document.getElementById('wrong-notes-view').classList.add('active');
+    }
+
+    function hideWrongNotesView() {
+        document.getElementById('wrong-notes-view').classList.remove('active');
+        startView.classList.remove('hidden');
+        updateWrongNotesBadge();
+    }
+
+    function clearWrongNotes() {
+        saveWrongNotes([]);
+        updateWrongNotesBadge();
+        hideWrongNotesView();
+    }
+
+    function startWrongNotesPractice() {
+        const notes = getWrongNotes();
+        if (notes.length === 0) return;
+        isWrongNotesPractice = true;
+        wrongNotesQueue = notes.map(n => ({ num1: n.num1, num2: n.num2, answer: n.answer }));
+        // Shuffle
+        for (let i = wrongNotesQueue.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [wrongNotesQueue[i], wrongNotesQueue[j]] = [wrongNotesQueue[j], wrongNotesQueue[i]];
+        }
+        if (window.speechSynthesis) {
+            const unlock = new SpeechSynthesisUtterance("");
+            window.speechSynthesis.speak(unlock);
+        }
+        currentQuestion = 1;
+        perfectScore = 0;
+        totalPassed = 0;
+        usedQuestions.clear();
+        startTime = Date.now();
+        document.getElementById('wrong-notes-view').classList.remove('active');
+        startView.classList.add('hidden');
+        resultView.classList.add('hidden');
+        playView.classList.remove('hidden');
+        generateQuestion();
+    }
+
+    // Override generateQuestion to support wrong notes practice
+    const _originalGenerateQuestion = generateQuestion;
+    generateQuestion = function() {
+        if (!isWrongNotesPractice) {
+            _originalGenerateQuestion();
+            return;
+        }
+        // Wrong notes practice mode
+        if (impulsePreventionTimer) {
+            clearInterval(impulsePreventionTimer);
+            impulsePreventionTimer = null;
+        }
+        var oldReveal = document.getElementById('revealBtn');
+        if (oldReveal) oldReveal.remove();
+        isProcessing = false;
+        tryCount = 0;
+        passBtn.disabled = false;
+        passBtn.style.opacity = '';
+
+        if (wrongNotesQueue.length === 0 || currentQuestion > wrongNotesQueue.length) {
+            showResults();
+            return;
+        }
+
+        const q = wrongNotesQueue[currentQuestion - 1];
+        num1 = q.num1;
+        num2 = q.num2;
+        correctAnswer = q.answer;
+
+        document.getElementById('num1').innerText = num1;
+        document.getElementById('num2').innerText = num2;
+        document.getElementById('question-number').innerText = `문제 ${currentQuestion} / ${wrongNotesQueue.length}`;
+        document.getElementById('progress-fill').style.width = `${(currentQuestion / wrongNotesQueue.length) * 100}%`;
+
+        setFeedback('', '');
+
+        if (inputMode === 'select') {
+            document.getElementById('options-grid').classList.remove('hidden');
+            document.getElementById('keypad-area').classList.add('hidden');
+            document.getElementById('write-area').classList.add('hidden');
+            createOptions();
+        } else if (inputMode === 'keypad') {
+            document.getElementById('options-grid').classList.add('hidden');
+            document.getElementById('keypad-area').classList.remove('hidden');
+            document.getElementById('write-area').classList.add('hidden');
+            keypadInput = '';
+            updateKeypadDisplay();
+            document.querySelectorAll('#keypad-area button').forEach(b => {
+                b.disabled = false; b.style.opacity = '';
+            });
+        } else if (inputMode === 'write') {
+            document.getElementById('options-grid').classList.add('hidden');
+            document.getElementById('keypad-area').classList.add('hidden');
+            document.getElementById('write-area').classList.remove('hidden');
+            initWriteCanvases();
+            clearWriteCanvases();
+            writeMode = 'idle';
+        }
+    };
+
+    // Override nextStep to support wrong notes practice
+    const _originalNextStep = nextStep;
+    nextStep = function() {
+        if (!isWrongNotesPractice) {
+            _originalNextStep();
+            return;
+        }
+        if (currentQuestion < wrongNotesQueue.length) {
+            currentQuestion++;
+            generateQuestion();
+        } else {
+            showResults();
+        }
+    };
+
+    // Override showResults to support wrong notes practice
+    const _originalShowResults = showResults;
+    showResults = function() {
+        if (!isWrongNotesPractice) {
+            _originalShowResults();
+            return;
+        }
+        const totalQ = wrongNotesQueue.length;
+        const endTime = Date.now();
+        const duration = Math.floor((endTime - startTime) / 1000);
+        playView.classList.add('hidden');
+        resultView.classList.remove('hidden');
+        document.getElementById('perfect-count').innerText = `${perfectScore} / ${totalQ}`;
+        document.getElementById('passed-count').innerText = `${totalPassed}`;
+        document.getElementById('accuracy').innerText = `${Math.round((perfectScore / totalQ) * 100)}%`;
+        document.getElementById('time-taken').innerText = `${duration}초`;
+        const korPerfect = getKoreanCount(perfectScore);
+        speak(`오답노트 연습이 끝났습니다. 한 번에 ${korPerfect} 문제를 맞혔네요.`);
+        isWrongNotesPractice = false;
+        wrongNotesQueue = [];
+    };
+
+    // Override resetGame to clear wrong notes practice flag
+    const _originalResetGame = resetGame;
+    resetGame = function() {
+        isWrongNotesPractice = false;
+        wrongNotesQueue = [];
+        _originalResetGame();
+        updateWrongNotesBadge();
+    };
+
+    // Check login state on load
+    (function checkLoginState() {
+        loadSettings();
+        try { applySettingsUI(); } catch(e) {}
+        updateWrongNotesBadge();
+        document.getElementById('login-view').style.display = 'none';
+        document.getElementById('start-view').classList.remove('hidden');
+        document.querySelector('.logout-btn').style.display = localStorage.getItem('slowmath_easy_login') ? '' : 'none';
+    })();
+
+</script>
+
+</body>
+</html>
