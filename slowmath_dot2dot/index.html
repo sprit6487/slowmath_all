@@ -746,9 +746,22 @@ var DOT_COUNTS = { 2: [2,3], 3: [3,4,5], 4: [5,6,7] };
 var orientationLocked = false;
 var useCssFallback = false;
 
+// Xiaomi/MIUI 기기 감지 (UA에 Xiaomi, Redmi, POCO, MIUI 포함)
+function isXiaomiDevice() {
+    return /xiaomi|redmi|poco|miui/i.test(navigator.userAgent);
+}
+
 function lockLandscape() {
     var gv = document.getElementById('game-view');
     gv.classList.add('landscape-layout');
+
+    // Xiaomi/MIUI: 네이티브 lock이 무시되므로 CSS 폴백만 사용
+    if (isXiaomiDevice()) {
+        useCssFallback = true;
+        applyCssFallback();
+        setTimeout(resizeBoards, 50);
+        return;
+    }
 
     function tryOrientationLock() {
         var so = screen.orientation;
