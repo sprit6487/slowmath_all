@@ -769,7 +769,18 @@ function lockLandscape() {
         if (so && so.lock) {
             so.lock('landscape').then(function() {
                 orientationLocked = true;
-                resizeBoards();
+                // lock()이 성공해도 일부 기기(Xiaomi MIUI 등)는 OS가 무시함
+                // 800ms 후 실제로 가로가 됐는지 확인
+                setTimeout(function() {
+                    if (window.innerHeight > window.innerWidth) {
+                        // 여전히 세로 → CSS 폴백으로 전환
+                        useCssFallback = true;
+                        applyCssFallback();
+                        setTimeout(resizeBoards, 50);
+                    } else {
+                        resizeBoards();
+                    }
+                }, 800);
             }).catch(function() {
                 useCssFallback = true;
                 applyCssFallback();
