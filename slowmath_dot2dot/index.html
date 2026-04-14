@@ -94,6 +94,8 @@
         body { align-items: center; padding: 32px; }
         .app {
             max-width: 680px; min-height: auto;
+            max-height: calc(100dvh - 64px);
+            overflow: hidden;
             border-radius: 32px;
             box-shadow: 0 8px 48px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
             padding: 44px 40px;
@@ -101,7 +103,7 @@
     }
     /* 대형 태블릿 / 데스크톱 */
     @media (min-width: 1024px) {
-        .app { max-width: 780px; padding: 52px 56px; }
+        .app { max-width: 780px; max-height: calc(100dvh - 64px); padding: 52px 56px; }
     }
     .hidden { display: none !important; }
 
@@ -371,8 +373,8 @@
         .board-label { font-size: .85rem; }
     }
     @media (min-width: 1024px) {
-        .game-boards { gap: 36px; }
-        .board-wrapper { max-width: 320px; }
+        .game-boards { gap: 28px; }
+        .board-wrapper { max-width: 310px; }
     }
     /* ── 가로 모드 공통 레이아웃 ── */
     .landscape-layout {
