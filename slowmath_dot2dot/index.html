@@ -742,79 +742,48 @@ var GRID_OPTIONS = [
 ];
 var DOT_COUNTS = { 2: [2,3], 3: [3,4,5], 4: [5,6,7] };
 
-// ─── Orientation ───
+// ─── Orientation (선 긋기 방식) ───
 var orientationLocked = false;
 var useCssFallback = false;
 
 function lockLandscape() {
     var gv = document.getElementById('game-view');
     gv.classList.add('landscape-layout');
-
-    function tryOrientationLock() {
-        var so = screen.orientation;
-        if (so && so.lock) {
-            so.lock('landscape').then(function() {
-                orientationLocked = true;
-                resizeBoards();
-            }).catch(function() {
-                useCssFallback = true;
-                applyCssFallback();
-                setTimeout(resizeBoards, 50);
-            });
-        } else {
-            useCssFallback = true;
-            applyCssFallback();
-            setTimeout(resizeBoards, 50);
-        }
-    }
-
-    // 1) 전체 화면 모드 진입 후 가로 모드 잠금 (Chrome Android 등)
-    var el = document.documentElement;
-    var requestFs = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
-    if (requestFs) {
-        requestFs.call(el).then(function() {
-            tryOrientationLock();
+    var so = screen.orientation;
+    if (so && so.lock) {
+        so.lock('landscape').then(function() {
+            orientationLocked = true;
+            setTimeout(resizeBoards, 100);
         }).catch(function() {
-            // 전체 화면 실패 시 가로 모드만 시도
-            tryOrientationLock();
+            useCssFallback = true;
+            if (window.innerHeight > window.innerWidth) {
+                gv.classList.add('force-landscape');
+            }
+            setTimeout(resizeBoards, 100);
         });
     } else {
-        tryOrientationLock();
+        useCssFallback = true;
+        if (window.innerHeight > window.innerWidth) {
+            gv.classList.add('force-landscape');
+        }
+        setTimeout(resizeBoards, 100);
     }
 }
 
 function unlockLandscape() {
     var gv = document.getElementById('game-view');
-    gv.classList.remove('landscape-layout');
-    // 보드 크기 초기화
+    gv.classList.remove('landscape-layout', 'force-landscape');
     var containers = document.querySelectorAll('.board-container');
     for (var i = 0; i < containers.length; i++) {
         containers[i].style.width = '';
         containers[i].style.height = '';
     }
-
     if (orientationLocked) {
         var so = screen.orientation;
         if (so && so.unlock) so.unlock();
         orientationLocked = false;
     }
-    if (useCssFallback) {
-        removeCssFallback();
-        useCssFallback = false;
-    }
-    // 전체 화면 해제
-    var exitFs = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
-    if (exitFs && document.fullscreenElement) exitFs.call(document);
-}
-
-function applyCssFallback() {
-    if (window.innerHeight > window.innerWidth) {
-        document.getElementById('game-view').classList.add('force-landscape');
-    }
-}
-
-function removeCssFallback() {
-    document.getElementById('game-view').classList.remove('force-landscape');
+    useCssFallback = false;
 }
 
 function resizeBoards() {
@@ -822,16 +791,20 @@ function resizeBoards() {
     var gv = document.getElementById('game-view');
     if (!gv.classList.contains('landscape-layout')) return;
 
-    // 가로 모드: 사용 가능한 높이 기준으로 보드 크기 계산
+    // 가로 모드: 높이·너비 양쪽 기준으로 보드 크기 계산
     requestAnimationFrame(function() {
-        var viewH = gv.classList.contains('force-landscape')
-            ? window.innerWidth   // CSS rotate 시 vw가 실제 높이
-            : window.innerHeight;
+        var isForce = gv.classList.contains('force-landscape');
+        var viewH = isForce ? window.innerWidth  : window.innerHeight;
+        var viewW = isForce ? window.innerHeight : window.innerWidth;
         var navH = document.querySelector('.game-nav').offsetHeight || 40;
         var hintH = 30;
         var clearH = 40;
-        var padding = 60;
-        var boardSize = Math.floor(viewH - navH - hintH - clearH - padding);
+        var paddingV = 60;
+        var paddingH = 80;
+        var gap = 20;
+        var byHeight = Math.floor(viewH - navH - hintH - clearH - paddingV);
+        var byWidth  = Math.floor((viewW - paddingH - gap) / 2);
+        var boardSize = Math.min(byHeight, byWidth);
         boardSize = Math.max(boardSize, 100);
 
         var containers = document.querySelectorAll('.board-container');
@@ -847,7 +820,7 @@ function resizeBoards() {
     });
 }
 
-// 화면 회전/리사이즈 시 캔버스 재설정
+// 화면 회전/리사이즈 시 캔버스 재설정 (선 긋기 방식)
 window.addEventListener('resize', function() {
     if (useCssFallback) {
         if (window.innerHeight > window.innerWidth) {
@@ -856,7 +829,6 @@ window.addEventListener('resize', function() {
             document.getElementById('game-view').classList.remove('force-landscape');
         }
     }
-    // 게임 중이면 보드 리사이즈
     if (!document.getElementById('game-view').classList.contains('hidden') && puzzle) {
         resizeBoards();
     }
