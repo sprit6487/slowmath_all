@@ -746,22 +746,9 @@ var DOT_COUNTS = { 2: [2,3], 3: [3,4,5], 4: [5,6,7] };
 var orientationLocked = false;
 var useCssFallback = false;
 
-// Xiaomi/MIUI 기기 감지 (UA에 Xiaomi, Redmi, POCO, MIUI 포함)
-function isXiaomiDevice() {
-    return /xiaomi|redmi|poco|miui/i.test(navigator.userAgent);
-}
-
 function lockLandscape() {
     var gv = document.getElementById('game-view');
     gv.classList.add('landscape-layout');
-
-    // Xiaomi/MIUI: 네이티브 lock이 무시되므로 CSS 폴백만 사용
-    if (isXiaomiDevice()) {
-        useCssFallback = true;
-        applyCssFallback();
-        setTimeout(resizeBoards, 50);
-        return;
-    }
 
     function tryOrientationLock() {
         var so = screen.orientation;
@@ -835,23 +822,16 @@ function resizeBoards() {
     var gv = document.getElementById('game-view');
     if (!gv.classList.contains('landscape-layout')) return;
 
-    // 가로 모드: 높이와 너비 양쪽 기준으로 보드 크기 계산
+    // 가로 모드: 사용 가능한 높이 기준으로 보드 크기 계산
     requestAnimationFrame(function() {
-        var isForce = gv.classList.contains('force-landscape');
-        // force-landscape: CSS 회전이므로 vw↔vh 교환
-        var viewH = isForce ? window.innerWidth  : window.innerHeight;
-        var viewW = isForce ? window.innerHeight : window.innerWidth;
-
+        var viewH = gv.classList.contains('force-landscape')
+            ? window.innerWidth   // CSS rotate 시 vw가 실제 높이
+            : window.innerHeight;
         var navH = document.querySelector('.game-nav').offsetHeight || 40;
         var hintH = 30;
         var clearH = 40;
-        var paddingV = 60;  // 상하 여백
-        var paddingH = 80;  // 좌우 여백
-        var gap = 20;       // 보드 사이 간격
-
-        var byHeight = Math.floor(viewH - navH - hintH - clearH - paddingV);
-        var byWidth  = Math.floor((viewW - paddingH - gap) / 2);
-        var boardSize = Math.min(byHeight, byWidth);
+        var padding = 60;
+        var boardSize = Math.floor(viewH - navH - hintH - clearH - padding);
         boardSize = Math.max(boardSize, 100);
 
         var containers = document.querySelectorAll('.board-container');
@@ -870,10 +850,10 @@ function resizeBoards() {
 // 화면 회전/리사이즈 시 캔버스 재설정
 window.addEventListener('resize', function() {
     if (useCssFallback) {
-        // force-landscape 제거는 unlockLandscape()에서만 수행
-        // resize 이벤트에서 제거하면 position:fixed로 인한 뷰포트 변화에 오작동 가능
         if (window.innerHeight > window.innerWidth) {
             document.getElementById('game-view').classList.add('force-landscape');
+        } else {
+            document.getElementById('game-view').classList.remove('force-landscape');
         }
     }
     // 게임 중이면 보드 리사이즈
