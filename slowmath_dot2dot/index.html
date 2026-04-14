@@ -764,43 +764,44 @@ function lockLandscape() {
     var gv = document.getElementById('game-view');
     gv.classList.add('landscape-layout');
 
+    // 세로 모드이면 CSS 폴백 즉시 적용 (네이티브 lock 결과를 기다리지 않음)
+    if (window.innerHeight > window.innerWidth) {
+        useCssFallback = true;
+        gv.classList.add('force-landscape');
+        setTimeout(resizeBoards, 50);
+    } else {
+        // 이미 가로 모드 (기기를 직접 돌린 경우)
+        resizeBoards();
+        return;
+    }
+
+    // 네이티브 lock도 시도 — 성공해서 실제로 가로가 되면 CSS 폴백 제거
     function tryOrientationLock() {
         var so = screen.orientation;
         if (so && so.lock) {
             so.lock('landscape').then(function() {
                 orientationLocked = true;
-                // lock()이 성공해도 일부 기기(Xiaomi MIUI 등)는 OS가 무시함
-                // 800ms 후 실제로 가로가 됐는지 확인
                 setTimeout(function() {
-                    if (window.innerHeight > window.innerWidth) {
-                        // 여전히 세로 → CSS 폴백으로 전환
-                        useCssFallback = true;
-                        applyCssFallback();
-                        setTimeout(resizeBoards, 50);
-                    } else {
+                    if (window.innerWidth > window.innerHeight) {
+                        // 실제로 가로가 됨 → CSS 폴백 불필요
+                        gv.classList.remove('force-landscape');
+                        useCssFallback = false;
                         resizeBoards();
                     }
+                    // 여전히 세로면 CSS 폴백 유지
                 }, 800);
             }).catch(function() {
-                useCssFallback = true;
-                applyCssFallback();
-                setTimeout(resizeBoards, 50);
+                // CSS 폴백이 이미 적용돼 있으므로 추가 조치 불필요
             });
-        } else {
-            useCssFallback = true;
-            applyCssFallback();
-            setTimeout(resizeBoards, 50);
         }
     }
 
-    // 1) 전체 화면 모드 진입 후 가로 모드 잠금 (Chrome Android 등)
     var el = document.documentElement;
     var requestFs = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
     if (requestFs) {
         requestFs.call(el).then(function() {
             tryOrientationLock();
         }).catch(function() {
-            // 전체 화면 실패 시 가로 모드만 시도
             tryOrientationLock();
         });
     } else {
