@@ -1091,7 +1091,7 @@ function pickAnswer(btn, picked, answer) {
             if (hintEnabled) {
                 const hintEl1 = document.getElementById('hint-answer1');
                 const hintEl2 = document.getElementById('hint-answer2');
-                if (hintEl1) { hintEl1.textContent = num + 1; hintEl1.className = 'hint-box revealed'; }
+                if (hintEl1) { hintEl1.textContent = num + 1; hintEl1.className = 'hint-box'; }
                 if (hintEl2) { hintEl2.textContent = num + 2; hintEl2.className = 'hint-box revealed'; }
             }
             fb.textContent = '정답! ' + num + ' 2 큰 수는 ' + answer;
