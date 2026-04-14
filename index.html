@@ -44,13 +44,24 @@
       transition: background 0.15s, border-color 0.15s, transform 0.15s;
       text-align: center;
     }
-    .grid a:hover {
+    @media (hover: hover) {
+      .grid a:hover {
+        background: #4a90d9;
+        border-color: #4a90d9;
+        color: #fff;
+        transform: translateY(-2px);
+      }
+      .grid a:hover svg * {
+        fill: #fff;
+        stroke: #fff;
+      }
+    }
+    .grid a:active {
       background: #4a90d9;
       border-color: #4a90d9;
       color: #fff;
-      transform: translateY(-2px);
     }
-    .grid a:hover svg * {
+    .grid a:active svg * {
       fill: #fff;
       stroke: #fff;
     }
