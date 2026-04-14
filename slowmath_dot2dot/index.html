@@ -835,16 +835,23 @@ function resizeBoards() {
     var gv = document.getElementById('game-view');
     if (!gv.classList.contains('landscape-layout')) return;
 
-    // 가로 모드: 사용 가능한 높이 기준으로 보드 크기 계산
+    // 가로 모드: 높이와 너비 양쪽 기준으로 보드 크기 계산
     requestAnimationFrame(function() {
-        var viewH = gv.classList.contains('force-landscape')
-            ? window.innerWidth   // CSS rotate 시 vw가 실제 높이
-            : window.innerHeight;
+        var isForce = gv.classList.contains('force-landscape');
+        // force-landscape: CSS 회전이므로 vw↔vh 교환
+        var viewH = isForce ? window.innerWidth  : window.innerHeight;
+        var viewW = isForce ? window.innerHeight : window.innerWidth;
+
         var navH = document.querySelector('.game-nav').offsetHeight || 40;
         var hintH = 30;
         var clearH = 40;
-        var padding = 60;
-        var boardSize = Math.floor(viewH - navH - hintH - clearH - padding);
+        var paddingV = 60;  // 상하 여백
+        var paddingH = 80;  // 좌우 여백
+        var gap = 20;       // 보드 사이 간격
+
+        var byHeight = Math.floor(viewH - navH - hintH - clearH - paddingV);
+        var byWidth  = Math.floor((viewW - paddingH - gap) / 2);
+        var boardSize = Math.min(byHeight, byWidth);
         boardSize = Math.max(boardSize, 100);
 
         var containers = document.querySelectorAll('.board-container');
