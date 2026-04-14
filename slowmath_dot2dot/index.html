@@ -419,10 +419,22 @@
         z-index: 50;
         background: white;
     }
-    /* 네이티브 가로 모드 */
-    @media (orientation: landscape) {
+    /* 네이티브 가로 모드 - 모바일 */
+    @media (orientation: landscape) and (max-width: 767px) {
         #game-view.landscape-layout {
             height: 100dvh;
+        }
+    }
+    /* 네이티브 가로 모드 - 태블릿: app 컨테이너 밖으로 꺼내 전체화면 점유 */
+    @media (orientation: landscape) and (min-width: 768px) {
+        #game-view.landscape-layout {
+            position: fixed;
+            inset: 0;
+            height: 100dvh;
+            width: 100vw !important;
+            z-index: 10;
+            background: white;
+            border-radius: 0;
         }
     }
     .game-hint { font-size: .875rem; font-weight: 600; color: #B8AD9E; text-align: center; min-height: 22px; }
@@ -850,18 +862,30 @@ function resizeBoards() {
 }
 
 // 화면 회전/리사이즈 시 캔버스 재설정
-window.addEventListener('resize', function() {
-    if (useCssFallback) {
-        if (window.innerHeight > window.innerWidth) {
-            document.getElementById('game-view').classList.add('force-landscape');
+function onOrientationChange() {
+    var gv = document.getElementById('game-view');
+    var isLandscapeActive = gv.classList.contains('landscape-layout');
+    var isPortraitNow = window.innerHeight > window.innerWidth;
+
+    if (isLandscapeActive) {
+        if (isPortraitNow) {
+            // 네이티브 락이 OS에 의해 무시됐을 때 (Xiaomi 등) CSS 폴백으로 보완
+            useCssFallback = true;
+            gv.classList.add('force-landscape');
         } else {
-            document.getElementById('game-view').classList.remove('force-landscape');
+            // 실제로 가로가 됐으면 CSS 폴백 제거
+            gv.classList.remove('force-landscape');
         }
     }
+
     // 게임 중이면 보드 리사이즈
-    if (!document.getElementById('game-view').classList.contains('hidden') && puzzle) {
+    if (!gv.classList.contains('hidden') && puzzle) {
         resizeBoards();
     }
+}
+window.addEventListener('resize', onOrientationChange);
+window.addEventListener('orientationchange', function() {
+    setTimeout(onOrientationChange, 150);
 });
 
 // ─── Navigation ───
