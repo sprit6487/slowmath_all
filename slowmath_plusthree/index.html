@@ -1095,8 +1095,8 @@ function pickAnswer(btn, picked, answer) {
                 const hintEl1 = document.getElementById('hint-answer1');
                 const hintEl2 = document.getElementById('hint-answer2');
                 const hintEl3 = document.getElementById('hint-answer3');
-                if (hintEl1) { hintEl1.textContent = num + 1; hintEl1.className = 'hint-box revealed'; }
-                if (hintEl2) { hintEl2.textContent = num + 2; hintEl2.className = 'hint-box revealed'; }
+                if (hintEl1) { hintEl1.textContent = num + 1; hintEl1.className = 'hint-box'; }
+                if (hintEl2) { hintEl2.textContent = num + 2; hintEl2.className = 'hint-box'; }
                 if (hintEl3) { hintEl3.textContent = num + 3; hintEl3.className = 'hint-box revealed'; }
             }
             fb.textContent = '정답! ' + num + ' 3 큰 수는 ' + answer;
