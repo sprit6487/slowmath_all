@@ -870,10 +870,10 @@ function resizeBoards() {
 // 화면 회전/리사이즈 시 캔버스 재설정
 window.addEventListener('resize', function() {
     if (useCssFallback) {
+        // force-landscape 제거는 unlockLandscape()에서만 수행
+        // resize 이벤트에서 제거하면 position:fixed로 인한 뷰포트 변화에 오작동 가능
         if (window.innerHeight > window.innerWidth) {
             document.getElementById('game-view').classList.add('force-landscape');
-        } else {
-            document.getElementById('game-view').classList.remove('force-landscape');
         }
     }
     // 게임 중이면 보드 리사이즈
