@@ -445,6 +445,22 @@ body:not(.sm-loggedin) #share-bubble { display: none !important; }
 .wrong-notes-btn{width:100%;padding:14px 0;border-radius:14px;border:2.5px solid #F07070;background:#FFF5F5;color:#F07070;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;margin-top:10px;transition:transform .1s;display:flex;align-items:center;justify-content:center;gap:8px;}
 .wrong-notes-btn:active{transform:scale(.97);}
 .wrong-notes-btn .badge{background:#F07070;color:white;border-radius:50%;min-width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;}
+
+/* ── 오답노트 화면 ── */
+.wn-view{display:none;flex-direction:column;align-items:center;padding:24px 20px;}
+.wn-view.active{display:flex;}
+.wn-header{text-align:center;margin-bottom:20px;}
+.wn-header h2{font-size:1.25rem;font-weight:900;color:#4A4035;margin:0 0 4px;}
+.wn-header p{font-size:.85rem;color:#B8AD9E;margin:0;}
+.wn-list{width:100%;max-width:400px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;}
+.wn-chip{padding:8px 16px;border-radius:10px;background:#FFF5F5;border:1.5px solid #F07070;font-size:.9rem;font-weight:700;color:#F07070;}
+.wn-empty{color:#B8AD9E;font-size:.9rem;margin:40px 0;}
+.wn-actions{display:flex;gap:10px;width:100%;max-width:320px;}
+.wn-actions button{flex:1;padding:13px 0;border-radius:12px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;transition:transform .1s;}
+.wn-actions button:active{transform:scale(.97);}
+.wn-btn-back{border:2.5px solid #E8E2DA;background:white;color:#8C8070;}
+.wn-btn-start{border:none;background:#F07070;color:white;box-shadow:0 2px 8px rgba(240,112,112,.3);}
+.wn-btn-clear{border:1.5px solid #E8E2DA;background:white;color:#B8AD9E;padding:8px 16px;border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer;margin-top:12px;font-family:inherit;}
 </style>
 </head>
 <body>
@@ -1785,8 +1801,7 @@ _smGameCompleted=true;
 
     function socialLogout() {
         localStorage.removeItem('slowmath_circle_login');
-        document.getElementById('login-view').classList.add('hidden');
-        document.getElementById('start-view').classList.remove('hidden');
+        document.querySelector('.logout-btn').style.display = 'none';
     }
 
     // ── 오답노트 ──
