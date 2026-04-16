@@ -2021,13 +2021,15 @@ var _APPS=[
 /* ── CSS ── */
 var s=document.createElement('style');
 s.textContent=[
-'#sm-tab-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1.5px solid #E8E2DA;display:flex;z-index:300;padding-bottom:env(safe-area-inset-bottom);overflow:visible;}',
+'#sm-tab-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1.5px solid #E8E2DA;display:flex;z-index:300;padding-bottom:env(safe-area-inset-bottom);}',
 '@media(min-width:768px){#sm-tab-bar{max-width:560px;}}',
 '#sm-tab-bar.smh{display:none!important;}',
-'.sm-tb{flex:1;padding:4px 0 7px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:inherit;font-size:.62rem;font-weight:700;color:#B8AD9E;-webkit-tap-highlight-color:transparent;transition:color .2s;}',
-'.sm-iw{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.35rem;transition:all .25s cubic-bezier(.34,1.56,.64,1);}',
+'.sm-tb{flex:1;padding:6px 0 4px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:inherit;font-size:.62rem;font-weight:700;color:#B8AD9E;-webkit-tap-highlight-color:transparent;transition:color .15s;}',
+'.sm-ie{font-size:1.45rem;line-height:1.2;filter:grayscale(1) opacity(.55);transition:filter .15s;}',
+'.sm-dot{width:4px;height:4px;border-radius:50%;background:transparent;margin-top:-2px;transition:background .15s;}',
 '.sm-tb.sma{color:#6BADE8;}',
-'.sm-tb.sma .sm-iw{background:#6BADE8;box-shadow:0 4px 14px rgba(107,173,232,.45);transform:translateY(-6px);}',
+'.sm-tb.sma .sm-ie{filter:none;}',
+'.sm-tb.sma .sm-dot{background:#6BADE8;}',
 '.sm-tv{width:100%;display:flex;flex-direction:column;align-items:flex-start;padding-bottom:80px;}',
 '.sm-tv.smh{display:none!important;}',
 /* 기록 */
@@ -2082,10 +2084,10 @@ var bar=document.createElement('div');
 bar.id='sm-tab-bar';
 bar.className='smh';
 bar.innerHTML=[
-  '<button class="sm-tb sma" id="sm-tb-home" onclick="window._smTab(\'home\')"><div class="sm-iw">🏠</div><span>홈</span></button>',
-  '<button class="sm-tb" id="sm-tb-records" onclick="window._smTab(\'records\')"><div class="sm-iw">📅</div><span>기록</span></button>',
-  '<button class="sm-tb" id="sm-tb-series" onclick="window._smTab(\'series\')"><div class="sm-iw">📚</div><span>시리즈</span></button>',
-  '<button class="sm-tb" id="sm-tb-my" onclick="window._smTab(\'my\')"><div class="sm-iw">👤</div><span>마이</span></button>',
+  '<button class="sm-tb sma" id="sm-tb-home" onclick="window._smTab(\'home\')"><span class="sm-ie">🏠</span><span>홈</span><div class="sm-dot"></div></button>',
+  '<button class="sm-tb" id="sm-tb-records" onclick="window._smTab(\'records\')"><span class="sm-ie">📅</span><span>기록</span><div class="sm-dot"></div></button>',
+  '<button class="sm-tb" id="sm-tb-series" onclick="window._smTab(\'series\')"><span class="sm-ie">📚</span><span>시리즈</span><div class="sm-dot"></div></button>',
+  '<button class="sm-tb" id="sm-tb-my" onclick="window._smTab(\'my\')"><span class="sm-ie">👤</span><span>마이</span><div class="sm-dot"></div></button>',
 ].join('');
 document.body.appendChild(bar);
 
