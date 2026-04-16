@@ -1447,19 +1447,58 @@ myv.innerHTML=[
 ].join('');
 _app.appendChild(myv);
 
-/* ── localStorage ── */
+/* ── localStorage / 문제별 실시간 기록 ── */
 var _VK='sm_visits_'+_AK;
+var _obsv=null,_prevQ=0,_prevSc=0;
+
 function _gv(){try{return JSON.parse(localStorage.getItem(_VK))||[];}catch(e){return [];}}
-function _recGame(tot,cor,mod){
+
+function _startSession(mod){
   var today=new Date().toISOString().split('T')[0];
   var vv=_gv();
   var en=vv.find(function(x){return x.date===today;});
   if(!en){en={date:today,sessions:[],totalProblems:0,totalCorrect:0};vv.push(en);}
-  en.sessions.push({total:tot,correct:cor,mode:mod,t:Date.now()});
-  en.totalProblems=(en.totalProblems||0)+tot;
-  en.totalCorrect=(en.totalCorrect||0)+cor;
+  en.sessions.push({total:0,correct:0,mode:mod,t:Date.now()});
   localStorage.setItem(_VK,JSON.stringify(vv));
 }
+
+function _recProblem(isCorrect){
+  var today=new Date().toISOString().split('T')[0];
+  var vv=_gv();
+  var en=vv.find(function(x){return x.date===today;});
+  if(!en) return;
+  var sess=en.sessions[en.sessions.length-1];
+  if(!sess) return;
+  sess.total++;
+  if(isCorrect) sess.correct++;
+  en.totalProblems=(en.totalProblems||0)+1;
+  if(isCorrect) en.totalCorrect=(en.totalCorrect||0)+1;
+  localStorage.setItem(_VK,JSON.stringify(vv));
+}
+
+function _startObserving(){
+  _stopObserving();
+  var ql=document.getElementById('q-label');
+  var sl=document.getElementById('play-score');
+  if(!ql) return;
+  _prevQ=1; _prevSc=0;
+  _obsv=new MutationObserver(function(){
+    var m=(ql.textContent||'').match(/(\d+)/);
+    if(!m) return;
+    var qn=parseInt(m[1]);
+    if(qn>_prevQ){
+      var sc=parseInt((sl?sl.textContent:'0').replace(/[^0-9]/g,''))||0;
+      _recProblem(sc>_prevSc);
+      _prevSc=sc; _prevQ=qn;
+    }
+  });
+  _obsv.observe(ql,{childList:true,characterData:true,subtree:true});
+}
+
+function _stopObserving(){
+  if(_obsv){_obsv.disconnect();_obsv=null;}
+}
+
 function _recVisit(){
   if(_LK&&!localStorage.getItem(_LK)) return;
   var today=new Date().toISOString().split('T')[0];
@@ -1516,9 +1555,17 @@ if(_oSV){
     _oSV(id);
     if(id==='login-view'){
       _showBar(false);
-    } else if(id==='play-view'||id==='result-view'){
+    } else if(id==='play-view'){
+      _showBar(false);
+      try{
+        var mod=typeof lastMode!=='undefined'?lastMode:null;
+        _startSession(mod);
+        setTimeout(_startObserving,150);
+      }catch(e){}
+    } else if(id==='result-view'){
       _showBar(false);
     } else if(id==='start-view'){
+      _stopObserving();
       if(_isLI()){
         _showBar(true);
         _ct='home';
@@ -1535,18 +1582,18 @@ if(_oSV){
   };
 }
 
-/* ── showResult / showResults 패치 ── */
+/* ── showResult / showResults 패치 (마지막 문제 기록) ── */
 var _oRF=_RFN&&typeof window[_RFN]==='function'?window[_RFN]:null;
 if(_oRF){
   window[_RFN]=function(){
     _oRF.apply(this,arguments);
     _showBar(false);
     try{
-      var tot=typeof questions!=='undefined'?questions.length:0;
-      var cor=typeof score!=='undefined'?score:0;
-      var mod=typeof lastMode!=='undefined'?lastMode:(typeof currentLevel!=='undefined'?currentLevel:null);
-      if(tot>0) _recGame(tot,cor,mod);
+      var sl=document.getElementById('play-score');
+      var sc=parseInt((sl?sl.textContent:'0').replace(/[^0-9]/g,''))||0;
+      _recProblem(sc>_prevSc);
     }catch(e){}
+    _stopObserving();
   };
 }
 
