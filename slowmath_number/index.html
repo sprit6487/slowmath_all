@@ -47,9 +47,11 @@ s.textContent=[
 '#sm-tab-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1.5px solid #E8E2DA;display:flex;z-index:300;padding-bottom:env(safe-area-inset-bottom);}',
 '@media(min-width:768px){#sm-tab-bar{max-width:560px;}}',
 '#sm-tab-bar.smh{display:none!important;}',
-'.sm-tb{flex:1;padding:8px 0 6px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:inherit;font-size:.62rem;font-weight:700;color:#B8AD9E;transition:color .15s;-webkit-tap-highlight-color:transparent;}',
+'.sm-tb{flex:1;padding:8px 0 6px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:inherit;font-size:.62rem;font-weight:700;color:#B8AD9E;transition:color .15s;-webkit-tap-highlight-color:transparent;position:relative;}',
+'.sm-tb::after{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:32px;height:3px;border-radius:0 0 3px 3px;background:transparent;transition:background .2s;}',
 '.sm-ti{font-size:1.4rem;line-height:1.2;}',
 '.sm-tb.sma{color:#6BADE8;}',
+'.sm-tb.sma::after{background:#6BADE8;}',
 '.sm-tv{width:100%;display:flex;flex-direction:column;align-items:flex-start;padding-bottom:80px;}',
 '.sm-tv.smh{display:none!important;}',
 /* 기록 */
