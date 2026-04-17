@@ -1453,8 +1453,11 @@ if(_oSL){
 /* ── 로그아웃 ── */
 window._smLogout=function(){
   if(typeof logout==='function') logout();
-  else if(_LK){localStorage.removeItem(_LK);location.reload();}
-  _showBar(false);
+  else if(typeof doLogout==='function') doLogout();
+  else if(_LK) localStorage.removeItem(_LK);
+  var lb=document.querySelector('.logout-btn');
+  if(lb) lb.style.display='none';
+  setTimeout(function(){window._smTab('home');},10);
 };
 
 /* ── 달력 ── */
