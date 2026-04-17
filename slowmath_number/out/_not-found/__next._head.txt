@@ -1,6 +1,0 @@
-1:"$Sreact.fragment"
-2:I[97367,["/slowmath_all/slowmath_number/_next/static/chunks/0dbhjjzl8qfwv.js"],"ViewportBoundary"]
-3:I[97367,["/slowmath_all/slowmath_number/_next/static/chunks/0dbhjjzl8qfwv.js"],"MetadataBoundary"]
-4:"$Sreact.suspense"
-5:I[27201,["/slowmath_all/slowmath_number/_next/static/chunks/0dbhjjzl8qfwv.js"],"IconMark"]
-0:{"rsc":["$","$1","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$L2",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L3",null,{"children":["$","$4",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"느린아이 숫자 익히기"}],["$","meta","1",{"name":"description","content":"숫자를 순서대로 배워보세요"}],["$","link","2",{"rel":"icon","href":"/slowmath_all/slowmath_number/favicon.ico?favicon.0x3dzn~oxb6tn.ico","sizes":"256x256","type":"image/x-icon"}],["$","$L5","3",{}]]}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"e9kms9xXxd8OZ5A9cBN1f"}

@@ -1,3 +1,0 @@
-:HL["/slowmath_all/slowmath_number/_next/static/chunks/0ss1opdg-2h4e.css","style"]
-:HL["/slowmath_all/slowmath_number/_next/static/chunks/0sca-lw5~0na7.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"e9kms9xXxd8OZ5A9cBN1f"}
