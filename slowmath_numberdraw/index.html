@@ -1626,7 +1626,7 @@ s.textContent=[
 '.sm-tb.sma .sm-ie{filter:none;}',
 '.sm-tb.sma .sm-dot{background:#6BADE8;}',
 '.sm-tv{width:100%;display:flex;flex-direction:column;align-items:flex-start;padding-bottom:80px;}',
-'.sm-tv.smh{display:none!important;}',
+'.sm-tv.smh,.sm-dd.smh{display:none!important;}',
 /* 기록 */
 '.sm-ms{display:flex;gap:10px;margin-bottom:16px;width:100%;}',
 '.sm-mc{flex:1;background:#F5F1EB;border-radius:14px;padding:12px;text-align:center;}',
@@ -1650,6 +1650,16 @@ s.textContent=[
 '.sm-dl{color:#8C8070;font-weight:500;}',
 '.sm-dv{color:#4A4035;font-weight:700;}',
 '.sm-db{background:#EEF6FD;color:#4A90D9;border-radius:99px;padding:2px 10px;font-size:.72rem;font-weight:700;}',
+'.sm-tg{width:100%;background:#F5F1EB;border-radius:16px;padding:14px 14px 10px;margin-top:16px;}',
+'.sm-tg-title{font-size:.85rem;font-weight:700;color:#4A4035;margin-bottom:10px;}',
+'.sm-tg-chart{width:100%;overflow:hidden;}',
+'.sm-tg-chart svg{width:100%;height:auto;display:block;}',
+'.sm-tg-empty{font-size:.8rem;color:#B8AD9E;text-align:center;padding:22px 0;}',
+'.sm-tg-legend{display:flex;gap:14px;align-items:center;justify-content:flex-end;margin-top:6px;font-size:.68rem;color:#8C8070;}',
+'.sm-tg-lg{display:inline-flex;align-items:center;gap:5px;}',
+'.sm-tg-lg::before{content:"";display:inline-block;width:10px;height:10px;}',
+'.sm-tg-lg-b::before{background:#6BADE8;border-radius:2px;}',
+'.sm-tg-lg-l::before{background:#5BC886;border-radius:50%;}',
 /* 시리즈 */
 '.sm-sh{font-size:1.35rem;font-weight:900;color:#4A4035;margin-bottom:4px;padding-top:4px;}',
 '.sm-ss{font-size:.8rem;color:#B8AD9E;margin-bottom:14px;}',
@@ -1694,6 +1704,7 @@ rv.id='sm-rec-v';rv.className='sm-tv smh';
 rv.innerHTML='<div class="sm-ms" id="sm-msum"></div>'
   +'<div class="sm-ch"><button class="sm-cn" onclick="window._smCN(-1)">‹</button><div class="sm-cm" id="sm-clbl"></div><button class="sm-cn" onclick="window._smCN(1)">›</button></div>'
   +'<table class="sm-cg"><thead><tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead><tbody id="sm-cbody"></tbody></table>'
+  +'<div id="sm-trend" class="sm-tg"></div>'
   +'<div id="sm-ddet" class="sm-dd smh"></div>';
 _app.appendChild(rv);
 
@@ -1979,7 +1990,60 @@ function _rCal(){
     if((first+d-1)%7===6&&d<days) html+='</tr><tr>';
   }
   body.innerHTML=html+'</tr>';
-  document.getElementById('sm-ddet').classList.add('smh');
+  var _recent=null;
+  for(var _rd=days;_rd>=1;_rd--){
+    var _rs=_cy+'-'+String(_cm+1).padStart(2,'0')+'-'+String(_rd).padStart(2,'0');
+    if(vm[_rs]&&(vm[_rs].totalProblems||0)>0){_recent=_rs;break;}
+  }
+  if(_recent) window._smDD(_recent);
+  else document.getElementById('sm-ddet').classList.add('smh');
+  _rTrend();
+}
+
+function _rTrend(){
+  var el=document.getElementById('sm-trend');
+  if(!el) return;
+  var vv=_gv();
+  var monthData=vv.filter(function(v){
+    var p=(v.date||'').split('-');
+    return p.length===3 && parseInt(p[0])===_cy && parseInt(p[1])===_cm+1 && (v.totalProblems||0)>0;
+  }).sort(function(a,b){return a.date<b.date?-1:1;});
+  if(monthData.length===0){
+    el.innerHTML='<div class="sm-tg-title">이달의 학습 추이</div><div class="sm-tg-empty">이번 달 기록이 없어요</div>';
+    return;
+  }
+  var W=320,H=120,pad=14,bot=24,top=12;
+  var maxP=0;
+  monthData.forEach(function(v){ if((v.totalProblems||0)>maxP) maxP=v.totalProblems; });
+  if(maxP<1) maxP=1;
+  var innerW=W-pad*2;
+  var n=monthData.length;
+  var step=innerW/n;
+  var barW=Math.max(2,Math.min(28,step*0.62));
+  var chartH=H-top-bot;
+  var bars='',labels='',line='',dots='';
+  var prevX=null,prevY=null;
+  monthData.forEach(function(v,i){
+    var cx=pad+step*(i+0.5);
+    var probH=((v.totalProblems||0)/maxP)*chartH;
+    var by=top+(chartH-probH);
+    bars+='<rect x="'+(cx-barW/2).toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+barW.toFixed(1)+'" height="'+probH.toFixed(1)+'" rx="2.5" fill="#6BADE8" opacity="0.85"/>';
+    var rate=(v.totalProblems||0)>0?(v.totalCorrect||0)/v.totalProblems:0;
+    var ry=top+(1-rate)*chartH;
+    if(prevX!==null) line+='<line x1="'+prevX.toFixed(1)+'" y1="'+prevY.toFixed(1)+'" x2="'+cx.toFixed(1)+'" y2="'+ry.toFixed(1)+'" stroke="#5BC886" stroke-width="1.8" stroke-linecap="round"/>';
+    dots+='<circle cx="'+cx.toFixed(1)+'" cy="'+ry.toFixed(1)+'" r="3" fill="#5BC886" stroke="white" stroke-width="1.5"/>';
+    prevX=cx;prevY=ry;
+    var day=parseInt((v.date||'').split('-')[2])||0;
+    var showLbl=(n<=10)||(i%Math.ceil(n/10)===0)||(i===n-1);
+    if(showLbl){
+      labels+='<text x="'+cx.toFixed(1)+'" y="'+(H-8).toFixed(1)+'" text-anchor="middle" font-size="9" fill="#8C8070" font-weight="600">'+day+'일</text>';
+    }
+  });
+  var axisY=top+chartH+0.5;
+  var axis='<line x1="'+pad+'" y1="'+axisY+'" x2="'+(W-pad)+'" y2="'+axisY+'" stroke="#E0DAD2" stroke-width="1"/>';
+  var maxLbl='<text x="'+pad+'" y="'+(top-2)+'" font-size="8" fill="#B8AD9E" font-weight="600">최대 '+maxP+'문제</text>';
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="월별 시간 내 추이">'+axis+maxLbl+bars+line+dots+labels+'</svg>';
+  el.innerHTML='<div class="sm-tg-title">이달의 학습 추이</div><div class="sm-tg-chart">'+svg+'</div><div class="sm-tg-legend"><span class="sm-tg-lg sm-tg-lg-b">문제 수</span><span class="sm-tg-lg sm-tg-lg-l">정답률</span></div>';
 }
 
 window._smDD=function(ds){
