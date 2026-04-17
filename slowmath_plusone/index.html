@@ -1623,17 +1623,27 @@ if(_oRF){
   };
 }
 
-/* ── socialLogin 패치 (로그인 후 pending 탭 이동) ── */
+/* ── socialLogin / doLogin 패치 (로그인 후 pending 탭 이동) ── */
+function _smAfterLogin(){
+  _showBar(true);
+  _recVisit();
+  if(window._smPendingTab){
+    var pt=window._smPendingTab;window._smPendingTab=null;
+    setTimeout(function(){window._smTab(pt);},50);
+  }
+}
 var _oSL=typeof socialLogin==='function'?socialLogin:null;
 if(_oSL){
   window.socialLogin=function(){
     _oSL.apply(this,arguments);
-    _showBar(true);
-    _recVisit();
-    if(window._smPendingTab){
-      var pt=window._smPendingTab;window._smPendingTab=null;
-      setTimeout(function(){window._smTab(pt);},50);
-    }
+    _smAfterLogin();
+  };
+}
+var _oDL=typeof doLogin==='function'?doLogin:null;
+if(_oDL){
+  window.doLogin=function(){
+    _oDL.apply(this,arguments);
+    _smAfterLogin();
   };
 }
 
@@ -1641,9 +1651,10 @@ if(_oSL){
 window._smLogout=function(){
   if(typeof logout==='function') logout();
   else if(typeof doLogout==='function') doLogout();
+  else if(typeof socialLogout==='function') socialLogout();
   else if(_LK) localStorage.removeItem(_LK);
-  var lb=document.querySelector('.logout-btn');
-  if(lb) lb.style.display='none';
+  var lbs=document.querySelectorAll('.logout-btn');
+  for(var i=0;i<lbs.length;i++) lbs[i].style.display='none';
   setTimeout(function(){window._smTab('home');},10);
 };
 
@@ -1721,7 +1732,18 @@ function _rMy(){
 setTimeout(function(){
   _showBar(true);
   if(_isLI()) _recVisit();
-},200);
+  var lbs=document.querySelectorAll('.logout-btn');
+  for(var i=0;i<lbs.length;i++){
+    var lb=lbs[i];
+    lb.removeAttribute('onclick');
+    lb.onclick=null;
+    lb.addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      window._smLogout();
+    },true);
+  }
+},250);
 
 })();
 </script>

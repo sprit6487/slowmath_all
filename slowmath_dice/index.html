@@ -1090,10 +1090,6 @@ setTimeout(function() {
                 Google로 시작하기
             </button>
         </div>
-        <div style="margin-top: 32px; text-align: center;">
-            <p style="color: #B8AD9E; font-size: 0.85rem; margin: 0; line-height: 1.5;">지금 지인에게 공유하시면<br>하루 무료 이용권을 드려요</p>
-            <button style="margin-top: 12px; padding: 8px 20px; border: 1.5px solid #4A4035; background: none; border-radius: 8px; color: #4A4035; font-weight: 600; cursor: pointer; font-family: inherit;" onclick="shareApp()">공유하기</button>
-        </div>
     </div>
 
   <!-- ===== START VIEW ===== -->
@@ -2917,17 +2913,27 @@ if(_oRF){
   };
 }
 
-/* ── socialLogin 패치 (로그인 후 pending 탭 이동) ── */
+/* ── socialLogin / doLogin 패치 (로그인 후 pending 탭 이동) ── */
+function _smAfterLogin(){
+  _showBar(true);
+  _recVisit();
+  if(window._smPendingTab){
+    var pt=window._smPendingTab;window._smPendingTab=null;
+    setTimeout(function(){window._smTab(pt);},50);
+  }
+}
 var _oSL=typeof socialLogin==='function'?socialLogin:null;
 if(_oSL){
   window.socialLogin=function(){
     _oSL.apply(this,arguments);
-    _showBar(true);
-    _recVisit();
-    if(window._smPendingTab){
-      var pt=window._smPendingTab;window._smPendingTab=null;
-      setTimeout(function(){window._smTab(pt);},50);
-    }
+    _smAfterLogin();
+  };
+}
+var _oDL=typeof doLogin==='function'?doLogin:null;
+if(_oDL){
+  window.doLogin=function(){
+    _oDL.apply(this,arguments);
+    _smAfterLogin();
   };
 }
 
@@ -2935,9 +2941,10 @@ if(_oSL){
 window._smLogout=function(){
   if(typeof logout==='function') logout();
   else if(typeof doLogout==='function') doLogout();
+  else if(typeof socialLogout==='function') socialLogout();
   else if(_LK) localStorage.removeItem(_LK);
-  var lb=document.querySelector('.logout-btn');
-  if(lb) lb.style.display='none';
+  var lbs=document.querySelectorAll('.logout-btn');
+  for(var i=0;i<lbs.length;i++) lbs[i].style.display='none';
   setTimeout(function(){window._smTab('home');},10);
 };
 
@@ -3015,7 +3022,18 @@ function _rMy(){
 setTimeout(function(){
   _showBar(true);
   if(_isLI()) _recVisit();
-},200);
+  var lbs=document.querySelectorAll('.logout-btn');
+  for(var i=0;i<lbs.length;i++){
+    var lb=lbs[i];
+    lb.removeAttribute('onclick');
+    lb.onclick=null;
+    lb.addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      window._smLogout();
+    },true);
+  }
+},250);
 
 })();
 </script>
