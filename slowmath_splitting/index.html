@@ -2555,32 +2555,32 @@ var _ct='home';
 var _cy=new Date().getFullYear(),_cm=new Date().getMonth();
 
 window._smTab=function(tab){
-  if((tab==='records'||tab==='my')&&!_isLI()){
-    window._smPendingTab=tab;
-    var lv=document.getElementById('login-view');
-    var sv=document.getElementById('start-view');
-    if(lv) lv.classList.remove('hidden');
-    if(sv) sv.classList.add('hidden');
-    _showBar(false);
-    return;
-  }
-  _ct=tab;
+  var lv=document.getElementById('login-view');
+  var homeV=document.getElementById('start-view');
+  var loggedIn=_isLI();
   ['home','records','series','my'].forEach(function(t){
     var b=document.getElementById('sm-tb-'+t);
     if(b) b.classList.toggle('sma',t===tab);
   });
-  var homeV=document.getElementById('start-view');
+  if((tab==='records'||tab==='my')&&!loggedIn){
+    window._smPendingTab=tab;
+    if(lv) lv.style.display='flex';
+    if(homeV) homeV.classList.add('hidden');
+    document.getElementById('sm-rec-v').classList.add('smh');
+    document.getElementById('sm-ser-v').classList.add('smh');
+    document.getElementById('sm-my-v').classList.add('smh');
+    return;
+  }
+  _ct=tab;
   if(tab==='home'){
     document.getElementById('sm-rec-v').classList.add('smh');
     document.getElementById('sm-ser-v').classList.add('smh');
     document.getElementById('sm-my-v').classList.add('smh');
+    if(lv) lv.style.display='none';
     if(homeV) homeV.classList.remove('hidden');
   } else {
+    if(lv) lv.style.display='none';
     if(homeV) homeV.classList.add('hidden');
-    ['rec','ser','my'].forEach(function(t){
-      var el=document.getElementById('sm-'+t+'-v');
-      if(el) el.classList.toggle('smh',t!==tab.slice(0,2)&&t!==tab.slice(0,3));
-    });
     document.getElementById('sm-rec-v').classList.toggle('smh',tab!=='records');
     document.getElementById('sm-ser-v').classList.toggle('smh',tab!=='series');
     document.getElementById('sm-my-v').classList.toggle('smh',tab!=='my');
@@ -2604,7 +2604,15 @@ if(_oSV){
   window.showView=function(id){
     _oSV(id);
     if(id==='login-view'){
-      _showBar(false);
+      _showBar(true);
+      _ct='home';
+      ['home','records','series','my'].forEach(function(t){
+        var b=document.getElementById('sm-tb-'+t);
+        if(b) b.classList.toggle('sma',t==='home');
+      });
+      document.getElementById('sm-rec-v').classList.add('smh');
+      document.getElementById('sm-ser-v').classList.add('smh');
+      document.getElementById('sm-my-v').classList.add('smh');
     } else if(id==='play-view'){
       _showBar(false);
       try{
