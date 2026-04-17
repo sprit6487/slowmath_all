@@ -1563,6 +1563,7 @@ window._smTab=function(tab){
     document.getElementById('sm-my-v').classList.toggle('smh',tab!=='my');
     if(tab==='records') _rCal();
     if(tab==='my') _rMy();
+    if(tab==='series'){try{window.scrollTo(0,0);}catch(e){}}
   }
 };
 
