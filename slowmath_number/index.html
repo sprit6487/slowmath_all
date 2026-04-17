@@ -1,10 +1,1446 @@
-<!DOCTYPE html><html lang="ko" class="noto_sans_kr_574d85dd-module__9QXMvW__variable"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" href="/slowmath_all/slowmath_number/_next/static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2" as="font" crossorigin="" type="font/woff2"/><link rel="stylesheet" href="/slowmath_all/slowmath_number/_next/static/chunks/0ss1opdg-2h4e.css" data-precedence="next"/><link rel="stylesheet" href="/slowmath_all/slowmath_number/_next/static/chunks/0sca-lw5~0na7.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/slowmath_all/slowmath_number/_next/static/chunks/0ht900cau6_ur.js"/><script src="/slowmath_all/slowmath_number/_next/static/chunks/01kdz5y--m.-q.js" async=""></script><script src="/slowmath_all/slowmath_number/_next/static/chunks/0mstyq17cbf8-.js" async=""></script><script src="/slowmath_all/slowmath_number/_next/static/chunks/turbopack-0j574xpe08vs0.js" async=""></script><script src="/slowmath_all/slowmath_number/_next/static/chunks/0dbhjjzl8qfwv.js" async=""></script><script src="/slowmath_all/slowmath_number/_next/static/chunks/0dlrtjka4h9no.js" async=""></script><meta name="next-size-adjust" content=""/><title>느린아이 숫자 익히기</title><meta name="description" content="숫자를 순서대로 배워보세요"/><link rel="icon" href="/slowmath_all/slowmath_number/favicon.ico?favicon.0x3dzn~oxb6tn.ico" sizes="256x256" type="image/x-icon"/><script src="/slowmath_all/slowmath_number/_next/static/chunks/03~yq9q893hmn.js" noModule=""></script></head><body><div hidden=""><!--$--><!--/$--></div><div class="splash-overlay"><div class="splash-logo"><svg viewBox="0 0 120 100" width="140" height="117" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"></ellipse><ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"></ellipse><ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"></ellipse><path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"></path><ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"></ellipse><ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"></ellipse><path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"></path><line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"></line><line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"></line><line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"></line><line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"></line><ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"></ellipse><ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"></ellipse><ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"></ellipse><ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"></ellipse><circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"></circle><circle cx="100" cy="34" r="2.5" fill="#3A9B6A"></circle><circle cx="101" cy="33" r="1" fill="white"></circle><circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"></circle><path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"></path></svg></div><h1 class="splash-title"><span style="color:#6BADE8">느린</span><span style="color:#F0A050">아이</span> <span style="color:#4A4035">숫자 익히기</span></h1><p class="splash-subtitle">숫자를 순서대로 배워보세요</p></div><div class="app"><div class="flex flex-col flex-1 relative"><div class="text-center pt-2 pb-3"><div class="inline-block mb-2"><svg viewBox="0 0 120 100" width="90" height="75" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"></ellipse><ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"></ellipse><ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"></ellipse><path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"></path><ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"></ellipse><ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"></ellipse><path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"></path><line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"></line><line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"></line><line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"></line><line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"></line><ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"></ellipse><ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"></ellipse><ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"></ellipse><ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"></ellipse><circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"></circle><circle cx="100" cy="34" r="2.5" fill="#3A9B6A"></circle><circle cx="101" cy="33" r="1" fill="white"></circle><circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"></circle><path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"></path></svg></div><h1 class="font-black tracking-tight" style="font-size:1.6rem"><span style="color:#6BADE8">느린</span><span style="color:#F0A050">아이</span> <span style="color:#4A4035">숫자 익히기</span></h1><p class="brand-sub">숫자를 순서대로 배워보세요.</p></div><div style="height:8px"></div><div class="flex flex-col gap-3 flex-1"><div class="game-section"><div class="game-section-header"><div class="icon-order"><div class="slot-box"><span class="num-fill">1</span></div><div class="slot-box"><span class="num-fill">2</span></div><div class="slot-box"><span class="num-fill">3</span></div></div><span class="game-section-title">숫자 순서 맞추기</span><span class="game-section-desc">끌어서 빈칸 채우기</span></div><div class="settings-group"><div class="settings-row"><span class="settings-label">읽기</span><div class="settings-options"><button class="counting-mode-btn selected">일, 이, 삼</button><button class="counting-mode-btn">하나, 둘, 셋</button></div></div><div class="settings-row"><span class="settings-label">순서</span><div class="settings-options"><button class="counting-mode-btn selected">1, 2, 3 정방향</button><button class="counting-mode-btn">10, 9, 8 역방향</button></div></div><div class="settings-row"><span class="settings-label">빈칸</span><div class="settings-options"><button class="counting-mode-btn selected">힌트 숨김</button><button class="counting-mode-btn">힌트 보임</button></div></div></div><div class="grid grid-cols-3 gap-2"><button data-range="5" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 <!-- -->5</p><p class="text-xs mt-0.5" style="color:#B8AD9E">반 줄</p></button><button data-range="10" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 <!-- -->10</p><p class="text-xs mt-0.5" style="color:#B8AD9E">한 줄</p></button><button data-range="20" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 <!-- -->20</p><p class="text-xs mt-0.5" style="color:#B8AD9E">두 줄</p></button><button data-range="30" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 <!-- -->30</p><p class="text-xs mt-0.5" style="color:#B8AD9E">세 줄</p></button><button data-range="50" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 <!-- -->50</p><p class="text-xs mt-0.5" style="color:#B8AD9E">다섯 줄</p></button><button data-range="100" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">51 부터 100</p><p class="text-xs mt-0.5" style="color:#B8AD9E">다섯 줄</p></button></div></div><div class="game-section"><div class="game-section-header"><div class="icon-blank"><div class="ib-card ib-fixed">1</div><div class="ib-card ib-empty"><span class="ib-q">?</span><span class="ib-ans">2</span></div><div class="ib-card ib-fixed">3</div></div><span class="game-section-title">부분 빈칸 채우기</span><span class="game-section-desc">숨은 숫자를 찾아요</span></div><div class="grid grid-cols-3 gap-2"><button data-range="5" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 <!-- -->5</p><p class="text-xs mt-0.5" style="color:#B8AD9E;white-space:pre-line">5개 중
-2개 숨김</p></button><button data-range="10" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 <!-- -->10</p><p class="text-xs mt-0.5" style="color:#B8AD9E;white-space:pre-line">8개 중
-4개 숨김</p></button><button data-range="20" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 <!-- -->20</p><p class="text-xs mt-0.5" style="color:#B8AD9E;white-space:pre-line">8개 중
-4개 숨김</p></button><button data-range="30" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 <!-- -->30</p><p class="text-xs mt-0.5" style="color:#B8AD9E;white-space:pre-line">8개 중
-4개 숨김</p></button><button data-range="50" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 <!-- -->50</p><p class="text-xs mt-0.5" style="color:#B8AD9E;white-space:pre-line">8개 중
-4개 숨김</p></button><button data-range="100" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 <!-- -->100</p><p class="text-xs mt-0.5" style="color:#B8AD9E;white-space:pre-line">8개 중
-4개 숨김</p></button></div></div><div class="game-section"><div class="game-section-header"><div class="icon-fill"><div class="fb fb-empty"><span class="fb-num">1</span></div><div class="fb fb-hint">2</div><div class="fb fb-empty"><span class="fb-num">3</span></div><div class="fb fb-empty"><span class="fb-num">4</span></div><div class="fb fb-hint">5</div></div><span class="game-section-title">전체 빈칸 채우기</span><span class="game-section-desc">힌트를 보고 나머지를 채워요</span></div><div class="grid grid-cols-3 gap-2"><button data-range="5" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 5</p><p class="text-xs mt-0.5" style="color:#B8AD9E">2개 힌트</p></button><button data-range="10" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 10</p><p class="text-xs mt-0.5" style="color:#B8AD9E">3개 힌트</p></button><button data-range="20" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 20</p><p class="text-xs mt-0.5" style="color:#B8AD9E">6개 힌트</p></button><button data-range="30" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 30</p><p class="text-xs mt-0.5" style="color:#B8AD9E">9개 힌트</p></button><button data-range="50" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">1 부터 50</p><p class="text-xs mt-0.5" style="color:#B8AD9E">15개 힌트</p></button><button data-range="100" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA;background:white"><p class="font-bold" style="color:#4A4035">51 부터 100</p><p class="text-xs mt-0.5" style="color:#B8AD9E">15개 힌트</p></button></div></div><div style="margin-top:auto"></div><div class="settings-section"><div class="setting-row"><div><div class="setting-label">음성</div><div class="setting-desc">정답/오답 음성 안내</div></div><button class="toggle-track on"><span class="toggle-knob"></span></button></div><div class="setting-row"><div><div class="setting-label">충동방지</div><div class="setting-desc">생각할 시간을 줘요</div></div><button class="toggle-track on"><span class="toggle-knob"></span></button></div><div class="impulse-details show" style="display:block"><div class="impulse-mode-options"><button class="impulse-mode-btn selected"><span class="impulse-mode-icon">👀</span><span class="impulse-mode-label">보기 확인</span><span class="impulse-mode-desc">버튼을 누르면 보기가 나타나요</span></button><button class="impulse-mode-btn"><span class="impulse-mode-icon">🔒</span><span class="impulse-mode-label">선택 잠금</span><span class="impulse-mode-desc">N초 동안 선택할 수 없어요</span></button></div><div class="imp-sec-row"><button class="imp-sec">1<!-- -->초</button><button class="imp-sec">2<!-- -->초</button><button class="imp-sec">3<!-- -->초</button><button class="imp-sec">4<!-- -->초</button><button class="imp-sec active">5<!-- -->초</button><button class="imp-sec">6<!-- -->초</button><button class="imp-sec">7<!-- -->초</button><button class="imp-sec">8<!-- -->초</button><button class="imp-sec">9<!-- -->초</button><button class="imp-sec">10<!-- -->초</button></div></div></div></div><div style="text-align:center;margin-top:24px"></div></div></div><div style="display:block;position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#3A7D44;color:white;padding:12px 20px;border-radius:14px;font-size:0.85rem;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.25);transition:opacity 0.4s;opacity:0;pointer-events:none;white-space:nowrap"></div><!--$--><!--/$--><script src="/slowmath_all/slowmath_number/_next/static/chunks/0ht900cau6_ur.js" id="_R_" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0])</script><script>self.__next_f.push([1,"1:\"$Sreact.fragment\"\n2:I[39756,[\"/slowmath_all/slowmath_number/_next/static/chunks/0dbhjjzl8qfwv.js\"],\"default\"]\n3:I[37457,[\"/slowmath_all/slowmath_number/_next/static/chunks/0dbhjjzl8qfwv.js\"],\"default\"]\n4:I[94859,[\"/slowmath_all/slowmath_number/_next/static/chunks/0dbhjjzl8qfwv.js\",\"/slowmath_all/slowmath_number/_next/static/chunks/0dlrtjka4h9no.js\"],\"default\"]\n5:I[97367,[\"/slowmath_all/slowmath_number/_next/static/chunks/0dbhjjzl8qfwv.js\"],\"OutletBoundary\"]\n6:\"$Sreact.suspense\"\n8:I[97367,[\"/slowmath_all/slowmath_number/_next/static/chunks/0dbhjjzl8qfwv.js\"],\"ViewportBoundary\"]\na:I[97367,[\"/slowmath_all/slowmath_number/_next/static/chunks/0dbhjjzl8qfwv.js\"],\"MetadataBoundary\"]\nc:I[68027,[\"/slowmath_all/slowmath_number/_next/static/chunks/0dbhjjzl8qfwv.js\"],\"default\",1]\n:HL[\"/slowmath_all/slowmath_number/_next/static/chunks/0ss1opdg-2h4e.css\",\"style\"]\n:HL[\"/slowmath_all/slowmath_number/_next/static/chunks/0sca-lw5~0na7.css\",\"style\"]\n:HL[\"/slowmath_all/slowmath_number/_next/static/media/fca78c2ee6cec166-s.p.0kizb7t94.kuf.woff2\",\"font\",{\"crossOrigin\":\"\",\"type\":\"font/woff2\"}]\n"])</script><script>self.__next_f.push([1,"0:{\"P\":null,\"c\":[\"\",\"\"],\"q\":\"\",\"i\":false,\"f\":[[[\"\",{\"children\":[\"__PAGE__\",{}]},\"$undefined\",\"$undefined\",16],[[\"$\",\"$1\",\"c\",{\"children\":[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/slowmath_all/slowmath_number/_next/static/chunks/0ss1opdg-2h4e.css\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}],[\"$\",\"link\",\"1\",{\"rel\":\"stylesheet\",\"href\":\"/slowmath_all/slowmath_number/_next/static/chunks/0sca-lw5~0na7.css\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}],[\"$\",\"script\",\"script-0\",{\"src\":\"/slowmath_all/slowmath_number/_next/static/chunks/0dbhjjzl8qfwv.js\",\"async\":true,\"nonce\":\"$undefined\"}]],[\"$\",\"html\",null,{\"lang\":\"ko\",\"className\":\"noto_sans_kr_574d85dd-module__9QXMvW__variable\",\"children\":[\"$\",\"body\",null,{\"children\":[\"$\",\"$L2\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L3\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"}],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}}],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":404}],[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"}]}]]}]}]],[]],\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\"}]}]}]]}],{\"children\":[[\"$\",\"$1\",\"c\",{\"children\":[[\"$\",\"$L4\",null,{}],[[\"$\",\"script\",\"script-0\",{\"src\":\"/slowmath_all/slowmath_number/_next/static/chunks/0dlrtjka4h9no.js\",\"async\":true,\"nonce\":\"$undefined\"}]],[\"$\",\"$L5\",null,{\"children\":[\"$\",\"$6\",null,{\"name\":\"Next.MetadataOutlet\",\"children\":\"$@7\"}]}]]}],{},null,false,null]},null,false,null],[\"$\",\"$1\",\"h\",{\"children\":[null,[\"$\",\"$L8\",null,{\"children\":\"$L9\"}],[\"$\",\"div\",null,{\"hidden\":true,\"children\":[\"$\",\"$La\",null,{\"children\":[\"$\",\"$6\",null,{\"name\":\"Next.Metadata\",\"children\":\"$Lb\"}]}]}],[\"$\",\"meta\",null,{\"name\":\"next-size-adjust\",\"content\":\"\"}]]}],false]],\"m\":\"$undefined\",\"G\":[\"$c\",[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/slowmath_all/slowmath_number/_next/static/chunks/0ss1opdg-2h4e.css\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}],[\"$\",\"link\",\"1\",{\"rel\":\"stylesheet\",\"href\":\"/slowmath_all/slowmath_number/_next/static/chunks/0sca-lw5~0na7.css\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}]]],\"S\":true,\"h\":null,\"s\":\"$undefined\",\"l\":\"$undefined\",\"p\":\"$undefined\",\"d\":\"$undefined\",\"b\":\"e9kms9xXxd8OZ5A9cBN1f\"}\n"])</script><script>self.__next_f.push([1,"9:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"}],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"}]]\n"])</script><script>self.__next_f.push([1,"d:I[27201,[\"/slowmath_all/slowmath_number/_next/static/chunks/0dbhjjzl8qfwv.js\"],\"IconMark\"]\n7:null\nb:[[\"$\",\"title\",\"0\",{\"children\":\"느린아이 숫자 익히기\"}],[\"$\",\"meta\",\"1\",{\"name\":\"description\",\"content\":\"숫자를 순서대로 배워보세요\"}],[\"$\",\"link\",\"2\",{\"rel\":\"icon\",\"href\":\"/slowmath_all/slowmath_number/favicon.ico?favicon.0x3dzn~oxb6tn.ico\",\"sizes\":\"256x256\",\"type\":\"image/x-icon\"}],[\"$\",\"$Ld\",\"3\",{}]]\n"])</script>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="숫자를 순서대로 배워보세요">
+<title>느린아이 숫자 익히기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ──────────────── 기본 ──────────────── */
+*, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin:0; padding:0; }
+html, body { min-height: 100dvh; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #F5F1EB;
+  min-height: 100dvh;
+  display: flex; justify-content: center; align-items: flex-start;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  color: #4A4035;
+}
+.hidden { display: none !important; }
+button { font-family: inherit; }
+
+/* ──────────────── 앱 컨테이너 ──────────────── */
+.app {
+  width: 100%; max-width: 600px;
+  min-height: 100dvh;
+  background: white;
+  padding: 24px 16px;
+  padding-top: max(24px, env(safe-area-inset-top));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; align-items: stretch;
+}
+
+/* ──────────────── 유틸리티 ──────────────── */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-1 { flex: 1; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-1 { gap: 4px; } .gap-2 { gap: 8px; } .gap-3 { gap: 12px; }
+.mb-1 { margin-bottom: 4px; } .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mb-4 { margin-bottom: 16px; } .mb-5 { margin-bottom: 20px; }
+.mt-2 { margin-top: 8px; } .mt-4 { margin-top: 16px; } .mt-6 { margin-top: 24px; }
+.pt-2 { padding-top: 8px; } .pb-3 { padding-bottom: 12px; }
+.p-3 { padding: 12px; }
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-xs { font-size: .75rem; }
+.text-sm { font-size: .875rem; }
+.text-base { font-size: 1rem; }
+.font-medium { font-weight: 500; }
+.font-bold { font-weight: 700; }
+.font-black { font-weight: 900; }
+.tracking-tight { letter-spacing: -0.025em; }
+.inline-block { display: inline-block; }
+.relative { position: relative; }
+.h-8 { height: 32px; }
+.grid { display: grid; }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.rounded-xl { border-radius: 12px; }
+.border-2 { border-width: 2px; border-style: solid; }
+
+/* ──────────────── 게임 섹션 ──────────────── */
+.game-section {
+  background: #FDFCFA;
+  border: 2px solid #F0ECE6;
+  border-radius: 20px;
+  padding: 14px;
+}
+.game-section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 0 2px; }
+.game-section-title { font-size: 0.9rem; font-weight: 700; color: #4A4035; }
+.game-section-desc { font-size: 0.7rem; color: #B8AD9E; }
+
+.settings-group { background: white; border: 2px solid #F0ECE6; border-radius: 12px; overflow: hidden; margin-bottom: 10px; }
+.settings-row { display: flex; align-items: center; padding: 0; }
+.settings-row + .settings-row { border-top: 1px solid #F0ECE6; }
+.settings-label { width: 36px; flex-shrink: 0; font-size: 0.68rem; font-weight: 700; color: #B8AD9E; text-align: center; padding: 8px 0; }
+.settings-options { display: flex; flex: 1; }
+.settings-options .counting-mode-btn { flex: 1; padding: 8px 0; text-align: center; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.15s; border: none; border-radius: 0; }
+.settings-options .counting-mode-btn + .counting-mode-btn { border-left: 1px solid #F0ECE6; }
+
+.mode-card { transition: transform 0.12s, box-shadow 0.12s; cursor: pointer; user-select: none; border-left: 3.5px solid transparent !important; background:white; color:#4A4035; }
+.mode-card:active { transform: scale(0.97); }
+.mode-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+.mode-card[data-range="5"]   { border-left-color: #5BC886 !important; }
+.mode-card[data-range="10"]  { border-left-color: #6BADE8 !important; }
+.mode-card[data-range="20"]  { border-left-color: #9B8FE8 !important; }
+.mode-card[data-range="30"]  { border-left-color: #F0A050 !important; }
+.mode-card[data-range="50"]  { border-left-color: #E87B7B !important; }
+.mode-card[data-range="100"] { border-left-color: #C46BE8 !important; }
+.mode-card p:first-child { font-size: 0.82rem !important; white-space: nowrap; font-weight: 700; color:#4A4035; }
+.mode-card p:last-child  { font-size: 0.75rem; color:#B8AD9E; margin-top:2px; }
+
+.btn-home { width: 36px; height: 36px; border-radius: 10px; border: 2px solid #E8E2DA; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s; font-size: 1rem; color: #8C8070; flex-shrink: 0; }
+.btn-home:active { background: #F5F1EB; }
+
+.progress-track { height: 8px; border-radius: 99px; background: #F0ECE6; overflow: hidden; }
+.progress-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #6BADE8, #5BC886); transition: width 0.5s ease; width: 0%; }
+
+/* ──────────────── 게임 뷰(숫자 순서/채우기) ──────────────── */
+.slots-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; width: 100%; }
+.slot {
+  aspect-ratio: 1; width: 100%;
+  border: 2.5px dashed #D0C8BC; border-radius: 12px;
+  background: #FDFCFA;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; font-weight: 800; color: #D0C8BC;
+  transition: all 0.2s; position: relative;
+}
+.slot .ghost-num { color: #E0D8CC; font-weight: 800; font-size: inherit; user-select: none; pointer-events: none; }
+.slot.drag-over { border-color: #6BADE8; border-style: solid; background: #EEF6FD; transform: scale(1.08); }
+.slot.filled { border: 2.5px solid #5BC886; background: #D4F5E0; color: #1A7A3A; cursor: default; }
+.slot.hint { background: #E8F5E9; color: #388E3C; border: 2.5px solid #5BC886; font-size: 1.25rem; }
+.slot.wrong { border-color: #F07070; background: #FDE8E8; animation: shake 0.4s ease; }
+
+.scatter-area { position: relative; width: 100%; min-height: 220px; }
+.num-chip {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 2px solid #E8E2DA; background: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; font-weight: 800; color: #4A4035;
+  cursor: grab; touch-action: none; user-select: none;
+  position: absolute; transition: transform 0.1s, box-shadow 0.1s, opacity 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.num-chip:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+.num-chip:active { cursor: grabbing; }
+.num-chip.dragging { opacity: 0.3; }
+.num-chip.placed { opacity: 0; pointer-events: none; transform: scale(0.5); }
+
+.floating-num {
+  position: fixed; z-index: 9999; pointer-events: none;
+  width: 42px; height: 42px; border-radius: 12px;
+  background: #4A4035; color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.98rem; font-weight: 900;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); } 40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); } 80% { transform: translateX(4px); }
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.3s ease-out; }
+@keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
+.pop-in { animation: pop 0.35s ease-out; }
+
+/* ──────────────── Quiz 뷰 ──────────────── */
+#quiz-cards { display: grid !important; grid-template-columns: repeat(5, 1fr); gap: 8px; justify-items: center; }
+#quiz-cards.quiz-cards-8 { grid-template-columns: repeat(8, 1fr); gap: 4px; }
+.quiz-card { width: 100%; max-width: 72px; aspect-ratio: 1; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; user-select: none; transition: all 0.2s; }
+.quiz-cards-8 .quiz-card { max-width: none; font-size: 1rem; border-radius: 12px; }
+.quiz-card.open { border: 2.5px solid #6BADE8; background: #EEF6FD; color: #6BADE8; }
+.quiz-card.hidden-card { border: 2.5px dashed #D0C8BC; background: #FDFCFA; color: #D0C8BC; font-size: 1.2rem; }
+.quiz-card.hidden-card.drag-over { border-color: #6BADE8; border-style: solid; background: #D9EDFC; transform: scale(1.08); }
+.quiz-card.hidden-card.filled { border: 2.5px solid #5BC886; background: #D4F5E0; color: #1A7A3A; }
+.quiz-card.hidden-card.wrong { border-color: #F07070; background: #FDE8E8; animation: shake 0.4s ease; }
+.quiz-chip { width: 56px; height: 56px; border-radius: 50%; border: 2.5px solid #E8E2DA; background: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: #4A4035; cursor: grab; touch-action: none; user-select: none; transition: transform 0.1s, box-shadow 0.1s, opacity 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.quiz-chip:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+.quiz-chip:active { cursor: grabbing; }
+.quiz-chip.dragging { opacity: 0.3; }
+.quiz-chip.placed { opacity: 0; pointer-events: none; transform: scale(0.5); }
+
+/* ──────────────── 충동방지 UI ──────────────── */
+.chips-hidden { visibility: hidden; }
+.chips-locked { pointer-events: none; opacity: 0.45; }
+.reveal-btn { display: block; width: 100%; max-width: 320px; margin: 0 auto 12px; padding: 14px 0; border-radius: 14px; border: 2px solid #C4AA82; background: #FAF5EE; color: #7B6545; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all .15s; text-align: center; }
+.reveal-btn:active { background: #F0E6D6; transform: scale(.98); }
+.delay-countdown { text-align: center; font-size: 1.5rem; font-weight: 900; color: #C4AA82; padding: 16px 0; animation: pulse-count 1s ease infinite; }
+@keyframes pulse-count { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.7; } }
+
+/* ──────────────── 홈 섹션 아이콘 애니메이션 ──────────────── */
+.icon-order { width: 72px; height: 36px; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.icon-order .slot-box { width: 20px; height: 28px; border-radius: 5px; border: 2px dashed #D0C8BC; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; color: white; position: relative; overflow: hidden; }
+.icon-order .slot-box .num-fill { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
+.icon-order .slot-box:nth-child(1) .num-fill { background: #5BC886; animation: orderFill1 3.5s ease infinite; }
+.icon-order .slot-box:nth-child(2) .num-fill { background: #5BC886; animation: orderFill2 3.5s ease infinite; }
+.icon-order .slot-box:nth-child(3) .num-fill { background: #5BC886; animation: orderFill3 3.5s ease infinite; }
+@keyframes orderFill1 { 0%, 10% { opacity: 0; transform: translateY(12px); } 20%, 65% { opacity: 1; transform: translateY(0); } 78%, 100% { opacity: 0; transform: translateY(0); } }
+@keyframes orderFill2 { 0%, 25% { opacity: 0; transform: translateY(12px); } 35%, 65% { opacity: 1; transform: translateY(0); } 78%, 100% { opacity: 0; transform: translateY(0); } }
+@keyframes orderFill3 { 0%, 40% { opacity: 0; transform: translateY(12px); } 50%, 65% { opacity: 1; transform: translateY(0); } 78%, 100% { opacity: 0; transform: translateY(0); } }
+
+.icon-blank { width: 72px; height: 36px; display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; overflow: visible; }
+.icon-blank .ib-card { width: 20px; height: 28px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; }
+.icon-blank .ib-card.ib-fixed { background: #EEF6FD; border: 2px solid #6BADE8; color: #6BADE8; }
+.icon-blank .ib-card.ib-empty { border: 2px dashed #D0C8BC; color: #D0C8BC; position: relative; overflow: hidden; }
+.icon-blank .ib-card.ib-empty .ib-q { position: absolute; animation: ibReveal 2.5s ease infinite; }
+.icon-blank .ib-card.ib-empty .ib-ans { position: absolute; inset: 0; background: #D4F5E0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; color: #1A7A3A; animation: ibFill 2.5s ease infinite; }
+@keyframes ibReveal { 0%, 40% { opacity: 1; } 50%, 90% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes ibFill { 0%, 40% { opacity: 0; } 50%, 85% { opacity: 1; } 90%, 100% { opacity: 0; } }
+
+.icon-fill { width: 72px; height: 36px; display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; }
+.icon-fill .fb { width: 13px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 900; flex-shrink: 0; position: relative; overflow: hidden; }
+.icon-fill .fb.fb-hint { background: #FFF3E0; border: 1.5px solid #FFB74D; color: #E65100; }
+.icon-fill .fb.fb-empty { border: 1.5px dashed #D0C8BC; }
+.icon-fill .fb.fb-empty .fb-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #E8F5E9; border-radius: 3px; font-size: 10px; font-weight: 900; color: #388E3C; }
+.icon-fill .fb:nth-child(1) .fb-num { animation: fillDrop 3s ease infinite; }
+.icon-fill .fb:nth-child(3) .fb-num { animation: fillDrop 3s ease 0.5s infinite; }
+.icon-fill .fb:nth-child(4) .fb-num { animation: fillDrop 3s ease 1s infinite; }
+@keyframes fillDrop { 0%, 15% { opacity: 0; transform: translateY(-10px) scale(0.7); } 25%, 65% { opacity: 1; transform: translateY(0) scale(1); } 78%, 100% { opacity: 0; transform: translateY(0) scale(1); } }
+
+/* ──────────────── 로그인 뷰 ──────────────── */
+.login-view { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; min-height: 100dvh; padding: 40px 20px; }
+.login-logo-area { text-align: center; margin-bottom: 48px; }
+.login-logo-area svg { display: block; margin: 0 auto; }
+.login-logo-area h1 { font-size: clamp(1.8rem, 6vw, 2.25rem); font-weight: 900; letter-spacing: -0.025em; margin-top: 8px; white-space: nowrap; }
+.login-subtitle { color: #B8AD9E; font-size: 0.9375rem; margin-top: 4px; }
+
+@keyframes floatBubble { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.login-trial { position: relative; background: #FFF8F0; border: 1.5px solid #EDD080; border-radius: 14px; padding: 9px 16px; font-size: 0.78rem; color: #7B6545; font-weight: 600; text-align: center; margin-bottom: 24px; line-height: 1.4; box-shadow: 0 4px 14px rgba(220,160,50,.18); animation: floatBubble 2.8s ease-in-out infinite; align-self: center; }
+.login-trial::before { content: ''; position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top: 8px solid #EDD080; border-bottom: 0; }
+.login-trial::after  { content: ''; position: absolute; bottom: -7px; left: 50%; transform: translateX(-50%); border: 4px solid transparent; border-top: 7px solid #FFF8F0; border-bottom: 0; z-index: 1; }
+
+.login-buttons { width: 100%; max-width: 300px; display: flex; flex-direction: column; gap: 12px; }
+.login-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px 20px; border-radius: 14px; font-size: 1rem; font-weight: 700; font-family: inherit; line-height: 1.2; border: none; cursor: pointer; transition: transform 0.1s; }
+.login-btn:active { transform: scale(0.97); }
+.login-btn svg { flex-shrink: 0; }
+.login-btn.kakao { background: #FEE500; color: #191919; }
+.login-btn.google { background: #FFFFFF; color: #444444; border: 1.5px solid #DADCE0; }
+
+/* ──────────────── 로그아웃 버튼 ──────────────── */
+.logout-btn { background: none; border: 1.5px solid #E8E2DA; border-radius: 8px; padding: 6px 14px; font-size: 0.75rem; font-weight: 600; color: #B8AD9E; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+.logout-btn:hover { background: #F5F1EB; }
+
+/* ──────────────── 설정 섹션 ──────────────── */
+.settings-section { width: 100%; margin-top: 16px; padding-top: 16px; border-top: 1.5px solid #F0ECE6; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.setting-label { font-size: 0.875rem; font-weight: 600; color: #4A4035; }
+.setting-desc { font-size: 0.75rem; color: #B8AD9E; margin-top: 2px; }
+.toggle-track { width: 48px; height: 28px; border-radius: 99px; position: relative; background: #E0DAD0; transition: background 0.2s; cursor: pointer; flex-shrink: 0; border: none; outline: none; }
+.toggle-track.on { background: #5BC886; }
+.toggle-knob { width: 22px; height: 22px; border-radius: 50%; background: white; position: absolute; top: 3px; left: 3px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); transition: transform 0.2s; display: block; }
+.toggle-track.on .toggle-knob { transform: translateX(20px); }
+
+.impulse-details { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.3s, opacity 0.3s, margin 0.3s; margin-top: 0; }
+.impulse-details.show { max-height: 240px; opacity: 1; margin-top: 9px; display: block; }
+.impulse-mode-options { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 9px; }
+.impulse-mode-btn { display: flex; flex-direction: column; align-items: center; padding: 9px 7px; border-radius: 13px; border: 2px solid #E8E2DA; background: white; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+.impulse-mode-btn.selected { border-color: #C4AA82; background: #FAF5EE; }
+.impulse-mode-icon { font-size: 1.08rem; margin-bottom: 2px; }
+.impulse-mode-label { font-size: 0.72rem; font-weight: 700; color: #4A4035; }
+.impulse-mode-desc { font-size: 0.59rem; color: #B8AD9E; margin-top: 1px; }
+
+.imp-sec-row { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+.imp-sec { flex: 0 0 calc((100% - 16px) / 5); padding: 8px 0; font-size: 0.7rem; font-weight: 600; border-radius: 10px; border: 2px solid #E8E2DA; background: white; color: #8C8070; cursor: pointer; transition: all 0.15s; text-align: center; font-family: inherit; }
+.imp-sec.active { border-color: #C4AA82; background: #FAF5EE; color: #7B6545; }
+
+.counting-mode-btn { background: white; color: #8C8070; border: none; font-family: inherit; }
+.counting-mode-btn.selected { background: #FAF5EE; color: #7B6545; }
+
+/* ──────────────── 오답노트 ──────────────── */
+.wrong-notes-btn { width: 100%; padding: 14px 0; border-radius: 14px; border: 2.5px solid #F07070; background: #FFF5F5; color: #F07070; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; transition: transform .1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.wrong-notes-btn:active { transform: scale(.97); }
+.wrong-notes-btn .badge { background: #F07070; color: white; border-radius: 50%; min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; }
+
+.wn-view { display: none; flex-direction: column; align-items: center; padding: 24px 20px; flex: 1; }
+.wn-view.active { display: flex; }
+.wn-header { text-align: center; margin-bottom: 20px; }
+.wn-header h2 { font-size: 1.25rem; font-weight: 900; color: #4A4035; margin: 0 0 4px; }
+.wn-header p { font-size: .85rem; color: #B8AD9E; margin: 0; }
+.wn-list { width: 100%; max-width: 400px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
+.wn-chip { padding: 8px 16px; border-radius: 10px; background: #FFF5F5; border: 1.5px solid #F07070; font-size: .9rem; font-weight: 700; color: #F07070; }
+.wn-empty { color: #B8AD9E; font-size: .9rem; margin: 40px 0; }
+.wn-actions { display: flex; gap: 10px; width: 100%; max-width: 320px; }
+.wn-actions button { flex: 1; padding: 13px 0; border-radius: 12px; font-family: inherit; font-size: .9rem; font-weight: 700; cursor: pointer; transition: transform .1s; }
+.wn-actions button:active { transform: scale(.97); }
+.wn-btn-back { border: 2.5px solid #E8E2DA; background: white; color: #8C8070; }
+.wn-btn-start { border: none; background: #F07070; color: white; box-shadow: 0 2px 8px rgba(240,112,112,.3); }
+.wn-btn-clear { border: 1.5px solid #E8E2DA; background: white; color: #B8AD9E; padding: 8px 16px; border-radius: 8px; font-size: .75rem; font-weight: 600; cursor: pointer; margin-top: 12px; font-family: inherit; }
+
+/* ──────────────── 스플래시 ──────────────── */
+.splash-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #FFFFFF; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease-out; }
+.splash-overlay.fade-out { opacity: 0; pointer-events: none; }
+.splash-logo { animation: splashFloat 2.4s ease-in-out infinite; margin-bottom: 24px; }
+.splash-title { font-size: 2rem; font-weight: 900; letter-spacing: -0.025em; margin-bottom: 8px; }
+.splash-subtitle { color: #B8B0A8; font-size: 0.9375rem; font-weight: 500; }
+.brand-sub { font-size: .8rem; color: #B8AD9E; margin-top: 6px; margin-bottom: 0; font-weight: 500; }
+@keyframes splashFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+@media (max-width: 380px) { .splash-title { font-size: 1.5rem; } }
+@media (min-width: 768px) { .splash-logo svg { width: 160px; height: 134px; } .splash-title { font-size: 2.5rem; } .splash-subtitle { font-size: 1.0625rem; } }
+
+/* ──────────────── 다음 문제 / 완료 뷰 ──────────────── */
+.btn-next-q { display: block; width: 100%; max-width: 360px; margin: 12px auto 0; padding: 14px 0; border-radius: 16px; border: none; background: #4A4035; color: white; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; box-shadow: 0 2px 8px rgba(74,64,53,0.15); }
+.btn-next-q:active { transform: scale(0.98); background: #2E261D; }
+.complete-overlay { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 40px 0; }
+.complete-emoji { font-size: 56px; }
+.complete-msg { font-size: 1.25rem; font-weight: 900; color: #4A4035; }
+.complete-sub { font-size: 0.85rem; color: #B8AD9E; }
+.next-btn { margin-top: 8px; padding: 14px 36px; border: none; border-radius: 12px; background: #6BADE8; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform 0.12s; }
+.next-btn:active { transform: scale(0.96); }
+
+/* ──────────────── 공유하기 ──────────────── */
+.share-bubble { position: absolute; right: 0; background: #FFF8F0; border: 1.5px solid #EDD080; border-radius: 12px; padding: 8px 12px; font-size: 0.55rem; color: #7B6545; font-weight: 600; box-shadow: 0 4px 12px rgba(220,160,50,.18); z-index: 20; animation: floatBubble 2.8s ease-in-out infinite; line-height: 1.5; text-align: right; max-width: 200px; }
+.share-bubble::before { content: ''; position: absolute; top: -8px; right: 10px; border: 4px solid transparent; border-bottom: 7px solid #EDD080; border-top: 0; }
+.share-bubble::after  { content: ''; position: absolute; top: -6px; right: 11px; border: 3px solid transparent; border-bottom: 6px solid #FFF8F0; border-top: 0; z-index: 1; }
+@media (max-width: 768px) { .share-bubble { font-size: 0.60rem; max-width: 170px; padding: 7px 10px; } }
+@media (max-width: 480px) { .share-bubble { font-size: 0.62rem; max-width: 165px; padding: 7px 9px; } }
+body:not(.sm-loggedin) [title="공유하기"], body:not(.sm-loggedin) .share-bubble { display: none !important; }
+
+@keyframes _smPop { from { opacity: 0; transform: scale(.88); } to { opacity: 1; transform: scale(1); } }
+
+/* ──────────────── 반응형 ──────────────── */
+@media (max-width: 420px) { .slot { border-radius: 8px; font-size: 0.85rem; border-width: 2px; } .slots-grid { gap: 3px; } .num-chip { width: 30px; height: 30px; font-size: 0.7rem; } }
+@media (max-width: 374px) { .app { padding: 16px 10px; } .slot { font-size: 0.75rem; } .num-chip { width: 29px; height: 29px; font-size: 0.65rem; } .quiz-card { max-width: 56px; font-size: 1.15rem; border-radius: 12px; } .quiz-cards-8 .quiz-card { max-width: none; font-size: 0.8rem; border-radius: 8px; } .quiz-chip { width: 48px; height: 48px; font-size: 1.05rem; } .floating-num { width: 36px; height: 36px; font-size: 0.78rem; } }
+@media (min-width: 768px) {
+  body { align-items: center; padding: 32px; }
+  .app { max-width: 720px; min-height: auto; border-radius: 32px; box-shadow: 0 8px 48px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04); padding: 40px 36px; }
+  .game-section { padding: 20px; border-radius: 22px; }
+  .game-section-title { font-size: 1.15rem; }
+  .settings-group { border-radius: 14px; }
+  .settings-label { width: 44px; font-size: 0.75rem; }
+  .settings-options .counting-mode-btn { font-size: 0.82rem; padding: 10px 0; }
+  .btn-home { width: 44px; height: 44px; border-radius: 12px; }
+  .btn-home svg { width: 22px; height: 22px; }
+  .progress-track { height: 10px; }
+  .mode-card { padding: 20px !important; }
+  .mode-card p:first-child { font-size: 1.05rem !important; }
+  .mode-card p:last-child { font-size: 0.8rem !important; }
+  .slots-grid { gap: 6px; }
+  .slot { border-radius: 14px; font-size: 1.3rem; border-width: 3px; }
+  .num-chip { width: 42px; height: 42px; font-size: 0.91rem; }
+  .floating-num { width: 47px; height: 47px; font-size: 1.04rem; border-radius: 12px; }
+  .quiz-card { max-width: 80px; font-size: 1.7rem; border-radius: 18px; }
+  .quiz-cards-8 .quiz-card { max-width: none; font-size: 1.2rem; border-radius: 14px; }
+  .quiz-chip { width: 68px; height: 68px; font-size: 1.4rem; }
+  #quiz-chips { gap: 16px !important; }
+  .impulse-toggle { padding: 16px 20px; border-radius: 20px; }
+  .delay-btn { min-width: 44px; height: 36px; font-size: 0.85rem; }
+  .delay-countdown { font-size: 1.8rem; }
+}
+@media (min-width: 1024px) { .app { max-width: 800px; padding: 48px 44px; } .mode-card p:first-child { font-size: 1.2rem !important; } .slot { font-size: 1.4rem; } .num-chip { width: 47px; height: 47px; font-size: 0.98rem; } .quiz-card { max-width: 90px; font-size: 1.9rem; } .quiz-cards-8 .quiz-card { max-width: none; font-size: 1.35rem; } .quiz-chip { width: 76px; height: 76px; font-size: 1.55rem; } }
+</style>
+</head>
+<body>
+
+<!-- ══════ Splash Overlay ══════ -->
+<div id="splash" class="splash-overlay">
+  <div class="splash-logo">
+    <svg viewBox="0 0 120 100" width="140" height="117" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+      <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+      <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+      <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+      <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+      <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+      <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+      <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+      <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+      <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+      <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+      <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+      <circle cx="101" cy="33" r="1" fill="white"/>
+      <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+      <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <h1 class="splash-title"><span style="color:#6BADE8">느린</span><span style="color:#F0A050">아이</span> <span style="color:#4A4035">숫자 익히기</span></h1>
+  <p class="splash-subtitle">숫자를 순서대로 배워보세요</p>
+</div>
+
+<div class="app">
+
+  <!-- ══════ Login View ══════ -->
+  <div id="login-view" class="login-view hidden">
+    <div class="login-logo-area">
+      <svg viewBox="0 0 120 100" width="120" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+        <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+        <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+        <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+        <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+        <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+        <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+        <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+        <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+        <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+        <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+        <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+        <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+        <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+        <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+        <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+        <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+        <circle cx="101" cy="33" r="1" fill="white"/>
+        <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+        <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <h1><span style="color:#6BADE8">느린</span><span style="color:#F0A050">아이</span> <span style="color:#4A4035">숫자 익히기</span></h1>
+      <p class="login-subtitle">숫자를 순서대로 배워보세요</p>
+    </div>
+    <p class="login-trial">가입하시고 하루 동안 모든 기능을<br>무료로 체험해보세요</p>
+    <div class="login-buttons">
+      <button class="login-btn kakao" onclick="socialLogin('kakao')">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 1C4.477 1 0 4.477 0 8.667c0 2.7 1.753 5.072 4.393 6.413-.192.717-.694 2.6-.794 3.004-.124.497.182.49.383.356.158-.105 2.51-1.708 3.525-2.398.8.118 1.628.18 2.493.18 5.523 0 10-3.477 10-7.555C20 4.477 15.523 1 10 1z" fill="#191919"/></svg>
+        카카오로 시작하기
+      </button>
+      <button class="login-btn google" onclick="socialLogin('google')">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" fill="#FFC107"/><path d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" fill="#FF3D00"/><path d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" fill="#4CAF50"/><path d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.001-.001 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" fill="#1976D2"/></svg>
+        Google로 시작하기
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════ Start View ══════ -->
+  <div id="start-view" class="flex flex-col flex-1 relative">
+
+    <!-- Share button (top-right) -->
+    <button id="share-btn" onclick="shareApp()" title="공유하기" style="position:absolute;top:0;right:0;background:white;border:2px solid #E8E2DA;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8C8070;z-index:10;">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+    </button>
+    <div id="share-bubble" class="share-bubble" style="top:44px">지금 지인에게 공유하시면<br>하루 무료 이용권을 드려요</div>
+
+    <!-- Header -->
+    <div class="text-center pt-2 pb-3">
+      <div class="inline-block mb-2">
+        <svg viewBox="0 0 120 100" width="90" height="75" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/>
+          <ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/>
+          <ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/>
+          <path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>
+          <ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/>
+          <path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+          <line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+          <line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+          <line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+          <line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/>
+          <ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/>
+          <ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/>
+          <ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/>
+          <ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/>
+          <circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/>
+          <circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/>
+          <circle cx="101" cy="33" r="1" fill="white"/>
+          <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
+          <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1 class="font-black tracking-tight" style="font-size:1.6rem"><span style="color:#6BADE8">느린</span><span style="color:#F0A050">아이</span> <span style="color:#4A4035">숫자 익히기</span></h1>
+      <p class="brand-sub">숫자를 순서대로 배워보세요.</p>
+    </div>
+
+    <div style="height:8px"></div>
+
+    <div class="flex flex-col gap-3 flex-1">
+
+      <!-- Section 1: 숫자 순서 맞추기 -->
+      <div class="game-section">
+        <div class="game-section-header">
+          <div class="icon-order">
+            <div class="slot-box"><span class="num-fill">1</span></div>
+            <div class="slot-box"><span class="num-fill">2</span></div>
+            <div class="slot-box"><span class="num-fill">3</span></div>
+          </div>
+          <span class="game-section-title">숫자 순서 맞추기</span>
+          <span class="game-section-desc">끌어서 빈칸 채우기</span>
+        </div>
+        <div class="settings-group">
+          <div class="settings-row">
+            <span class="settings-label">읽기</span>
+            <div class="settings-options">
+              <button class="counting-mode-btn" data-setting="countingMode" data-value="sino">일, 이, 삼</button>
+              <button class="counting-mode-btn" data-setting="countingMode" data-value="native">하나, 둘, 셋</button>
+            </div>
+          </div>
+          <div class="settings-row">
+            <span class="settings-label">순서</span>
+            <div class="settings-options">
+              <button class="counting-mode-btn" data-setting="reverseMode" data-value="false">1, 2, 3 정방향</button>
+              <button class="counting-mode-btn" data-setting="reverseMode" data-value="true">10, 9, 8 역방향</button>
+            </div>
+          </div>
+          <div class="settings-row">
+            <span class="settings-label">빈칸</span>
+            <div class="settings-options">
+              <button class="counting-mode-btn" data-setting="ghostMode" data-value="false">힌트 숨김</button>
+              <button class="counting-mode-btn" data-setting="ghostMode" data-value="true">힌트 보임</button>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <button data-range="5"   class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startGame(5,1)"><p>1 부터 5</p><p>반 줄</p></button>
+          <button data-range="10"  class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startGame(10,1)"><p>1 부터 10</p><p>한 줄</p></button>
+          <button data-range="20"  class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startGame(20,1)"><p>1 부터 20</p><p>두 줄</p></button>
+          <button data-range="30"  class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startGame(30,1)"><p>1 부터 30</p><p>세 줄</p></button>
+          <button data-range="50"  class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startGame(50,1)"><p>1 부터 50</p><p>다섯 줄</p></button>
+          <button data-range="100" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startGame(100,51)"><p>51 부터 100</p><p>다섯 줄</p></button>
+        </div>
+      </div>
+
+      <!-- Section 2: 부분 빈칸 채우기 -->
+      <div class="game-section">
+        <div class="game-section-header">
+          <div class="icon-blank">
+            <div class="ib-card ib-fixed">1</div>
+            <div class="ib-card ib-empty"><span class="ib-q">?</span><span class="ib-ans">2</span></div>
+            <div class="ib-card ib-fixed">3</div>
+          </div>
+          <span class="game-section-title">부분 빈칸 채우기</span>
+          <span class="game-section-desc">숨은 숫자를 찾아요</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <button data-range="5"   class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startQuiz(5)"><p>1 부터 5</p><p style="white-space:pre-line">5개 중&#10;2개 숨김</p></button>
+          <button data-range="10"  class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startQuiz(10)"><p>1 부터 10</p><p style="white-space:pre-line">8개 중&#10;4개 숨김</p></button>
+          <button data-range="20"  class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startQuiz(20)"><p>1 부터 20</p><p style="white-space:pre-line">8개 중&#10;4개 숨김</p></button>
+          <button data-range="30"  class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startQuiz(30)"><p>1 부터 30</p><p style="white-space:pre-line">8개 중&#10;4개 숨김</p></button>
+          <button data-range="50"  class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startQuiz(50)"><p>1 부터 50</p><p style="white-space:pre-line">8개 중&#10;4개 숨김</p></button>
+          <button data-range="100" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startQuiz(100)"><p>1 부터 100</p><p style="white-space:pre-line">8개 중&#10;4개 숨김</p></button>
+        </div>
+      </div>
+
+      <!-- Section 3: 전체 빈칸 채우기 -->
+      <div class="game-section">
+        <div class="game-section-header">
+          <div class="icon-fill">
+            <div class="fb fb-empty"><span class="fb-num">1</span></div>
+            <div class="fb fb-hint">2</div>
+            <div class="fb fb-empty"><span class="fb-num">3</span></div>
+            <div class="fb fb-empty"><span class="fb-num">4</span></div>
+            <div class="fb fb-hint">5</div>
+          </div>
+          <span class="game-section-title">전체 빈칸 채우기</span>
+          <span class="game-section-desc">힌트를 보고 나머지를 채워요</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <button data-range="5"   class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startFill(5,1)"><p>1 부터 5</p><p>2개 힌트</p></button>
+          <button data-range="10"  class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startFill(10,1)"><p>1 부터 10</p><p>3개 힌트</p></button>
+          <button data-range="20"  class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startFill(20,1)"><p>1 부터 20</p><p>6개 힌트</p></button>
+          <button data-range="30"  class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startFill(30,1)"><p>1 부터 30</p><p>9개 힌트</p></button>
+          <button data-range="50"  class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startFill(50,1)"><p>1 부터 50</p><p>15개 힌트</p></button>
+          <button data-range="100" class="mode-card rounded-xl p-3 text-left border-2" style="border-color:#E8E2DA" onclick="startFill(100,51)"><p>51 부터 100</p><p>15개 힌트</p></button>
+        </div>
+      </div>
+
+      <!-- 오답노트 -->
+      <button id="wn-btn" class="wrong-notes-btn hidden" onclick="showView('wn-view')">
+        오답노트 <span class="badge" id="wn-badge">0</span>
+      </button>
+
+      <div style="margin-top:auto"></div>
+
+      <!-- 설정 영역 -->
+      <div class="settings-section">
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">음성</div>
+            <div class="setting-desc">정답/오답 음성 안내</div>
+          </div>
+          <button id="tts-toggle" class="toggle-track on" onclick="toggleTTS()"><span class="toggle-knob"></span></button>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">충동방지</div>
+            <div class="setting-desc">생각할 시간을 줘요</div>
+          </div>
+          <button id="imp-toggle" class="toggle-track on" onclick="toggleImpulse()"><span class="toggle-knob"></span></button>
+        </div>
+        <div id="impulse-details" class="impulse-details show" style="display:block">
+          <div class="impulse-mode-options">
+            <button class="impulse-mode-btn" data-imp-mode="hide" onclick="setImpulseMode('hide')"><span class="impulse-mode-icon">👀</span><span class="impulse-mode-label">보기 확인</span><span class="impulse-mode-desc">버튼을 누르면 보기가 나타나요</span></button>
+            <button class="impulse-mode-btn" data-imp-mode="lock" onclick="setImpulseMode('lock')"><span class="impulse-mode-icon">🔒</span><span class="impulse-mode-label">선택 잠금</span><span class="impulse-mode-desc">N초 동안 선택할 수 없어요</span></button>
+          </div>
+          <div class="imp-sec-row" id="imp-sec-row"></div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:24px">
+        <button id="logout-btn" class="logout-btn hidden" onclick="socialLogout()">로그아웃</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ Play View (game / fill) ══════ -->
+  <div id="play-view" class="flex flex-col flex-1 hidden fade-in">
+    <div class="flex items-center gap-3 mb-4">
+      <button onclick="goHome()" class="btn-home" title="홈">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-8 9 8M5 11v9a1 1 0 001 1h3m8 0h3a1 1 0 001-1v-9"/></svg>
+      </button>
+      <div class="flex-1">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-xs font-medium" style="color:#B8AD9E" id="play-label">1 ~ 10</span>
+          <span class="text-xs font-medium" style="color:#B8AD9E"><span id="placed-count">0</span> / <span id="total-count">10</span></span>
+        </div>
+        <div class="progress-track"><div id="play-progress" class="progress-bar"></div></div>
+      </div>
+    </div>
+
+    <p id="play-hint" class="text-center text-sm mb-4 font-medium" style="color:#6BADE8"></p>
+
+    <div id="slots-grid" class="slots-grid mb-5"></div>
+
+    <div class="mb-2" style="border-top:1.5px solid #F0ECE6"></div>
+    <p class="text-center text-xs mb-2 mt-2" style="color:#D0C8BC">아래 숫자를 위 빈칸으로 끌어다 놓으세요</p>
+
+    <button id="reveal-btn" class="reveal-btn hidden" onclick="revealChips()">보기 확인</button>
+    <div id="countdown" class="delay-countdown hidden"></div>
+
+    <div id="scatter-area" class="scatter-area"></div>
+
+    <div id="play-feedback" class="text-center h-8 text-base font-bold mt-4" style="color:#4A4035"></div>
+  </div>
+
+  <!-- ══════ Quiz View ══════ -->
+  <div id="quiz-view" class="flex flex-col flex-1 hidden fade-in">
+    <div class="flex items-center gap-3 mb-4">
+      <button onclick="goHome()" class="btn-home" title="홈">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-8 9 8M5 11v9a1 1 0 001 1h3m8 0h3a1 1 0 001-1v-9"/></svg>
+      </button>
+      <div class="flex-1">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-xs font-medium" style="color:#B8AD9E" id="quiz-label">문제 1 / 5</span>
+          <span class="text-xs font-medium" style="color:#B8AD9E">맞힌 문제: <span id="quiz-correct" style="color:#5BC886">0</span></span>
+        </div>
+        <div class="progress-track"><div id="quiz-progress" class="progress-bar"></div></div>
+      </div>
+    </div>
+
+    <p id="quiz-hint" class="text-center text-sm mb-5 font-medium" style="color:#6BADE8">숨은 숫자를 찾아서 빈칸에 놓아봐요</p>
+
+    <div id="quiz-cards" style="margin-bottom:32px"></div>
+
+    <div class="mb-4" style="border-top:1.5px solid #F0ECE6"></div>
+    <p class="text-center text-xs mb-3" style="color:#D0C8BC">숨은 숫자를 끌어다 놓으세요</p>
+
+    <button id="quiz-reveal-btn" class="reveal-btn hidden" onclick="revealChips()">보기 확인</button>
+    <div id="quiz-countdown" class="delay-countdown hidden"></div>
+
+    <div id="quiz-chips" class="flex justify-center gap-3" style="flex-wrap:wrap"></div>
+
+    <div id="quiz-feedback" class="text-center h-8 text-base font-bold mt-6" style="color:#4A4035"></div>
+    <button id="quiz-next-btn" class="btn-next-q hidden" onclick="quizNext()">다음 문제 →</button>
+  </div>
+
+  <!-- ══════ Wrong Notes View ══════ -->
+  <div id="wn-view" class="wn-view">
+    <div class="wn-header">
+      <h2>오답노트</h2>
+      <p>자주 틀리는 숫자를 다시 연습해요</p>
+    </div>
+    <div class="wn-list" id="wn-list"></div>
+    <div class="wn-actions">
+      <button class="wn-btn-back" onclick="showView('start-view')">돌아가기</button>
+      <button id="wn-start-btn" class="wn-btn-start hidden" onclick="startWnPractice()">연습 시작</button>
+    </div>
+    <button id="wn-clear-btn" class="wn-btn-clear hidden" onclick="clearWrongNotes()">전체 삭제</button>
+  </div>
+
+  <!-- ══════ Result View ══════ -->
+  <div id="result-view" class="flex flex-col flex-1 hidden fade-in">
+    <div class="complete-overlay">
+      <div class="complete-emoji" id="result-emoji">🏆</div>
+      <div class="complete-msg" id="result-msg">완료!</div>
+      <div class="complete-sub" id="result-sub"></div>
+      <button class="next-btn" onclick="replay()">다시 하기</button>
+      <button class="next-btn" onclick="goHome()" style="background:#EDE8E0;color:#8C8070">홈으로</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Share toast -->
+<div id="share-toast" style="display:block;position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#3A7D44;color:white;padding:12px 20px;border-radius:14px;font-size:0.85rem;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.25);transition:opacity 0.4s;opacity:0;pointer-events:none;white-space:nowrap"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//                    느린아이 숫자 익히기
+// ══════════════════════════════════════════════════════════════
+
+const LOGIN_KEY = 'slowmath_number_login';
+const SETTINGS_KEY = 'slowmath_number_settings';
+const WN_KEY = 'slowmath_number_wrong_notes';
+const SHARE_KEY = 'slowmath_share_days';
+const FILL_HINTS = { 5:2, 10:3, 20:6, 30:9, 50:15, 100:15 };
+const QUIZ_TOTAL = 5;
+
+// ── State ─────────────────────────────────────
+let settings = {
+  ttsEnabled: true,
+  impulsePrevention: true,
+  impulseMode: 'hide',
+  impulseDelay: 5,
+  countingMode: 'sino',
+  reverseMode: false,
+  ghostMode: false
+};
+let currentView = 'start-view';
+let gameMode = null; // 'game' | 'fill' | 'quiz'
+let lastRange = 10, lastStart = 1;
+let startTime = 0;
+let placedCount = 0, wrongCount = 0, fillTotal = 0;
+let chips = [], slots = [];
+let chipPx = 36, scatterH = 220;
+let maxNum = 10, startNum = 1;
+
+// Quiz state
+let quizRound = 0, quizTotalRounds = QUIZ_TOTAL, quizCorrect = 0, quizWrong = 0;
+let quizCards = [], quizChips = [];
+let quizHiddenOrder = [];
+let quizPlacedInRound = 0;
+let quizFirstTry = true;
+let quizRange = 10;
+let quizStartTime = 0;
+let isWnPractice = false;
+let wnChunks = [], wnRoundIdx = 0;
+
+// Impulse UI
+let chipsHidden = false, chipsLocked = false;
+let impulseCountdown = null, impulseTimer = null;
+let lastGameCompleted = false;
+
+// Drag state
+let isDragging = false, dragValue = null, dragChipIndex = null, isDragQuiz = false;
+let floatingEl = null, currentChipPx = 36;
+
+// ── Helpers ─────────────────────────────────────
+function $(id) { return document.getElementById(id); }
+function shuffleArr(arr) { const a=[...arr]; for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function nativeKorean(n) {
+  if (n === 100) return '백';
+  const ones = ['', '하나','둘','셋','넷','다섯','여섯','일곱','여덟','아홉'];
+  const tens = ['', '열','스물','서른','마흔','쉰','예순','일흔','여든','아흔'];
+  return tens[Math.floor(n/10)] + ones[n%10];
+}
+function sinoKorean(n) {
+  if (n === 100) return '백';
+  const ones = ['','일','이','삼','사','오','육','칠','팔','구'];
+  if (n <= 0) return '';
+  const t = Math.floor(n/10), o = n%10;
+  let r = '';
+  if (t >= 2) r += ones[t];
+  if (t >= 1) r += '십';
+  r += ones[o];
+  return r;
+}
+function countingWord(n) { return settings.countingMode === 'native' ? nativeKorean(n) : sinoKorean(n); }
+function speak(text) {
+  if (!settings.ttsEnabled || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ko-KR'; u.rate = 0.9;
+  setTimeout(() => window.speechSynthesis.speak(u), 50);
+}
+
+// ── Settings persistence ─────────────────────
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+    Object.keys(settings).forEach(k => { if (s[k] !== undefined) settings[k] = s[k]; });
+  } catch(e) {}
+}
+function saveSettings() { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
+
+// ── Wrong notes ───────────────────────────────
+function getWrongNotes() {
+  try {
+    const d = JSON.parse(localStorage.getItem(WN_KEY) || '[]');
+    if (Array.isArray(d)) return d.map(x => typeof x === 'number' ? x : (x && x.number)).filter(x => typeof x === 'number');
+  } catch(e) {}
+  return [];
+}
+function saveWrongNotes(list) { localStorage.setItem(WN_KEY, JSON.stringify(list)); refreshWnUi(); }
+function addWrongNote(n) { const list = getWrongNotes(); if (!list.includes(n)) saveWrongNotes([...list, n]); }
+function removeWrongNote(n) { saveWrongNotes(getWrongNotes().filter(x => x !== n)); }
+function clearWrongNotes() { if (confirm('오답노트를 전체 삭제할까요?')) { saveWrongNotes([]); showView('start-view'); } }
+function refreshWnUi() {
+  const list = getWrongNotes();
+  const btn = $('wn-btn'), badge = $('wn-badge');
+  if (list.length) { btn.classList.remove('hidden'); badge.textContent = list.length; }
+  else btn.classList.add('hidden');
+  const wnList = $('wn-list');
+  const wnStartBtn = $('wn-start-btn'), wnClearBtn = $('wn-clear-btn');
+  if (wnList) {
+    if (list.length === 0) {
+      wnList.innerHTML = '<div class="wn-empty">틀린 숫자가 없어요!</div>';
+      wnStartBtn.classList.add('hidden');
+      wnClearBtn.classList.add('hidden');
+    } else {
+      wnList.innerHTML = [...list].sort((a,b) => a-b).map(n => `<span class="wn-chip">${n}</span>`).join('');
+      wnStartBtn.classList.remove('hidden');
+      wnClearBtn.classList.remove('hidden');
+    }
+  }
+}
+
+// ── View management ───────────────────────────
+const VIEWS = ['login-view', 'start-view', 'play-view', 'quiz-view', 'wn-view', 'result-view'];
+function showView(id) {
+  currentView = id;
+  VIEWS.forEach(v => {
+    const el = $(v);
+    if (!el) return;
+    if (v === id) {
+      el.classList.remove('hidden');
+      if (v === 'wn-view') el.classList.add('active');
+      if (v === 'login-view') el.style.display = 'flex';
+    } else {
+      el.classList.add('hidden');
+      if (v === 'wn-view') el.classList.remove('active');
+      if (v === 'login-view') el.style.display = '';
+    }
+  });
+  refreshLogoutBtn();
+}
+function refreshLogoutBtn() {
+  const lb = $('logout-btn');
+  if (!lb) return;
+  const loggedIn = !!localStorage.getItem(LOGIN_KEY);
+  lb.style.display = (currentView === 'start-view' && loggedIn) ? '' : 'none';
+  if (loggedIn) lb.classList.remove('hidden');
+  else lb.classList.add('hidden');
+}
+
+// ── Login ────────────────────────────────────
+function socialLogin(provider) {
+  localStorage.setItem(LOGIN_KEY, JSON.stringify({ provider, loginTime: new Date().toISOString() }));
+  document.body.classList.add('sm-loggedin');
+  refreshLogoutBtn();
+  const sp = sessionStorage.getItem('_sp');
+  if (sp) {
+    sessionStorage.removeItem('_sp');
+    try {
+      const args = JSON.parse(sp);
+      if (args[0] === 'fill') { startFill(args[1], args[2]); return; }
+      if (args[0] === 'quiz') { startQuiz(args[1]); return; }
+      startGame(args[0], args[1] || 1);
+      return;
+    } catch(e) {}
+  }
+  showView('start-view');
+}
+function socialLogout() {
+  localStorage.removeItem(LOGIN_KEY);
+  document.body.classList.remove('sm-loggedin');
+  refreshLogoutBtn();
+  showView('start-view');
+}
+
+// ── Share ────────────────────────────────────
+function shareApp() {
+  const days = parseInt(localStorage.getItem(SHARE_KEY) || '0');
+  function onShared() {
+    const nd = Math.min(days + 1, 5);
+    localStorage.setItem(SHARE_KEY, String(nd));
+    const toast = $('share-toast');
+    toast.textContent = '하루 무료 이용권이 지급되었습니다!';
+    toast.style.opacity = '1';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => toast.style.opacity = '0', 3000);
+    if (nd >= 5) { const b = $('share-bubble'); if (b) b.style.display = 'none'; }
+  }
+  if (navigator.share) {
+    navigator.share({ title: document.title, url: location.href }).then(onShared).catch(() => {});
+  } else {
+    if (navigator.clipboard) navigator.clipboard.writeText(location.href);
+    alert('링크가 복사되었어요!');
+    onShared();
+  }
+}
+
+// ── Settings UI ───────────────────────────────
+function renderSettingsUi() {
+  document.querySelectorAll('[data-setting]').forEach(btn => {
+    const key = btn.dataset.setting;
+    const val = btn.dataset.value;
+    let cur;
+    if (key === 'reverseMode' || key === 'ghostMode') cur = String(settings[key]);
+    else cur = settings[key];
+    btn.classList.toggle('selected', cur === val);
+  });
+  document.querySelectorAll('[data-imp-mode]').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.impMode === settings.impulseMode);
+  });
+  $('tts-toggle').classList.toggle('on', settings.ttsEnabled);
+  $('imp-toggle').classList.toggle('on', settings.impulsePrevention);
+  const details = $('impulse-details');
+  if (settings.impulsePrevention) { details.classList.add('show'); details.style.display = 'block'; }
+  else { details.classList.remove('show'); details.style.display = 'none'; }
+  const row = $('imp-sec-row');
+  if (settings.impulseMode === 'lock') {
+    row.style.display = '';
+    row.innerHTML = '';
+    for (let n = 1; n <= 10; n++) {
+      const b = document.createElement('button');
+      b.className = 'imp-sec' + (settings.impulseDelay === n ? ' active' : '');
+      b.textContent = n + '초';
+      b.onclick = () => { settings.impulseDelay = n; saveSettings(); renderSettingsUi(); };
+      row.appendChild(b);
+    }
+  } else {
+    row.style.display = 'none';
+    row.innerHTML = '';
+  }
+}
+function toggleTTS() {
+  settings.ttsEnabled = !settings.ttsEnabled;
+  if (!settings.ttsEnabled && window.speechSynthesis) window.speechSynthesis.cancel();
+  saveSettings(); renderSettingsUi();
+}
+function toggleImpulse() { settings.impulsePrevention = !settings.impulsePrevention; saveSettings(); renderSettingsUi(); }
+function setImpulseMode(m) { settings.impulseMode = m; saveSettings(); renderSettingsUi(); }
+
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-setting]');
+  if (!btn) return;
+  const key = btn.dataset.setting, val = btn.dataset.value;
+  if (key === 'reverseMode' || key === 'ghostMode') settings[key] = (val === 'true');
+  else settings[key] = val;
+  saveSettings(); renderSettingsUi();
+});
+
+// ── Impulse control ─────────────────────────
+function clearImpulse() {
+  if (impulseTimer) { clearInterval(impulseTimer); impulseTimer = null; }
+  chipsHidden = false; chipsLocked = false;
+  impulseCountdown = null;
+  document.querySelectorAll('.scatter-area, #quiz-chips').forEach(el => { el.classList.remove('chips-hidden'); el.classList.remove('chips-locked'); });
+  $('reveal-btn').classList.add('hidden');
+  $('quiz-reveal-btn').classList.add('hidden');
+  $('countdown').classList.add('hidden');
+  $('quiz-countdown').classList.add('hidden');
+}
+function applyImpulse() {
+  if (!settings.impulsePrevention) return;
+  if (settings.impulseMode === 'hide') {
+    chipsHidden = true;
+    document.querySelectorAll('.scatter-area, #quiz-chips').forEach(el => el.classList.add('chips-hidden'));
+    if (currentView === 'play-view') $('reveal-btn').classList.remove('hidden');
+    else if (currentView === 'quiz-view') $('quiz-reveal-btn').classList.remove('hidden');
+  } else {
+    chipsLocked = true;
+    document.querySelectorAll('.scatter-area, #quiz-chips').forEach(el => el.classList.add('chips-locked'));
+    let rem = settings.impulseDelay;
+    const cd = currentView === 'quiz-view' ? $('quiz-countdown') : $('countdown');
+    cd.classList.remove('hidden');
+    cd.textContent = rem + '초 동안 생각해 보세요';
+    impulseTimer = setInterval(() => {
+      rem--;
+      if (rem <= 0) {
+        clearInterval(impulseTimer); impulseTimer = null;
+        chipsLocked = false;
+        document.querySelectorAll('.scatter-area, #quiz-chips').forEach(el => el.classList.remove('chips-locked'));
+        cd.classList.add('hidden');
+      } else {
+        cd.textContent = rem + '초 동안 생각해 보세요';
+      }
+    }, 1000);
+  }
+}
+function revealChips() {
+  chipsHidden = false;
+  document.querySelectorAll('.scatter-area, #quiz-chips').forEach(el => el.classList.remove('chips-hidden'));
+  $('reveal-btn').classList.add('hidden');
+  $('quiz-reveal-btn').classList.add('hidden');
+}
+
+// ── Scatter positioning ─────────────────────
+function scatterPositions(count, areaW, areaH, chipSize) {
+  const gap = Math.round(chipSize * 0.3);
+  const cell = chipSize + gap;
+  const cols = Math.max(1, Math.floor(areaW / cell));
+  const rows = Math.ceil(count / cols);
+  const cells = [];
+  for (let r = 0; r < rows; r++) {
+    const itemsInRow = r < rows - 1 ? cols : count - r * cols;
+    const rowW = itemsInRow * cell - gap;
+    const startX = Math.max(0, (areaW - rowW) / 2);
+    for (let c = 0; c < itemsInRow; c++) cells.push({ x: startX + c*cell, y: r*cell });
+  }
+  const sh = shuffleArr(cells);
+  const jitter = Math.floor(gap * 0.3);
+  return sh.map(p => ({ x: p.x + (Math.random()*2-1)*jitter, y: p.y + (Math.random()*2-1)*jitter }));
+}
+
+// ── Game: drag-to-order ─────────────────────
+function startGame(range, start) {
+  start = start || 1;
+  if (!localStorage.getItem(LOGIN_KEY)) {
+    sessionStorage.setItem('_sp', JSON.stringify([range, start]));
+    showView('login-view'); return;
+  }
+  lastGameCompleted = false;
+  lastRange = range; lastStart = start;
+  gameMode = 'game';
+  maxNum = range; startNum = start;
+  startTime = Date.now();
+  placedCount = 0; wrongCount = 0; fillTotal = 0;
+
+  const isTablet = window.innerWidth >= 768;
+  const areaW = isTablet ? 600 : Math.min(window.innerWidth - 32, 568);
+  const count = range - start + 1;
+  const availH = Math.max(120, window.innerHeight * 0.45);
+  const neededH = (px) => { const cell = px * 1.3; const cols = Math.max(1, Math.floor(areaW / cell)); return Math.ceil(count / cols) * cell; };
+  const maxCpx = isTablet ? 88 : 72;
+  const minCpx = isTablet ? 26 : 22;
+  let cpx = maxCpx;
+  while (cpx > minCpx && neededH(cpx) > availH) cpx -= 2;
+  chipPx = cpx; currentChipPx = cpx;
+
+  const gap = Math.round(cpx * 0.3);
+  const cellSize = cpx + gap;
+  const cols = Math.max(1, Math.floor(areaW / cellSize));
+  scatterH = Math.ceil(count / cols) * cellSize;
+
+  slots = [];
+  for (let i = 0; i < count; i++) {
+    const n = settings.reverseMode ? range - i : start + i;
+    slots.push({ num: n, filled: false, wrong: false, hint: false });
+  }
+  const nums = shuffleArr(Array.from({ length: count }, (_, i) => start + i));
+  chips = nums.map((n, i) => ({ num: n, x: 0, y: 0, placed: false, isDragging: false }));
+
+  const label = settings.reverseMode ? `${range} → ${start} 역순` : `${start} ~ ${range}`;
+  $('play-label').textContent = label;
+  $('play-hint').textContent = '';
+  $('play-feedback').textContent = '';
+
+  showView('play-view');
+  requestAnimationFrame(() => {
+    const container = $('scatter-area');
+    const w = container.offsetWidth || areaW;
+    const positions = scatterPositions(count, w, scatterH, cpx);
+    chips.forEach((c, i) => { c.x = positions[i].x; c.y = positions[i].y; });
+    renderPlayView();
+    clearImpulse(); applyImpulse();
+    if (window.speechSynthesis) window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+    setTimeout(() => speak('천천히 생각하고 풀어보세요.'), 300);
+  });
+}
+
+function startFill(range, start) {
+  start = start || 1;
+  if (!localStorage.getItem(LOGIN_KEY)) {
+    sessionStorage.setItem('_sp', JSON.stringify(['fill', range, start]));
+    showView('login-view'); return;
+  }
+  lastGameCompleted = false;
+  lastRange = range; lastStart = start;
+  gameMode = 'fill';
+  maxNum = range; startNum = start;
+  startTime = Date.now();
+  placedCount = 0; wrongCount = 0;
+
+  const totalCount = range - start + 1;
+  const hintCount = FILL_HINTS[totalCount] !== undefined ? FILL_HINTS[totalCount] : Math.round(totalCount * 0.3);
+  fillTotal = totalCount - hintCount;
+
+  const allNums = Array.from({ length: totalCount }, (_, i) => start + i);
+  const prefilled = new Set(shuffleArr(allNums).slice(0, hintCount));
+  slots = allNums.map(n => ({ num: n, filled: prefilled.has(n), wrong: false, hint: prefilled.has(n) }));
+  const chipNums = shuffleArr(allNums.filter(n => !prefilled.has(n)));
+
+  const isTablet = window.innerWidth >= 768;
+  const areaW = isTablet ? 600 : Math.min(window.innerWidth - 32, 568);
+  const cpx = isTablet ? 44 : 36;
+  chipPx = cpx; currentChipPx = cpx;
+  const gap = Math.round(cpx * 0.3);
+  const cellSize = cpx + gap;
+  const cols = Math.max(1, Math.floor(areaW / cellSize));
+  scatterH = Math.ceil(chipNums.length / cols) * cellSize;
+
+  chips = chipNums.map(n => ({ num: n, x: 0, y: 0, placed: false, isDragging: false }));
+
+  $('play-label').textContent = `${start} ~ ${range} (${hintCount}개 힌트)`;
+  $('play-hint').textContent = `${fillTotal}개 남았어요`;
+  $('play-hint').style.color = '#C4AA82';
+  $('play-feedback').textContent = '';
+
+  showView('play-view');
+  requestAnimationFrame(() => {
+    const container = $('scatter-area');
+    const w = container.offsetWidth || areaW;
+    const positions = scatterPositions(chipNums.length, w, scatterH, cpx);
+    chips.forEach((c, i) => { c.x = positions[i].x; c.y = positions[i].y; });
+    renderPlayView();
+    clearImpulse(); applyImpulse();
+    if (window.speechSynthesis) window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+    setTimeout(() => speak('힌트를 보고 나머지를 채워봐요.'), 300);
+  });
+}
+
+function renderPlayView() {
+  const total = gameMode === 'fill' ? fillTotal : (maxNum - startNum + 1);
+  $('total-count').textContent = total;
+  $('placed-count').textContent = placedCount;
+  $('play-progress').style.width = (total > 0 ? Math.round(placedCount/total*100) : 0) + '%';
+
+  // Slots
+  const grid = $('slots-grid');
+  grid.style.gridTemplateColumns = `repeat(${slots.length <= 5 ? 5 : 10}, 1fr)`;
+  grid.style.fontSize = (maxNum >= 100 ? '0.7rem' : '');
+  grid.innerHTML = '';
+  slots.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'slot' + (s.filled ? ' filled' : '') + (s.hint ? ' hint' : '') + (s.wrong ? ' wrong' : '');
+    el.dataset.num = s.num;
+    if (s.filled) el.textContent = s.num;
+    else if (settings.ghostMode && !s.hint) el.innerHTML = `<span class="ghost-num">${s.num}</span>`;
+    grid.appendChild(el);
+  });
+
+  // Chips
+  const sc = $('scatter-area');
+  sc.style.minHeight = scatterH + 'px';
+  sc.innerHTML = '';
+  chips.forEach((c, i) => {
+    const el = document.createElement('div');
+    el.className = 'num-chip' + (c.isDragging ? ' dragging' : '') + (c.placed ? ' placed' : '');
+    el.style.left = c.x + 'px';
+    el.style.top = c.y + 'px';
+    el.style.width = chipPx + 'px';
+    el.style.height = chipPx + 'px';
+    el.style.fontSize = ((chipPx * 0.35) / 16).toFixed(2) + 'rem';
+    el.textContent = c.num;
+    el.dataset.idx = i;
+    el.addEventListener('mousedown', (e) => { e.preventDefault(); beginDrag(i, c.num, e.clientX, e.clientY, false); });
+    el.addEventListener('touchstart', (e) => { e.preventDefault(); beginDrag(i, c.num, e.touches[0].clientX, e.touches[0].clientY, false); }, { passive: false });
+    sc.appendChild(el);
+  });
+}
+
+// ── Quiz: hidden-number practice ──────────
+function startQuiz(range) {
+  if (!localStorage.getItem(LOGIN_KEY)) {
+    sessionStorage.setItem('_sp', JSON.stringify(['quiz', range]));
+    showView('login-view'); return;
+  }
+  lastGameCompleted = false;
+  lastRange = range;
+  gameMode = 'quiz';
+  quizRange = range;
+  quizRound = 0; quizCorrect = 0; quizWrong = 0;
+  quizTotalRounds = QUIZ_TOTAL;
+  isWnPractice = false;
+  quizStartTime = Date.now();
+  showView('quiz-view');
+  requestAnimationFrame(() => { quizNext(); });
+}
+
+function startWnPractice() {
+  const notes = getWrongNotes();
+  if (notes.length === 0) return;
+  const sorted = [...notes].sort((a,b)=>a-b);
+  const hide = Math.min(sorted.length <= 4 ? sorted.length : 4, sorted.length);
+  const chunks = [];
+  for (let i = 0; i < sorted.length; i += hide) chunks.push(sorted.slice(i, i+hide));
+  wnChunks = chunks; wnRoundIdx = 0;
+  isWnPractice = true;
+  gameMode = 'quiz';
+  quizRange = sorted[sorted.length-1];
+  quizRound = 0; quizCorrect = 0; quizWrong = 0;
+  quizTotalRounds = chunks.length;
+  quizStartTime = Date.now();
+  showView('quiz-view');
+  requestAnimationFrame(() => { quizNext(); });
+}
+
+function quizNext() {
+  $('quiz-next-btn').classList.add('hidden');
+  $('quiz-feedback').textContent = '';
+  quizPlacedInRound = 0; quizFirstTry = true;
+
+  if (quizRound >= quizTotalRounds) {
+    const sec = Math.floor((Date.now() - quizStartTime) / 1000);
+    let emoji = '🏆', msg = '완료!';
+    if (quizCorrect < quizTotalRounds * 0.5) emoji = '💪', msg = '다시 도전!';
+    else if (quizCorrect < quizTotalRounds) emoji = '👏', msg = '잘했어요!';
+    $('result-emoji').textContent = emoji;
+    $('result-msg').textContent = msg;
+    $('result-sub').textContent = `${quizCorrect} / ${quizTotalRounds}개 맞힘 · ${sec}초`;
+    lastGameCompleted = true;
+    showView('result-view');
+    return;
+  }
+  quizRound++;
+  $('quiz-label').textContent = `문제 ${quizRound} / ${quizTotalRounds}`;
+  $('quiz-progress').style.width = ((quizRound - 1) / quizTotalRounds * 100) + '%';
+  $('quiz-correct').textContent = quizCorrect;
+
+  // Build cards
+  const range = quizRange;
+  let visibleCount, hideCount;
+  let startNum_ = 1, endNum_ = range;
+  if (range === 5) { visibleCount = 5; hideCount = 2; }
+  else { visibleCount = 8; hideCount = 4; }
+  // For range > 8, choose a random 8-consecutive window
+  if (range > 8) {
+    const maxStart = range - 7;
+    startNum_ = 1 + Math.floor(Math.random() * maxStart);
+    endNum_ = startNum_ + 7;
+  }
+  const all = [];
+  for (let n = startNum_; n <= endNum_; n++) all.push(n);
+
+  let hiddenNums;
+  if (isWnPractice) {
+    const chunk = wnChunks[wnRoundIdx] || [];
+    wnRoundIdx = (wnRoundIdx + 1) % wnChunks.length;
+    hiddenNums = chunk.filter(n => n >= startNum_ && n <= endNum_).slice(0, hideCount);
+    if (hiddenNums.length === 0) hiddenNums = shuffleArr(all).slice(0, hideCount);
+  } else {
+    hiddenNums = shuffleArr(all).slice(0, hideCount);
+  }
+  quizHiddenOrder = [...hiddenNums].sort((a,b)=>a-b);
+
+  quizCards = all.map(n => ({ num: n, hidden: hiddenNums.includes(n), filled: false, wrong: false }));
+  quizChips = shuffleArr(hiddenNums).map(n => ({ num: n, placed: false, isDragging: false }));
+
+  $('quiz-hint').textContent = '숨은 숫자를 찾아서 빈칸에 놓아봐요';
+  renderQuizView();
+  clearImpulse(); applyImpulse();
+}
+
+function renderQuizView() {
+  const cardsEl = $('quiz-cards');
+  const layout = quizCards.length;
+  cardsEl.classList.toggle('quiz-cards-8', layout >= 8);
+  cardsEl.innerHTML = '';
+  quizCards.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'quiz-card' + (c.hidden ? ' hidden-card' : ' open') + (c.filled ? ' filled' : '') + (c.wrong ? ' wrong' : '');
+    el.dataset.num = c.num;
+    el.textContent = c.filled ? c.num : (c.hidden ? '?' : c.num);
+    cardsEl.appendChild(el);
+  });
+  const chipsEl = $('quiz-chips');
+  chipsEl.innerHTML = '';
+  quizChips.forEach((c, i) => {
+    const el = document.createElement('div');
+    el.className = 'quiz-chip' + (c.isDragging ? ' dragging' : '') + (c.placed ? ' placed' : '');
+    el.textContent = c.num;
+    el.dataset.idx = i;
+    el.addEventListener('mousedown', (e) => { e.preventDefault(); beginDrag(i, c.num, e.clientX, e.clientY, true); });
+    el.addEventListener('touchstart', (e) => { e.preventDefault(); beginDrag(i, c.num, e.touches[0].clientX, e.touches[0].clientY, true); }, { passive: false });
+    chipsEl.appendChild(el);
+  });
+}
+
+// ── Drag logic ─────────────────────────────
+function beginDrag(idx, val, x, y, isQuiz) {
+  if (isDragging || chipsLocked) return;
+  isDragging = true; dragValue = val; dragChipIndex = idx; isDragQuiz = isQuiz;
+  if (isQuiz) quizChips[idx].isDragging = true;
+  else chips[idx].isDragging = true;
+  // Toggle class on the original element — do NOT re-render here, or we'd dispose
+  // the element that received the mousedown/touchstart and break the pointer stream.
+  var _cnt = document.getElementById(isQuiz ? 'quiz-chips' : 'scatter-area');
+  if (_cnt && _cnt.children[idx]) _cnt.children[idx].classList.add('dragging');
+
+  if (floatingEl) floatingEl.remove();
+  const el = document.createElement('div');
+  el.className = 'floating-num';
+  el.textContent = String(val);
+  const firstSlot = isQuiz ? document.querySelector('.quiz-card.hidden-card') : document.querySelector('.slot');
+  const sz = firstSlot ? Math.round(firstSlot.getBoundingClientRect().width) : currentChipPx;
+  el.style.width = sz + 'px'; el.style.height = sz + 'px';
+  el.style.fontSize = ((sz * 0.38) / 16).toFixed(2) + 'rem';
+  el.style.borderRadius = Math.round(sz * 0.3) + 'px';
+  el.style.left = x + 'px'; el.style.top = y + 'px';
+  document.body.appendChild(el);
+  floatingEl = el;
+}
+
+function getSlotAt(x, y, isQuiz) {
+  const selector = isQuiz ? '.quiz-card.hidden-card:not(.filled)' : '.slot';
+  for (const el of document.querySelectorAll(selector)) {
+    const r = el.getBoundingClientRect();
+    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return { num: parseInt(el.dataset.num), el };
+  }
+  return null;
+}
+
+function clearDragHighlights() {
+  document.querySelectorAll('.slot.drag-over, .quiz-card.drag-over').forEach(el => el.classList.remove('drag-over'));
+}
+
+function onDragMove(x, y) {
+  if (!isDragging) return;
+  if (floatingEl) { floatingEl.style.left = x + 'px'; floatingEl.style.top = y + 'px'; }
+  clearDragHighlights();
+  const t = getSlotAt(x, y, isDragQuiz);
+  if (t && t.el) t.el.classList.add('drag-over');
+}
+
+function onDragEnd(x, y) {
+  if (!isDragging) return;
+  clearDragHighlights();
+  const target = getSlotAt(x, y, isDragQuiz);
+  const idx = dragChipIndex, val = dragValue;
+  if (target && val != null && idx != null) {
+    if (isDragQuiz) {
+      const cardIdx = quizCards.findIndex(c => c.num === target.num);
+      if (cardIdx >= 0 && !quizCards[cardIdx].filled) {
+        if (val === target.num) {
+          // Correct
+          quizCards[cardIdx].filled = true;
+          quizCards[cardIdx].wrong = false;
+          quizChips[idx].placed = true;
+          quizPlacedInRound++;
+          speak(countingWord(val));
+          if (quizPlacedInRound >= quizHiddenOrder.length) {
+            if (quizFirstTry) quizCorrect++;
+            quizHiddenOrder.forEach(n => removeWrongNote(n));
+            $('quiz-correct').textContent = quizCorrect;
+            $('quiz-feedback').textContent = '잘했어요! 🎉';
+            $('quiz-feedback').style.color = '#5BC886';
+            $('quiz-progress').style.width = (quizRound / quizTotalRounds * 100) + '%';
+            setTimeout(() => { $('quiz-next-btn').classList.remove('hidden'); }, 800);
+          } else {
+            $('quiz-feedback').textContent = '좋아요!';
+            $('quiz-feedback').style.color = '#5BC886';
+            setTimeout(() => { if ($('quiz-feedback').textContent === '좋아요!') $('quiz-feedback').textContent = ''; }, 800);
+          }
+        } else {
+          // Wrong
+          quizCards[cardIdx].wrong = true;
+          quizFirstTry = false;
+          quizWrong++;
+          addWrongNote(val);
+          $('quiz-feedback').textContent = '이 칸은 다른 숫자예요';
+          $('quiz-feedback').style.color = '#F07070';
+          quizChips[idx].isDragging = false;
+          speak('다시 해봐요.');
+          setTimeout(() => { quizCards[cardIdx].wrong = false; renderQuizView(); }, 400);
+        }
+        renderQuizView();
+      } else {
+        quizChips[idx].isDragging = false; renderQuizView();
+      }
+    } else {
+      const slotIdx = slots.findIndex(s => s.num === target.num);
+      if (slotIdx >= 0 && !slots[slotIdx].filled) {
+        if (val === target.num) {
+          slots[slotIdx].filled = true;
+          slots[slotIdx].wrong = false;
+          chips[idx].placed = true;
+          placedCount++;
+          const total = gameMode === 'fill' ? fillTotal : (maxNum - startNum + 1);
+          if (placedCount >= total) {
+            $('play-feedback').textContent = '완성! 🎉';
+            $('play-feedback').style.color = '#5BC886';
+            $('play-hint').textContent = '완성!';
+            $('play-hint').style.color = '#5BC886';
+            speak('다 맞혔어요! 정말 잘했어요.');
+            setTimeout(() => {
+              const sec = Math.floor((Date.now() - startTime) / 1000);
+              const rangeText = settings.reverseMode ? `${maxNum} → ${startNum} 역순` : `${startNum} ~ ${maxNum}`;
+              $('result-emoji').textContent = wrongCount === 0 ? '🏆' : '👏';
+              $('result-msg').textContent = '완료!';
+              $('result-sub').textContent = `범위 ${rangeText} · ${sec}초 · 틀린 횟수 ${wrongCount}번`;
+              lastGameCompleted = true;
+              showView('result-view');
+            }, 1500);
+          } else {
+            $('play-feedback').textContent = '잘했어요!';
+            $('play-feedback').style.color = '#5BC886';
+            speak(countingWord(val));
+            setTimeout(() => { if ($('play-feedback').textContent === '잘했어요!') $('play-feedback').textContent = ''; }, 800);
+            if (gameMode === 'fill') {
+              const rem = fillTotal - placedCount;
+              $('play-hint').textContent = `${rem}개 남았어요`;
+              $('play-hint').style.color = '#C4AA82';
+            }
+          }
+          renderPlayView();
+        } else {
+          slots[slotIdx].wrong = true;
+          wrongCount++;
+          addWrongNote(val);
+          $('play-feedback').textContent = '이 칸은 다른 숫자 자리예요';
+          $('play-feedback').style.color = '#F07070';
+          chips[idx].isDragging = false;
+          speak('다시 해봐요.');
+          renderPlayView();
+          setTimeout(() => { slots[slotIdx].wrong = false; renderPlayView(); }, 400);
+        }
+      } else {
+        chips[idx].isDragging = false; renderPlayView();
+      }
+    }
+  } else {
+    if (isDragQuiz) { if (idx != null) { quizChips[idx].isDragging = false; renderQuizView(); } }
+    else { if (idx != null) { chips[idx].isDragging = false; renderPlayView(); } }
+  }
+  if (floatingEl) { floatingEl.remove(); floatingEl = null; }
+  isDragging = false; dragValue = null; dragChipIndex = null;
+}
+
+document.addEventListener('mousemove', (e) => { if (isDragging) onDragMove(e.clientX, e.clientY); });
+document.addEventListener('mouseup', (e) => { if (isDragging) onDragEnd(e.clientX, e.clientY); });
+document.addEventListener('touchmove', (e) => { if (isDragging) { e.preventDefault(); onDragMove(e.touches[0].clientX, e.touches[0].clientY); } }, { passive: false });
+document.addEventListener('touchend', (e) => { if (isDragging) { const t = e.changedTouches[0]; onDragEnd(t.clientX, t.clientY); } });
+
+// ── Navigation ──────────────────────────────
+function goHome() {
+  clearImpulse();
+  if (floatingEl) { floatingEl.remove(); floatingEl = null; }
+  isDragging = false;
+  isWnPractice = false;
+  showView('start-view');
+  refreshWnUi();
+}
+function replay() {
+  if (gameMode === 'game') startGame(lastRange, lastStart);
+  else if (gameMode === 'quiz') startQuiz(lastRange);
+  else if (gameMode === 'fill') startFill(lastRange, lastStart);
+  else goHome();
+}
+
+// ── Init ────────────────────────────────────
+function init() {
+  loadSettings();
+  refreshWnUi();
+  renderSettingsUi();
+  // Login state
+  const loggedIn = !!localStorage.getItem(LOGIN_KEY);
+  if (loggedIn) document.body.classList.add('sm-loggedin');
+  else document.body.classList.remove('sm-loggedin');
+  // Share bubble
+  const shareDays = parseInt(localStorage.getItem(SHARE_KEY) || '0');
+  if (shareDays >= 5) { const b = $('share-bubble'); if (b) b.style.display = 'none'; }
+  showView('start-view');
+  refreshLogoutBtn();
+  if (window.speechSynthesis) { window.speechSynthesis.getVoices(); if (window.speechSynthesis.onvoiceschanged !== undefined) window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); }
+  // Splash fade
+  setTimeout(() => { const s = $('splash'); if (s) s.classList.add('fade-out'); }, 3000);
+  setTimeout(() => { const s = $('splash'); if (s) s.remove(); }, 3500);
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
+</script>
+
 <!-- ===== 느린아이 탭바 시스템 ===== -->
 <script>
 (function(){
@@ -12,7 +1448,7 @@
 if(document.getElementById('sm-tab-bar')) return;
 
 /* ── 앱 설정 ── */
-var _LK  = '';
+var _LK  = 'slowmath_number_login';
 var _RFN = '';
 var _AK  = 'slowmath_number';
 
@@ -164,53 +1600,6 @@ var _VK='sm_visits_'+_AK;
 var _obsv=null,_prevQ=0,_prevSc=0;
 
 function _gv(){try{return JSON.parse(localStorage.getItem(_VK))||[];}catch(e){return [];}}
-
-function _startSession(mod){
-  var today=new Date().toISOString().split('T')[0];
-  var vv=_gv();
-  var en=vv.find(function(x){return x.date===today;});
-  if(!en){en={date:today,sessions:[],totalProblems:0,totalCorrect:0};vv.push(en);}
-  en.sessions.push({total:0,correct:0,mode:mod,t:Date.now()});
-  localStorage.setItem(_VK,JSON.stringify(vv));
-}
-
-function _recProblem(isCorrect){
-  var today=new Date().toISOString().split('T')[0];
-  var vv=_gv();
-  var en=vv.find(function(x){return x.date===today;});
-  if(!en) return;
-  var sess=en.sessions[en.sessions.length-1];
-  if(!sess) return;
-  sess.total++;
-  if(isCorrect) sess.correct++;
-  en.totalProblems=(en.totalProblems||0)+1;
-  if(isCorrect) en.totalCorrect=(en.totalCorrect||0)+1;
-  localStorage.setItem(_VK,JSON.stringify(vv));
-}
-
-function _startObserving(){
-  _stopObserving();
-  var ql=document.getElementById('q-label');
-  var sl=document.getElementById('play-score');
-  if(!ql) return;
-  _prevQ=1; _prevSc=0;
-  _obsv=new MutationObserver(function(){
-    var m=(ql.textContent||'').match(/(\d+)/);
-    if(!m) return;
-    var qn=parseInt(m[1]);
-    if(qn>_prevQ){
-      var sc=parseInt((sl?sl.textContent:'0').replace(/[^0-9]/g,''))||0;
-      _recProblem(sc>_prevSc);
-      _prevSc=sc; _prevQ=qn;
-    }
-  });
-  _obsv.observe(ql,{childList:true,characterData:true,subtree:true});
-}
-
-function _stopObserving(){
-  if(_obsv){_obsv.disconnect();_obsv=null;}
-}
-
 function _recVisit(){
   if(_LK&&!localStorage.getItem(_LK)) return;
   var today=new Date().toISOString().split('T')[0];
@@ -287,17 +1676,9 @@ if(_oSV){
       document.getElementById('sm-rec-v').classList.add('smh');
       document.getElementById('sm-ser-v').classList.add('smh');
       document.getElementById('sm-my-v').classList.add('smh');
-    } else if(id==='play-view'){
-      _showBar(false);
-      try{
-        var mod=typeof lastMode!=='undefined'?lastMode:null;
-        _startSession(mod);
-        setTimeout(_startObserving,150);
-      }catch(e){}
-    } else if(id==='result-view'){
+    } else if(id==='play-view'||id==='quiz-view'||id==='result-view'){
       _showBar(false);
     } else if(id==='start-view'){
-      _stopObserving();
       _showBar(true);
       _ct='home';
       ['home','records','series','my'].forEach(function(t){
@@ -313,21 +1694,6 @@ if(_oSV){
         setTimeout(function(){window._smTab(pt);},50);
       }
     }
-  };
-}
-
-/* ── showResult / showResults 패치 (마지막 문제 기록) ── */
-var _oRF=_RFN&&typeof window[_RFN]==='function'?window[_RFN]:null;
-if(_oRF){
-  window[_RFN]=function(){
-    _oRF.apply(this,arguments);
-    _showBar(false);
-    try{
-      var sl=document.getElementById('play-score');
-      var sc=parseInt((sl?sl.textContent:'0').replace(/[^0-9]/g,''))||0;
-      _recProblem(sc>_prevSc);
-    }catch(e){}
-    _stopObserving();
   };
 }
 
@@ -456,4 +1822,6 @@ setTimeout(function(){
 })();
 </script>
 <!-- ===== /느린아이 탭바 시스템 ===== -->
-</body></html>
+
+</body>
+</html>
