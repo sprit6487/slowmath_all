@@ -400,18 +400,10 @@ window._smDD=function(ds){
   if(!v){el.classList.add('smh');return;}
   var d=new Date(ds+'T00:00:00');
   var dl=(d.getMonth()+1)+'월 '+d.getDate()+'일';
-  var sh='';
-  if(v.sessions&&v.sessions.length){
-    v.sessions.forEach(function(s,i){
-      var ml=s.mode!=null?' · 모드 '+s.mode:'';
-      sh+='<div class="sm-dr"><span class="sm-dl">세션 '+(i+1)+ml+'</span><span class="sm-dv">'+s.total+'문제 / '+s.correct+'정답</span></div>';
-    });
-  }
   el.classList.remove('smh');
   el.innerHTML='<div class="sm-dt">📅 '+dl+' 기록</div>'
     +'<div class="sm-dr"><span class="sm-dl">총 푼 문제</span><span class="sm-dv">'+v.totalProblems+'문제</span></div>'
-    +'<div class="sm-dr"><span class="sm-dl">정답</span><span class="sm-dv">'+v.totalCorrect+'개 <span class="sm-db">'+(v.totalProblems>0?Math.round(v.totalCorrect/v.totalProblems*100):0)+'%</span></span></div>'
-    +sh;
+    +'<div class="sm-dr"><span class="sm-dl">정답</span><span class="sm-dv">'+v.totalCorrect+'개 <span class="sm-db">'+(v.totalProblems>0?Math.round(v.totalCorrect/v.totalProblems*100):0)+'%</span></span></div>';
 };
 
 /* ── 마이 ── */
