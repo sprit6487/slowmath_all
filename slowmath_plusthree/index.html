@@ -1544,6 +1544,10 @@ window._smTab=function(tab){
     return;
   }
   _ct=tab;
+  ['play-view','game-view','playView','gameView','result-view','resultView','quiz-view','drag-view','fill-view','wn-view','wrong-notes-view','wrongNotesView'].forEach(function(_id){
+    var _e=document.getElementById(_id);
+    if(_e) _e.classList.add('hidden');
+  });
   if(tab==='home'){
     document.getElementById('sm-rec-v').classList.add('smh');
     document.getElementById('sm-ser-v').classList.add('smh');
