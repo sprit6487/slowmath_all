@@ -51,24 +51,20 @@
       text-align: center;
       -webkit-tap-highlight-color: rgba(74, 144, 217, 0.18);
     }
-    @media (hover: hover) {
-      .grid a:hover,
-      .grid a:active {
+    @media (hover: hover) and (pointer: fine) {
+      .grid a:hover {
         background: #4a90d9;
         border-color: #4a90d9;
         color: #fff;
         transform: translateY(-2px);
       }
-      .grid a:hover svg *,
-      .grid a:active svg * {
+      .grid a:hover svg * {
         fill: #fff;
         stroke: #fff;
       }
     }
-    @media (hover: none) {
-      .grid a:active {
-        transform: scale(0.98);
-      }
+    .grid a:active {
+      transform: scale(0.98);
     }
     .icon { font-size: 2rem; line-height: 1; height: 56px; display: flex; align-items: center; justify-content: center; }
     .icon svg { display: block; }
