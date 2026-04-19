@@ -49,27 +49,26 @@
       font-weight: 600;
       transition: background 0.15s, border-color 0.15s, transform 0.15s;
       text-align: center;
+      -webkit-tap-highlight-color: rgba(74, 144, 217, 0.18);
     }
     @media (hover: hover) {
-      .grid a:hover {
+      .grid a:hover,
+      .grid a:active {
         background: #4a90d9;
         border-color: #4a90d9;
         color: #fff;
         transform: translateY(-2px);
       }
-      .grid a:hover svg * {
+      .grid a:hover svg *,
+      .grid a:active svg * {
         fill: #fff;
         stroke: #fff;
       }
     }
-    .grid a.pressed {
-      background: #4a90d9;
-      border-color: #4a90d9;
-      color: #fff;
-    }
-    .grid a.pressed svg * {
-      fill: #fff;
-      stroke: #fff;
+    @media (hover: none) {
+      .grid a:active {
+        transform: scale(0.98);
+      }
     }
     .icon { font-size: 2rem; line-height: 1; height: 56px; display: flex; align-items: center; justify-content: center; }
     .icon svg { display: block; }
@@ -242,29 +241,5 @@
     </a>
 
   </div>
-  <script>
-    (function () {
-      var anchors = document.querySelectorAll('.grid a');
-      var press = function (e) { e.currentTarget.classList.add('pressed'); };
-      var release = function (e) { e.currentTarget.classList.remove('pressed'); };
-      var clearAll = function () {
-        anchors.forEach(function (a) { a.classList.remove('pressed'); });
-      };
-      anchors.forEach(function (a) {
-        a.addEventListener('pointerdown', press);
-        a.addEventListener('pointerup', release);
-        a.addEventListener('pointercancel', release);
-        a.addEventListener('pointerleave', release);
-        a.addEventListener('touchend', release, { passive: true });
-        a.addEventListener('touchcancel', release, { passive: true });
-        a.addEventListener('click', release);
-      });
-      window.addEventListener('pagehide', clearAll);
-      window.addEventListener('pageshow', clearAll);
-      document.addEventListener('visibilitychange', function () {
-        if (document.hidden) clearAll();
-      });
-    })();
-  </script>
 </body>
 </html>
