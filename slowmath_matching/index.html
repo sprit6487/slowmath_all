@@ -1622,21 +1622,29 @@ function _recProblem(isCorrect){
 
 function _startObserving(){
   _stopObserving();
-  var ql=document.getElementById('q-label');
-  var sl=document.getElementById('play-score');
-  if(!ql) return;
+  var ql=document.getElementById('q-label')||document.getElementById('question-number')||document.getElementById('progress-label')||document.getElementById('dq-label')||document.getElementById('cv-question');
+  var sl=document.getElementById('play-score')||document.getElementById('dscore')||document.getElementById('correctCount');
   _prevQ=1; _prevSc=0;
-  _obsv=new MutationObserver(function(){
-    var m=(ql.textContent||'').match(/(\d+)/);
-    if(!m) return;
-    var qn=parseInt(m[1]);
-    if(qn>_prevQ){
-      var sc=parseInt((sl?sl.textContent:'0').replace(/[^0-9]/g,''))||0;
-      _recProblem(sc>_prevSc);
-      _prevSc=sc; _prevQ=qn;
-    }
-  });
-  _obsv.observe(ql,{childList:true,characterData:true,subtree:true});
+  if(ql){
+    _obsv=new MutationObserver(function(){
+      var m=(ql.textContent||'').match(/(\d+)/);
+      if(!m) return;
+      var qn=parseInt(m[1]);
+      if(qn>_prevQ){
+        var sc=parseInt((sl?sl.textContent:'0').replace(/[^0-9]/g,''))||0;
+        _recProblem(sc>_prevSc);
+        _prevSc=sc; _prevQ=qn;
+      }
+    });
+    _obsv.observe(ql,{childList:true,characterData:true,subtree:true});
+  } else if(sl){
+    _prevSc=parseInt((sl.textContent||'').replace(/[^0-9]/g,''))||0;
+    _obsv=new MutationObserver(function(){
+      var sc=parseInt((sl.textContent||'').replace(/[^0-9]/g,''))||0;
+      if(sc>_prevSc){ _recProblem(true); _prevSc=sc; }
+    });
+    _obsv.observe(sl,{childList:true,characterData:true,subtree:true});
+  }
 }
 
 function _stopObserving(){
@@ -1652,6 +1660,10 @@ function _recVisit(){
     localStorage.setItem(_VK,JSON.stringify(vv));
   }
 }
+
+window._smRec=function(isCorrect){ try{ _recProblem(!!isCorrect); }catch(e){} };
+window._smStart=function(mode){ try{ _startSession(mode==null?null:mode); }catch(e){} };
+window._smStop=function(){ try{ _stopObserving(); }catch(e){} };
 
 /* ── 탭 전환 ── */
 var _ct='home';
@@ -1723,7 +1735,7 @@ if(_oSV){
       document.getElementById('sm-rec-v').classList.add('smh');
       document.getElementById('sm-ser-v').classList.add('smh');
       document.getElementById('sm-my-v').classList.add('smh');
-    } else if(id==='play-view'){
+    } else if(id==='play-view'||id==='game-view'||id==='quiz-view'){
       _showBar(false);
       try{
         var mod=typeof lastMode!=='undefined'?lastMode:null;
@@ -1732,6 +1744,7 @@ if(_oSV){
       }catch(e){}
     } else if(id==='result-view'){
       _showBar(false);
+      try{ _stopObserving(); }catch(e){}
     } else if(id==='start-view'){
       _stopObserving();
       _showBar(true);
@@ -1937,9 +1950,23 @@ function _anyGameVisible(){
   }
   return false;
 }
+var _smSessionActive=false;
 function _syncBarToGame(){
-  if(_anyGameVisible()) _showBar(false);
-  else _showBar(true);
+  var _vis=_anyGameVisible();
+  if(_vis){
+    _showBar(false);
+    if(!_smSessionActive){
+      try{ _startSession(null); }catch(e){}
+      _smSessionActive=true;
+      setTimeout(function(){ try{ _startObserving(); }catch(e){} },150);
+    }
+  } else {
+    _showBar(true);
+    if(_smSessionActive){
+      try{ _stopObserving(); }catch(e){}
+      _smSessionActive=false;
+    }
+  }
 }
 setTimeout(function(){
   _showBar(true);

@@ -1308,6 +1308,7 @@ function onDragEnd(x, y) {
           quizCards[cardIdx].wrong = false;
           quizChips[idx].placed = true;
           quizPlacedInRound++;
+          if(window._smRec) window._smRec(true);
           speak(countingWord(val));
           if (quizPlacedInRound >= quizHiddenOrder.length) {
             if (quizFirstTry) quizCorrect++;
@@ -1327,6 +1328,7 @@ function onDragEnd(x, y) {
           quizCards[cardIdx].wrong = true;
           quizFirstTry = false;
           quizWrong++;
+          if(window._smRec) window._smRec(false);
           addWrongNote(val);
           $('quiz-feedback').textContent = '이 칸은 다른 숫자예요';
           $('quiz-feedback').style.color = '#F07070';
@@ -1346,6 +1348,7 @@ function onDragEnd(x, y) {
           slots[slotIdx].wrong = false;
           chips[idx].placed = true;
           placedCount++;
+          if(window._smRec) window._smRec(true);
           const total = gameMode === 'fill' ? fillTotal : (maxNum - startNum + 1);
           if (placedCount >= total) {
             $('play-feedback').textContent = '완성! 🎉';
@@ -1377,6 +1380,7 @@ function onDragEnd(x, y) {
         } else {
           slots[slotIdx].wrong = true;
           wrongCount++;
+          if(window._smRec) window._smRec(false);
           addWrongNote(val);
           $('play-feedback').textContent = '이 칸은 다른 숫자 자리예요';
           $('play-feedback').style.color = '#F07070';
@@ -1621,6 +1625,36 @@ function _recVisit(){
   }
 }
 
+function _startSession(mod){
+  var today=new Date().toISOString().split('T')[0];
+  var vv=_gv();
+  var en=vv.find(function(x){return x.date===today;});
+  if(!en){en={date:today,sessions:[],totalProblems:0,totalCorrect:0};vv.push(en);}
+  en.sessions.push({total:0,correct:0,mode:mod,t:Date.now()});
+  localStorage.setItem(_VK,JSON.stringify(vv));
+}
+
+function _recProblem(isCorrect){
+  var today=new Date().toISOString().split('T')[0];
+  var vv=_gv();
+  var en=vv.find(function(x){return x.date===today;});
+  if(!en){ _recVisit(); vv=_gv(); en=vv.find(function(x){return x.date===today;}); if(!en) return; }
+  var sess=en.sessions[en.sessions.length-1];
+  if(!sess){ en.sessions.push({total:0,correct:0,mode:null,t:Date.now()}); sess=en.sessions[en.sessions.length-1]; }
+  sess.total++;
+  if(isCorrect) sess.correct++;
+  en.totalProblems=(en.totalProblems||0)+1;
+  if(isCorrect) en.totalCorrect=(en.totalCorrect||0)+1;
+  localStorage.setItem(_VK,JSON.stringify(vv));
+}
+
+function _startObserving(){}
+function _stopObserving(){}
+
+window._smRec=function(isCorrect){ try{ _recProblem(!!isCorrect); }catch(e){} };
+window._smStart=function(mode){ try{ _startSession(mode==null?null:mode); }catch(e){} };
+window._smStop=function(){ try{ _stopObserving(); }catch(e){} };
+
 /* ── 탭 전환 ── */
 var _ct='home';
 var _cy=new Date().getFullYear(),_cm=new Date().getMonth();
@@ -1691,8 +1725,12 @@ if(_oSV){
       document.getElementById('sm-rec-v').classList.add('smh');
       document.getElementById('sm-ser-v').classList.add('smh');
       document.getElementById('sm-my-v').classList.add('smh');
-    } else if(id==='play-view'||id==='quiz-view'||id==='result-view'){
+    } else if(id==='play-view'||id==='quiz-view'||id==='game-view'){
       _showBar(false);
+      try{ _startSession(null); }catch(e){}
+    } else if(id==='result-view'){
+      _showBar(false);
+      try{ _stopObserving(); }catch(e){}
     } else if(id==='start-view'){
       _showBar(true);
       _ct='home';
@@ -1882,9 +1920,19 @@ function _anyGameVisible(){
   }
   return false;
 }
+var _smSessionActive=false;
 function _syncBarToGame(){
-  if(_anyGameVisible()) _showBar(false);
-  else _showBar(true);
+  var _vis=_anyGameVisible();
+  if(_vis){
+    _showBar(false);
+    if(!_smSessionActive){
+      try{ _startSession(null); }catch(e){}
+      _smSessionActive=true;
+    }
+  } else {
+    _showBar(true);
+    if(_smSessionActive){ _smSessionActive=false; }
+  }
 }
 setTimeout(function(){
   _showBar(true);
