@@ -247,6 +247,9 @@
       var anchors = document.querySelectorAll('.grid a');
       var press = function (e) { e.currentTarget.classList.add('pressed'); };
       var release = function (e) { e.currentTarget.classList.remove('pressed'); };
+      var clearAll = function () {
+        anchors.forEach(function (a) { a.classList.remove('pressed'); });
+      };
       anchors.forEach(function (a) {
         a.addEventListener('pointerdown', press);
         a.addEventListener('pointerup', release);
@@ -254,11 +257,12 @@
         a.addEventListener('pointerleave', release);
         a.addEventListener('touchend', release, { passive: true });
         a.addEventListener('touchcancel', release, { passive: true });
+        a.addEventListener('click', release);
       });
-      window.addEventListener('pageshow', function (e) {
-        if (e.persisted) {
-          anchors.forEach(function (a) { a.classList.remove('pressed'); });
-        }
+      window.addEventListener('pagehide', clearAll);
+      window.addEventListener('pageshow', clearAll);
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) clearAll();
       });
     })();
   </script>
