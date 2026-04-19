@@ -62,12 +62,12 @@
         stroke: #fff;
       }
     }
-    .grid a:active {
+    .grid a.pressed {
       background: #4a90d9;
       border-color: #4a90d9;
       color: #fff;
     }
-    .grid a:active svg * {
+    .grid a.pressed svg * {
       fill: #fff;
       stroke: #fff;
     }
@@ -242,5 +242,25 @@
     </a>
 
   </div>
+  <script>
+    (function () {
+      var anchors = document.querySelectorAll('.grid a');
+      var press = function (e) { e.currentTarget.classList.add('pressed'); };
+      var release = function (e) { e.currentTarget.classList.remove('pressed'); };
+      anchors.forEach(function (a) {
+        a.addEventListener('pointerdown', press);
+        a.addEventListener('pointerup', release);
+        a.addEventListener('pointercancel', release);
+        a.addEventListener('pointerleave', release);
+        a.addEventListener('touchend', release, { passive: true });
+        a.addEventListener('touchcancel', release, { passive: true });
+      });
+      window.addEventListener('pageshow', function (e) {
+        if (e.persisted) {
+          anchors.forEach(function (a) { a.classList.remove('pressed'); });
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
