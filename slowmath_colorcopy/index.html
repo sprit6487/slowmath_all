@@ -1849,9 +1849,30 @@ function _rMy(){
 }
 
 /* ── 초기화 ── */
+var _gameViewIds=['play-view','game-view','playView','gameView','result-view','resultView','quiz-view','drag-view','fill-view','wn-view','wrong-notes-view','wrongNotesView'];
+function _anyGameVisible(){
+  for(var i=0;i<_gameViewIds.length;i++){
+    var el=document.getElementById(_gameViewIds[i]);
+    if(!el) continue;
+    if(el.classList.contains('hidden')||el.classList.contains('smh')) continue;
+    var cs=window.getComputedStyle(el);
+    if(cs.display!=='none') return true;
+  }
+  return false;
+}
+function _syncBarToGame(){
+  if(_anyGameVisible()) _showBar(false);
+  else _showBar(true);
+}
 setTimeout(function(){
   _showBar(true);
   if(_isLI()) _recVisit();
+  _gameViewIds.forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el) return;
+    try{ new MutationObserver(_syncBarToGame).observe(el,{attributes:true,attributeFilter:['class','style']}); }catch(e){}
+  });
+  _syncBarToGame();
   var lbs=document.querySelectorAll('.logout-btn');
   for(var i=0;i<lbs.length;i++){
     var lb=lbs[i];
