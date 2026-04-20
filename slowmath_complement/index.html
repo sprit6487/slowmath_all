@@ -1487,7 +1487,7 @@ setTimeout(function() {
     document.body.classList.toggle('sm-loggedin', loggedIn && days < 5);
   }
   _updateShareVis();
-  ['socialLogin','socialLogout','goLogin'].forEach(function(fn) {
+  ['socialLogin','socialLogout','goLogin','doLogin','doLogout'].forEach(function(fn) {
     if (typeof window[fn] === 'function') {
       var _orig = window[fn];
       window[fn] = function() { _orig.apply(this, arguments); _updateShareVis(); };
