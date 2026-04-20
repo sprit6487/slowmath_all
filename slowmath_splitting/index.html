@@ -3004,7 +3004,18 @@ setTimeout(function(){
 
 <!-- ===== 로그인 버튼 크기 통일 ===== -->
 <style>
-.login-buttons, .login-btn { box-sizing: border-box !important; }
+.login-view { align-self: stretch !important; }
+.login-buttons {
+  box-sizing: border-box !important;
+  width: min(300px, 100vw - 80px) !important;
+  max-width: 300px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.login-btn {
+  box-sizing: border-box !important;
+  width: 100% !important;
+}
 </style>
 <!-- ===== /로그인 버튼 크기 통일 ===== -->
 
