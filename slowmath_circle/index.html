@@ -2669,17 +2669,27 @@ setTimeout(function(){
 
 <!-- ===== 로그인 화면 레이아웃 ===== -->
 <style>
+/* Anchor login-view to the very top of .app and collapse the app's
+   own top padding while the login view is showing, so the turtle
+   logo sits close to the top of the viewport. */
+body:has(.login-view:not(.hidden)) .app,
+.app:has(#login-view:not(.hidden)),
+.app:has(#loginView:not(.hidden)) {
+  padding-top: 0 !important;
+}
 .login-view {
   justify-content: flex-start !important;
-  padding-top: 32px !important;
-  padding-bottom: 40px !important;
+  padding-top: 12px !important;
+  padding-bottom: 24px !important;
+  min-height: 0 !important;
+  flex: 0 0 auto !important;
 }
 .login-logo-area {
-  margin-bottom: 28px !important;
+  margin-bottom: 24px !important;
 }
 .login-trial {
   margin-top: 0 !important;
-  margin-bottom: 20px !important;
+  margin-bottom: 18px !important;
 }
 </style>
 <!-- ===== /로그인 화면 레이아웃 ===== -->
