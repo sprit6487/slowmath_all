@@ -1556,6 +1556,56 @@ setTimeout(function(){
 })();
 </script>
 <!-- ===== /느린아이 탭바 시스템 ===== -->
+<!-- ===== 홈탭 로그아웃 숨김 ===== -->
+<style>
+.logout-btn { display: none !important; }
+</style>
+<!-- ===== /홈탭 로그아웃 숨김 ===== -->
+
+<!-- ===== 로그인 버튼 크기 통일 ===== -->
+<style>
+.login-view { align-self: stretch !important; }
+.login-buttons {
+  box-sizing: border-box !important;
+  width: min(300px, 100vw - 80px) !important;
+  max-width: 300px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.login-btn {
+  box-sizing: border-box !important;
+  width: 100% !important;
+}
+</style>
+<!-- ===== /로그인 버튼 크기 통일 ===== -->
+
+<!-- ===== 로그인 화면 레이아웃 ===== -->
+<style>
+/* Anchor login-view to the very top of .app and collapse the app's
+   own top padding while the login view is showing, so the turtle
+   logo sits close to the top of the viewport. */
+body:has(.login-view:not(.hidden)) .app,
+.app:has(#login-view:not(.hidden)),
+.app:has(#loginView:not(.hidden)) {
+  padding-top: 0 !important;
+}
+.login-view {
+  justify-content: flex-start !important;
+  padding-top: 28px !important;
+  padding-bottom: 24px !important;
+  min-height: 0 !important;
+  flex: 0 0 auto !important;
+}
+.login-logo-area {
+  margin-bottom: 56px !important;
+}
+.login-trial {
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;
+}
+</style>
+<!-- ===== /로그인 화면 레이아웃 ===== -->
+
 <!-- ===== 가입 환영 팝업 ===== -->
 <style>
 #sm-welcome-overlay {
@@ -1616,9 +1666,18 @@ setTimeout(function(){
         '<button type="button" class="sm-welcome-btn">시작하기</button>' +
       '</div>';
     document.body.appendChild(ov);
-    function close(){ if (ov && ov.parentNode) ov.parentNode.removeChild(ov); }
-    ov.querySelector('.sm-welcome-btn').addEventListener('click', close);
-    ov.addEventListener('click', function(e){ if (e.target === ov) close(); });
+    function close(e){
+      if (e) { try { e.preventDefault(); e.stopPropagation(); } catch(_){} }
+      if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+    }
+    var _btn = ov.querySelector('.sm-welcome-btn');
+    // click + touchend 양쪽 바인딩: dot2dot 등 landscape 앱은 document 레벨에서
+    // touchstart preventDefault 를 걸어 synthetic click 이 나오지 않으므로
+    // touchend 를 명시적으로 받아 팝업을 닫는다.
+    ['click','touchend'].forEach(function(ev){ _btn.addEventListener(ev, close); });
+    ['click','touchend'].forEach(function(ev){
+      ov.addEventListener(ev, function(e){ if (e.target === ov) close(e); });
+    });
   }
   window._smShowWelcome = showWelcome;
 
@@ -1650,56 +1709,6 @@ setTimeout(function(){
 })();
 </script>
 <!-- ===== /가입 환영 팝업 ===== -->
-
-<!-- ===== 홈탭 로그아웃 숨김 ===== -->
-<style>
-.logout-btn { display: none !important; }
-</style>
-<!-- ===== /홈탭 로그아웃 숨김 ===== -->
-
-<!-- ===== 로그인 버튼 크기 통일 ===== -->
-<style>
-.login-view { align-self: stretch !important; }
-.login-buttons {
-  box-sizing: border-box !important;
-  width: min(300px, 100vw - 80px) !important;
-  max-width: 300px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-.login-btn {
-  box-sizing: border-box !important;
-  width: 100% !important;
-}
-</style>
-<!-- ===== /로그인 버튼 크기 통일 ===== -->
-
-<!-- ===== 로그인 화면 레이아웃 ===== -->
-<style>
-/* Anchor login-view to the very top of .app and collapse the app's
-   own top padding while the login view is showing, so the turtle
-   logo sits close to the top of the viewport. */
-body:has(.login-view:not(.hidden)) .app,
-.app:has(#login-view:not(.hidden)),
-.app:has(#loginView:not(.hidden)) {
-  padding-top: 0 !important;
-}
-.login-view {
-  justify-content: flex-start !important;
-  padding-top: 28px !important;
-  padding-bottom: 24px !important;
-  min-height: 0 !important;
-  flex: 0 0 auto !important;
-}
-.login-logo-area {
-  margin-bottom: 56px !important;
-}
-.login-trial {
-  margin-top: 0 !important;
-  margin-bottom: 20px !important;
-}
-</style>
-<!-- ===== /로그인 화면 레이아웃 ===== -->
 
 </body>
 </html>
