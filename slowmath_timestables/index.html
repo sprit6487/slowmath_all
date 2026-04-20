@@ -1775,5 +1775,100 @@ setTimeout(function(){
 })();
 </script>
 <!-- ===== /느린아이 탭바 시스템 ===== -->
+<!-- ===== 가입 환영 팝업 ===== -->
+<style>
+#sm-welcome-overlay {
+  position: fixed; inset: 0; z-index: 99999;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+  animation: smWelcomeFade .18s ease-out;
+}
+@keyframes smWelcomeFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes smWelcomePop  { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+#sm-welcome-overlay .sm-welcome-card {
+  background: #FFFDF8;
+  border: 1.5px solid #EDE0CC;
+  border-radius: 22px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.22);
+  padding: 32px 28px 24px;
+  width: 100%; max-width: 300px;
+  text-align: center;
+  animation: smWelcomePop .22s cubic-bezier(.2,.8,.2,1.05);
+}
+#sm-welcome-overlay .sm-welcome-emoji {
+  font-size: 2.75rem; margin-bottom: 10px; line-height: 1;
+}
+#sm-welcome-overlay .sm-welcome-title {
+  font-size: 1.2rem; font-weight: 900; color: #4A4035;
+  margin-bottom: 10px; letter-spacing: -0.01em;
+}
+#sm-welcome-overlay .sm-welcome-desc {
+  font-size: 0.88rem; color: #7B6545; line-height: 1.65; margin-bottom: 22px;
+}
+#sm-welcome-overlay .sm-welcome-btn {
+  display: block; width: 100%;
+  background: #6BADE8; color: #fff;
+  border: none; border-radius: 14px;
+  padding: 15px 0;
+  font-size: 1rem; font-weight: 700; font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(107,173,232,.3);
+}
+#sm-welcome-overlay .sm-welcome-btn:active { transform: scale(0.98); }
+</style>
+<script>
+(function(){
+  if (window.__smWelcomeInstalled) return;
+  window.__smWelcomeInstalled = true;
+
+  function showWelcome(){
+    if (document.getElementById('sm-welcome-overlay')) return;
+    var ov = document.createElement('div');
+    ov.id = 'sm-welcome-overlay';
+    ov.innerHTML =
+      '<div class="sm-welcome-card" role="dialog" aria-modal="true">' +
+        '<div class="sm-welcome-emoji">🎉</div>' +
+        '<div class="sm-welcome-title">가입을 환영합니다!</div>' +
+        '<div class="sm-welcome-desc">지금부터 하루 동안 모든 기능을<br>무료로 이용하실 수 있어요</div>' +
+        '<button type="button" class="sm-welcome-btn">시작하기</button>' +
+      '</div>';
+    document.body.appendChild(ov);
+    function close(){ if (ov && ov.parentNode) ov.parentNode.removeChild(ov); }
+    ov.querySelector('.sm-welcome-btn').addEventListener('click', close);
+    ov.addEventListener('click', function(e){ if (e.target === ov) close(); });
+  }
+  window._smShowWelcome = showWelcome;
+
+  function wrap(name){
+    var fn = window[name];
+    if (typeof fn !== 'function' || fn.__smWelcomeWrapped) return false;
+    var wrapped = function(){
+      var r = fn.apply(this, arguments);
+      try { setTimeout(showWelcome, 80); } catch(e) {}
+      return r;
+    };
+    wrapped.__smWelcomeWrapped = true;
+    window[name] = wrapped;
+    return true;
+  }
+
+  function wrapAll(){
+    wrap('socialLogin');
+    wrap('doLogin');
+  }
+
+  // Re-wrap periodically; inline patches may redefine these after us.
+  wrapAll();
+  var tries = 0;
+  var iv = setInterval(function(){
+    wrapAll();
+    if (++tries > 20) clearInterval(iv);
+  }, 300);
+})();
+</script>
+<!-- ===== /가입 환영 팝업 ===== -->
+
 </body>
 </html>
