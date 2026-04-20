@@ -1604,7 +1604,10 @@ function _rTrend(){
   var maxLbl='<text x="'+pad+'" y="'+(top-2)+'" font-size="8" fill="#B8AD9E" font-weight="600">최대 '+maxP+'문제</text>';
   var accLbl100='<text x="'+(W-pad)+'" y="'+(top-2)+'" font-size="8" fill="#5BC886" font-weight="700" text-anchor="end">정답률 100%</text>';
   var accLbl50='<text x="'+(W-pad)+'" y="'+(midY-2).toFixed(1)+'" font-size="7" fill="#B8AD9E" font-weight="600" text-anchor="end">50%</text>';
-  var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="월별 시간 내 추이">'+refLine+axis+maxLbl+accLbl100+accLbl50+bars+line+dots+labels+'</svg>';
+  var midPVal=maxP/2;
+  var midPStr=(midPVal===Math.floor(midPVal))?String(midPVal):midPVal.toFixed(1);
+  var midLbl='<text x="'+pad+'" y="'+(midY-2).toFixed(1)+'" font-size="7" fill="#B8AD9E" font-weight="600">'+midPStr+'문제</text>';
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="월별 시간 내 추이">'+refLine+axis+maxLbl+accLbl100+accLbl50+midLbl+bars+line+dots+labels+'</svg>';
   var avgP=Math.round(totalP/monthData.length);
   var acc=totalP>0?Math.round(totalC/totalP*100):0;
   var summary='<div class="sm-tg-sum">일평균 <b>'+avgP+'</b>문제 · 정답률 <b>'+acc+'</b>%</div>';
