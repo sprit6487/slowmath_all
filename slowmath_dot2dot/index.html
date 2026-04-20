@@ -20,7 +20,7 @@
         min-height: 100dvh;
         background: white;
         padding: 24px 20px;
-        padding-top: max(40px, env(safe-area-inset-top));
+        padding-top: max(24px, env(safe-area-inset-top));
         padding-bottom: max(24px, env(safe-area-inset-bottom));
         display: flex; flex-direction: column;
     }
@@ -65,7 +65,7 @@
     }
     /* 소형 폰 (≤ 380px) */
     @media (max-width: 380px) {
-        .app { padding: 16px 12px; padding-top: max(40px, env(safe-area-inset-top)); }
+        .app { padding: 16px 12px; padding-top: max(24px, env(safe-area-inset-top)); }
         .app-header h1 { font-size: 1.6rem; }
         .login-logo-area h1 { font-size: 1.5rem; }
         .login-subtitle { font-size: .82rem; }
@@ -85,7 +85,7 @@
     }
     /* 중형 폰 (≤ 420px) */
     @media (max-width: 420px) {
-        .app { padding: 20px 16px; padding-top: max(40px, env(safe-area-inset-top)); }
+        .app { padding: 20px 16px; padding-top: max(24px, env(safe-area-inset-top)); }
         .game-boards { gap: 8px; }
         .board-wrapper { max-width: 45vw; }
     }
@@ -2355,6 +2355,15 @@ body:has(.login-view:not(.hidden)) .app,
 })();
 </script>
 <!-- ===== /가입 환영 팝업 ===== -->
+
+<!-- ===== 홈/시작 뷰 상단 여백 ===== -->
+<style>
+.app:has(#home-view:not(.hidden)),
+.app:has(#start-view:not(.hidden)) {
+  padding-top: max(40px, env(safe-area-inset-top)) !important;
+}
+</style>
+<!-- ===== /홈/시작 뷰 상단 여백 ===== -->
 
 </body>
 </html>
