@@ -527,6 +527,7 @@
   }
   .split-buckets {
     display: flex; gap: 16px; width: 100%; margin-bottom: 8px;
+    touch-action: none;
   }
   .split-bucket {
     flex: 1; min-height: 80px; padding: 12px 8px;
@@ -535,6 +536,7 @@
     gap: 6px;
     overflow: hidden;
     transition: border-color 0.2s, background 0.2s;
+    touch-action: none;
   }
   .bucket-inner {
     display: grid;
@@ -543,6 +545,7 @@
     justify-items: start;
     align-content: start;
     max-width: 100%;
+    touch-action: none;
   }
   .bucket-inner .drag-circle {
     width: 26px; height: 26px;

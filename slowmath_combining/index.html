@@ -327,18 +327,19 @@
   .choices-grid.chips-locked .circle-choice-btn { pointer-events: none; opacity: 0.4; }
 
   /* ===== Drag Combine Mode ===== */
-  .drag-game-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 16px 0 20px; width: 100%; }
-  .drag-sources-row { display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap; width: 100%; }
+  .drag-game-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 16px 0 20px; width: 100%; touch-action: none; }
+  .drag-sources-row { display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap; width: 100%; touch-action: none; }
   .drag-circle-box {
     flex: 1; border: 2.5px solid; border-radius: 14px;
     display: grid; grid-template-columns: repeat(3, 1fr);
     gap: 8px; padding: 12px; position: relative;
     align-content: center; justify-content: center;
+    touch-action: none;
   }
   .drag-circle-box.orange-src { border-color: var(--app-orange); background: var(--app-orange-soft); }
   .drag-circle-box.green-src { border-color: var(--app-green); background: #EDFAF4; }
   .drag-circle-box .cdot { width: 100% !important; height: auto !important; aspect-ratio: 1/1; cursor: grab; touch-action: none; user-select: none; transition: opacity 0.15s; justify-self: center; align-self: center; }
-  .drag-tray { width: 100%; border: 2.5px dashed #6BADE8; border-radius: 20px; background: #EEF6FD; display: grid; gap: 6px; padding: 12px; align-content: center; justify-content: center; position: relative; }
+  .drag-tray { width: 100%; border: 2.5px dashed #6BADE8; border-radius: 20px; background: #EEF6FD; display: grid; gap: 6px; padding: 12px; align-content: center; justify-content: center; position: relative; touch-action: none; }
   .drag-hint-txt { font-size: 1rem; color: #6BADE8; font-weight: 600; pointer-events: none; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
   .drag-arrow-wrap { width: 100%; pointer-events: none; display: block; }
   .tray-dot, .tray-slot { width: 100%; height: 100%; border-radius: 50%; }
