@@ -190,6 +190,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 /* Clock scene */
 .scene-area{width:100%;margin-bottom:14px;display:flex;justify-content:center;align-items:center;}
 .scene-area svg{max-width:210px;max-height:210px;width:100%;}
+.scene-text-question{font-size:2.6rem;font-weight:900;color:var(--warm-700);padding:36px 16px;min-height:180px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.25;letter-spacing:.5px;background:#FAF5EE;border:2px solid var(--border);border-radius:20px;width:100%;max-width:260px;box-sizing:border-box;}
+.sub-preview-text{font-size:.8rem;font-weight:900;color:var(--warm-700);padding:4px 8px;background:#FAF5EE;border:1.5px solid var(--border);border-radius:10px;line-height:1;white-space:nowrap;}
 
 /* Item cards — 2×2 grid for 4 time choices */
 .compare-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:12px;}
@@ -431,6 +433,58 @@ setTimeout(function() {
       </div>
     </div>
 
+    <!-- 우리말 → 숫자 맞추기 -->
+    <div class="clock-type-section">
+      <div class="clock-type-header">
+        <span class="clock-type-icon">🔢</span>
+        <span class="clock-type-title">우리말 → 숫자 맞추기</span>
+      </div>
+      <div class="sub-mode-grid">
+        <button class="sub-mode-btn" onclick="startGame('hour','kornum')">
+          <div class="sub-preview" id="sprev-kn-hour"></div>
+          <div class="sub-mode-label">정시 맞추기</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('half','kornum')">
+          <div class="sub-preview" id="sprev-kn-half"></div>
+          <div class="sub-mode-label">30분 맞추기</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('quarter','kornum')">
+          <div class="sub-preview" id="sprev-kn-quarter"></div>
+          <div class="sub-mode-label">15분 맞추기</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('three_quarter','kornum')">
+          <div class="sub-preview" id="sprev-kn-three_quarter"></div>
+          <div class="sub-mode-label">45분 맞추기</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- 숫자 → 우리말 맞추기 -->
+    <div class="clock-type-section">
+      <div class="clock-type-header">
+        <span class="clock-type-icon">📜</span>
+        <span class="clock-type-title">숫자 → 우리말 맞추기</span>
+      </div>
+      <div class="sub-mode-grid">
+        <button class="sub-mode-btn" onclick="startGame('hour','numkor')">
+          <div class="sub-preview" id="sprev-nk-hour"></div>
+          <div class="sub-mode-label">정시 맞추기</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('half','numkor')">
+          <div class="sub-preview" id="sprev-nk-half"></div>
+          <div class="sub-mode-label">30분 맞추기</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('quarter','numkor')">
+          <div class="sub-preview" id="sprev-nk-quarter"></div>
+          <div class="sub-mode-label">15분 맞추기</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('three_quarter','numkor')">
+          <div class="sub-preview" id="sprev-nk-three_quarter"></div>
+          <div class="sub-mode-label">45분 맞추기</div>
+        </button>
+      </div>
+    </div>
+
   <!-- 설정 -->
   <div class="settings-section">
     <div class="setting-row" style="align-items:flex-start;">
@@ -627,15 +681,18 @@ function clockSVG(h, m, isSmall, customSz) {
 }
 
 /* ══ 시간 포맷 ══ */
-function formatTime(h, m) {
-  if (timeLabelStyle === 'korean') {
-    const hw = HOUR_KR[h] || String(h);
-    if (m === 0) return `${hw}시`;
-    const mw = MIN_KR[m] || String(m);
-    return `${hw}시 ${mw}분`;
-  }
+function formatTimeNumeric(h, m) {
   if (m === 0) return `${h}시`;
   return `${h}시 ${m}분`;
+}
+function formatTimeKorean(h, m) {
+  const hw = HOUR_KR[h] || String(h);
+  if (m === 0) return `${hw}시`;
+  const mw = MIN_KR[m] || String(m);
+  return `${hw}시 ${mw}분`;
+}
+function formatTime(h, m) {
+  return timeLabelStyle === 'korean' ? formatTimeKorean(h, m) : formatTimeNumeric(h, m);
 }
 function formatDigital(h, m) {
   return `${h}:${String(m).padStart(2, '0')}`;
@@ -707,6 +764,14 @@ function initPreviews() {
   if (cd2a) cd2a.innerHTML = digitalClockSVG(1, 0, true);
   const ca2d = document.getElementById('sprev-cross-a2d');
   if (ca2d) ca2d.innerHTML = clockSVG(1, 0, true);
+  /* 우리말→숫자: 문제는 우리말 / 숫자→우리말: 문제는 숫자 */
+  const krTimes = { hour:[1,0], half:[1,30], quarter:[1,15], three_quarter:[1,45] };
+  for (const [mode, [h, m]] of Object.entries(krTimes)) {
+    const kn = document.getElementById(`sprev-kn-${mode}`);
+    if (kn) kn.innerHTML = `<span class="sub-preview-text">${formatTimeKorean(h, m)}</span>`;
+    const nk = document.getElementById(`sprev-nk-${mode}`);
+    if (nk) nk.innerHTML = `<span class="sub-preview-text">${formatTimeNumeric(h, m)}</span>`;
+  }
 }
 
 /* ══ 바늘시계 헤더 아이콘 SVG (100×100 뷰박스, 비율 최적화) ══ */
@@ -988,6 +1053,24 @@ function renderQ() {
     row.innerHTML = q.choices.map((c, i) =>
       `<div class="item-card digital-choice" id="card-${i}" onclick="selectCard(${i})">
         ${digitalChoiceSVG(c.h, c.m)}
+      </div>`
+    ).join('');
+  } else if (curDisplayType === 'numkor') {
+    document.getElementById('question-prompt').textContent = '같은 시간을 우리말로?';
+    document.getElementById('scene-area').innerHTML =
+      `<div class="scene-text-question">${formatTimeNumeric(q.h, q.m)}</div>`;
+    row.innerHTML = q.choices.map((c, i) =>
+      `<div class="item-card" id="card-${i}" onclick="selectCard(${i})">
+        <span class="time-label">${formatTimeKorean(c.h, c.m)}</span>
+      </div>`
+    ).join('');
+  } else if (curDisplayType === 'kornum') {
+    document.getElementById('question-prompt').textContent = '같은 시간을 숫자로?';
+    document.getElementById('scene-area').innerHTML =
+      `<div class="scene-text-question">${formatTimeKorean(q.h, q.m)}</div>`;
+    row.innerHTML = q.choices.map((c, i) =>
+      `<div class="item-card" id="card-${i}" onclick="selectCard(${i})">
+        <span class="time-label">${formatTimeNumeric(c.h, c.m)}</span>
       </div>`
     ).join('');
   } else {
