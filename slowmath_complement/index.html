@@ -37,9 +37,9 @@
     width: 100%; max-width: 480px;
     min-height: 100dvh;
     background: #fff;
-    padding: 24px 20px;
-    padding-top: max(24px, env(safe-area-inset-top));
-    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    padding: 16px 18px;
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
     display: flex; flex-direction: column; align-items: center;
     position: relative;
   }
@@ -348,25 +348,25 @@
   .game-container {
     background: #fff; border: 2px solid var(--border);
     border-radius: 20px;
-    padding: 24px 18px; width: 100%;
+    padding: 16px 14px; width: 100%;
     display: flex; flex-direction: column; align-items: center;
     position: relative;
   }
 
   /* Question */
   .question-label {
-    font-size: 0.85rem; color: var(--warm-400); font-weight: 500;
-    margin-bottom: 8px;
+    font-size: 0.8rem; color: var(--warm-400); font-weight: 500;
+    margin-bottom: 4px;
   }
   .question-number {
-    font-size: 3rem; font-weight: 900; line-height: 1;
-    color: var(--warm-800); margin-bottom: 8px;
+    font-size: 2.5rem; font-weight: 900; line-height: 1;
+    color: var(--warm-800); margin-bottom: 4px;
   }
 
   /* Circles - 5 per row, 2 rows */
   .circles-row {
     display: grid; grid-template-columns: repeat(5, 30px);
-    gap: 8px; margin: 12px 0 20px;
+    gap: 8px; margin: 8px 0 10px;
     justify-content: center;
   }
   .dot {
@@ -399,29 +399,29 @@
     cursor: pointer;
   }
   .drag-hint {
-    font-size: 0.8rem; color: var(--app-orange);
-    font-weight: 600; margin: 2px 0 6px;
+    font-size: 0.75rem; color: var(--app-orange);
+    font-weight: 600; margin: 0 0 4px;
     text-align: center;
   }
   .circles-row.orange-pool {
-    margin: 4px 0 12px;
-    padding: 8px 6px;
+    margin: 0 0 8px;
+    padding: 6px 10px;
     background: var(--app-orange-soft);
-    border-radius: 14px;
+    border-radius: 12px;
   }
 
   /* Choices */
   .choices-grid {
     display: grid; grid-template-columns: 1fr 1fr;
-    gap: 12px; width: 100%; max-width: 280px;
-    margin-top: 20px;
+    gap: 10px; width: 100%; max-width: 280px;
+    margin-top: 10px;
     position: relative;
   }
   .choice-btn {
-    padding: 18px;
+    padding: 8px;
     border: 2.5px solid var(--border);
-    border-radius: 16px; background: #fff;
-    font-size: 2rem; font-weight: 900;
+    border-radius: 12px; background: #fff;
+    font-size: 1.4rem; font-weight: 900;
     color: var(--warm-700);
     cursor: pointer; font-family: inherit;
     transition: all 0.1s; text-align: center;
@@ -529,7 +529,7 @@
   }
   .next-btn:active { transform: scale(0.96); }
 
-  .btn-next-q { display: block; width: 100%; max-width: 360px; margin: 16px auto 0; padding: 14px 0; border-radius: 16px; border: none; background: var(--warm-700); color: white; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; box-shadow: 0 2px 8px rgba(74,64,53,0.15); }
+  .btn-next-q { display: block; width: 100%; max-width: 360px; margin: 10px auto 0; padding: 12px 0; border-radius: 14px; border: none; background: var(--warm-700); color: white; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; box-shadow: 0 2px 8px rgba(74,64,53,0.15); }
   .btn-next-q:active { transform: scale(0.98); background: var(--warm-800); }
 
   /* Feedback */
@@ -591,7 +591,7 @@
     }
     .login-view { min-height: auto; padding: 60px 40px; }
     .question-number { font-size: 3.75rem; }
-    .choice-btn { font-size: 2.5rem; }
+    .choice-btn { font-size: 2.5rem; padding: 18px; border-radius: 16px; }
     .dot { width: 34px; height: 34px; }
     .dot.empty { width: 34px; height: 34px; }
     .circles-row { grid-template-columns: repeat(5, 34px); gap: 10px; }
@@ -744,38 +744,20 @@ setTimeout(function() {
     <h2>보수 찾기 (원 표시)</h2>
     <p class="desc">숫자와 원을 보고, 더해서 10이 되는 수를 골라요</p>
     <div class="mode-preview">
-      <!-- 2x5 grid: 3 blue circles static, 7 dashed circles pop in -->
+      <!-- 2x5 grid: 3 blue circles, 7 dashed circles (static) -->
       <svg width="160" height="64" viewBox="0 0 160 64">
         <!-- Row 1 -->
-        <!-- Blue dot 1 - always visible -->
         <circle cx="16" cy="18" r="11" fill="#6BADE8" opacity="0.7"/>
-        <!-- Blue dot 2 - always visible -->
         <circle cx="44" cy="18" r="11" fill="#6BADE8" opacity="0.7"/>
-        <!-- Blue dot 3 - always visible -->
         <circle cx="72" cy="18" r="11" fill="#6BADE8" opacity="0.7"/>
-        <!-- Empty dashed circles - all appear at once -->
-        <circle cx="100" cy="18" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0">
-          <animate attributeName="opacity" values="0;0;0;0.7;0.7;0.7;0.7;0" dur="4s" repeatCount="indefinite"/>
-        </circle>
-        <circle cx="128" cy="18" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0">
-          <animate attributeName="opacity" values="0;0;0;0.7;0.7;0.7;0.7;0" dur="4s" repeatCount="indefinite"/>
-        </circle>
+        <circle cx="100" cy="18" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0.7"/>
+        <circle cx="128" cy="18" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0.7"/>
         <!-- Row 2 -->
-        <circle cx="16" cy="46" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0">
-          <animate attributeName="opacity" values="0;0;0;0.7;0.7;0.7;0.7;0" dur="4s" repeatCount="indefinite"/>
-        </circle>
-        <circle cx="44" cy="46" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0">
-          <animate attributeName="opacity" values="0;0;0;0.7;0.7;0.7;0.7;0" dur="4s" repeatCount="indefinite"/>
-        </circle>
-        <circle cx="72" cy="46" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0">
-          <animate attributeName="opacity" values="0;0;0;0.7;0.7;0.7;0.7;0" dur="4s" repeatCount="indefinite"/>
-        </circle>
-        <circle cx="100" cy="46" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0">
-          <animate attributeName="opacity" values="0;0;0;0.7;0.7;0.7;0.7;0" dur="4s" repeatCount="indefinite"/>
-        </circle>
-        <circle cx="128" cy="46" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0">
-          <animate attributeName="opacity" values="0;0;0;0.7;0.7;0.7;0.7;0" dur="4s" repeatCount="indefinite"/>
-        </circle>
+        <circle cx="16" cy="46" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0.7"/>
+        <circle cx="44" cy="46" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0.7"/>
+        <circle cx="72" cy="46" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0.7"/>
+        <circle cx="100" cy="46" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0.7"/>
+        <circle cx="128" cy="46" r="11" fill="none" stroke="#D5CDC2" stroke-width="2" stroke-dasharray="4 3" opacity="0.7"/>
       </svg>
     </div>
     <div class="mode-btns">
