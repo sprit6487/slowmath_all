@@ -190,7 +190,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 /* Clock scene */
 .scene-area{width:100%;margin-bottom:14px;display:flex;justify-content:center;align-items:center;}
 .scene-area svg{max-width:210px;max-height:210px;width:100%;}
-.scene-text-question{font-size:2.6rem;font-weight:900;color:var(--warm-700);padding:36px 16px;min-height:180px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.25;letter-spacing:.5px;background:#FAF5EE;border:2px solid var(--border);border-radius:20px;width:100%;max-width:260px;box-sizing:border-box;}
+.scene-text-question{font-size:2.6rem;font-weight:900;color:var(--warm-700);padding:22px 16px 18px;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;line-height:1.25;letter-spacing:.5px;background:#FAF5EE;border:2px solid var(--border);border-radius:20px;width:100%;max-width:260px;box-sizing:border-box;}
+.count-icons{display:flex;flex-wrap:wrap;justify-content:center;gap:3px 5px;font-size:1.55rem;line-height:1;letter-spacing:0;font-weight:400;max-width:100%;}
+.count-icons span{display:inline-block;line-height:1;}
 .sub-preview-text{font-size:.8rem;font-weight:900;color:var(--warm-700);padding:4px 8px;background:#FAF5EE;border:1.5px solid var(--border);border-radius:10px;line-height:1;white-space:nowrap;}
 
 /* Item cards — 2×2 grid for 4 time choices */
@@ -376,7 +378,7 @@ setTimeout(function() {
         </button>
         <button class="sub-mode-btn" onclick="startGame('gae','kornum')">
           <div class="sub-preview" id="sprev-kn-gae"></div>
-          <div class="sub-mode-label">📦 물건</div>
+          <div class="sub-mode-label">⚽ 물건</div>
         </button>
         <button class="sub-mode-btn" onclick="startGame('mari','kornum')">
           <div class="sub-preview" id="sprev-kn-mari"></div>
@@ -392,7 +394,7 @@ setTimeout(function() {
         </button>
         <button class="sub-mode-btn" onclick="startGame('byeong','kornum')">
           <div class="sub-preview" id="sprev-kn-byeong"></div>
-          <div class="sub-mode-label">🧃 음료</div>
+          <div class="sub-mode-label">🍶 음료</div>
         </button>
         <button class="sub-mode-btn" onclick="startGame('al','kornum')">
           <div class="sub-preview" id="sprev-kn-al"></div>
@@ -418,7 +420,7 @@ setTimeout(function() {
         </button>
         <button class="sub-mode-btn" onclick="startGame('gae','numkor')">
           <div class="sub-preview" id="sprev-nk-gae"></div>
-          <div class="sub-mode-label">📦 물건</div>
+          <div class="sub-mode-label">⚽ 물건</div>
         </button>
         <button class="sub-mode-btn" onclick="startGame('mari','numkor')">
           <div class="sub-preview" id="sprev-nk-mari"></div>
@@ -434,7 +436,7 @@ setTimeout(function() {
         </button>
         <button class="sub-mode-btn" onclick="startGame('byeong','numkor')">
           <div class="sub-preview" id="sprev-nk-byeong"></div>
-          <div class="sub-mode-label">🧃 음료</div>
+          <div class="sub-mode-label">🍶 음료</div>
         </button>
         <button class="sub-mode-btn" onclick="startGame('al','numkor')">
           <div class="sub-preview" id="sprev-nk-al"></div>
@@ -551,6 +553,17 @@ let delayTimer = null;
 
 /* ══ 우리말 수 표현 (셀 때 쓰는 형태: 한, 두, 세...) ══ */
 const NUM_KR = ['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열'];
+
+/* ══ 단위별 시각 아이콘 (서브모드 라벨과 동일) ══ */
+const UNIT_EMOJI = {
+  myeong: '🧑', gae: '⚽', mari: '🐰', dae: '🚗',
+  jang:   '📄', byeong: '🍶', al: '🍬', jan: '🥛'
+};
+function renderCountIcons(n, unitKey) {
+  const emoji = UNIT_EMOJI[unitKey] || '⭐';
+  const items = Array(n).fill(`<span>${emoji}</span>`).join('');
+  return `<div class="count-icons">${items}</div>`;
+}
 
 /* ══ 세는 말 포맷 ══ */
 function formatCounterKorean(n, unitKey) {
@@ -769,7 +782,7 @@ function renderQ() {
     /* 우리말 → 숫자 */
     document.getElementById('question-prompt').textContent = '숫자로 어떻게 쓸까요?';
     document.getElementById('scene-area').innerHTML =
-      `<div class="scene-text-question">${formatCounterKorean(q.n, q.unit)}</div>`;
+      `<div class="scene-text-question"><span>${formatCounterKorean(q.n, q.unit)}</span>${renderCountIcons(q.n, q.unit)}</div>`;
     row.innerHTML = q.choices.map((c, i) =>
       `<div class="item-card" id="card-${i}" onclick="selectCard(${i})">
         <span class="time-label">${formatCounterNumeric(c.n, c.unit)}</span>
@@ -779,7 +792,7 @@ function renderQ() {
     /* numkor: 숫자 → 우리말 */
     document.getElementById('question-prompt').textContent = '우리말로 어떻게 셀까요?';
     document.getElementById('scene-area').innerHTML =
-      `<div class="scene-text-question">${formatCounterNumeric(q.n, q.unit)}</div>`;
+      `<div class="scene-text-question"><span>${formatCounterNumeric(q.n, q.unit)}</span>${renderCountIcons(q.n, q.unit)}</div>`;
     row.innerHTML = q.choices.map((c, i) =>
       `<div class="item-card" id="card-${i}" onclick="selectCard(${i})">
         <span class="time-label">${formatCounterKorean(c.n, c.unit)}</span>
