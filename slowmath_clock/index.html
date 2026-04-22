@@ -158,6 +158,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 .toggle-knob{width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:transform .2s;}
 .toggle-track.on .toggle-knob{transform:translateX(20px);}
 .impulse-mode-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.label-style-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;}
+.label-style-btn{padding:10px 8px;border-radius:14px;border:2px solid var(--border);background:#fff;cursor:pointer;transition:all .15s;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.label-style-btn.selected{border-color:#C4AA82;background:#FAF5EE;}
+.label-style-title{font-size:.8rem;font-weight:700;color:var(--warm-700);}
+.label-style-sample{font-size:.85rem;font-weight:800;color:var(--warm-500);}
 .impulse-mode-btn{display:flex;flex-direction:column;align-items:center;padding:10px 8px;border-radius:14px;border:2px solid var(--border);background:#fff;cursor:pointer;transition:all .15s;font-family:inherit;}
 .impulse-mode-btn.selected{border-color:#C4AA82;background:#FAF5EE;}
 .impulse-mode-icon{font-size:1.2rem;margin-bottom:2px;}
@@ -428,6 +433,22 @@ setTimeout(function() {
 
   <!-- 설정 -->
   <div class="settings-section">
+    <div class="setting-row" style="align-items:flex-start;">
+      <div style="flex:1;">
+        <div class="setting-label">보기 표시</div>
+        <div class="setting-desc">시간 보기를 우리말 또는 숫자로 보여줘요</div>
+        <div class="label-style-options">
+          <button class="label-style-btn selected" onclick="setTimeLabelStyle('korean')" data-style="korean">
+            <span class="label-style-title">우리말</span>
+            <span class="label-style-sample">다섯시 삼십분</span>
+          </button>
+          <button class="label-style-btn" onclick="setTimeLabelStyle('numeric')" data-style="numeric">
+            <span class="label-style-title">숫자</span>
+            <span class="label-style-sample">5시 30분</span>
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="setting-row">
       <div>
         <div class="setting-label">음성</div>
@@ -523,7 +544,12 @@ const MODE_MINUTES = {
 /* ══ 상태 ══ */
 let curMode, curDisplayType, curQuestions, qIdx, score, curQ, locked;
 let ttsOn = true, impulsePrevention = true, impulseMode = 'hide', impulseDelay = 5;
+let timeLabelStyle = 'korean';
 let delayTimer = null;
+
+/* ══ 우리말 시간 표현 ══ */
+const HOUR_KR = ['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열','열한','열두'];
+const MIN_KR = {15:'십오', 30:'삼십', 45:'사십오'};
 
 /* ══ 시계 SVG 그리기 ══ */
 function clockHand(cx, cy, angleDeg, len, backLen, width, color) {
@@ -602,6 +628,12 @@ function clockSVG(h, m, isSmall, customSz) {
 
 /* ══ 시간 포맷 ══ */
 function formatTime(h, m) {
+  if (timeLabelStyle === 'korean') {
+    const hw = HOUR_KR[h] || String(h);
+    if (m === 0) return `${hw}시`;
+    const mw = MIN_KR[m] || String(m);
+    return `${hw}시 ${mw}분`;
+  }
   if (m === 0) return `${h}시`;
   return `${h}시 ${m}분`;
 }
@@ -813,7 +845,7 @@ if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
 /* ══ 설정 ══ */
 function saveSettings() {
   localStorage.setItem('slowmath_clock_settings', JSON.stringify(
-    {ttsOn, impulsePrevention, impulseMode, impulseDelay}
+    {ttsOn, impulsePrevention, impulseMode, impulseDelay, timeLabelStyle}
   ));
 }
 function loadSettings() {
@@ -824,6 +856,7 @@ function loadSettings() {
     if (s.impulsePrevention !== undefined) impulsePrevention = s.impulsePrevention;
     if (s.impulseMode) impulseMode = s.impulseMode;
     if (s.impulseDelay) impulseDelay = s.impulseDelay;
+    if (s.timeLabelStyle) timeLabelStyle = s.timeLabelStyle;
   } catch(e) {}
 }
 function applySettingsUI() {
@@ -837,6 +870,16 @@ function applySettingsUI() {
   document.querySelectorAll('.imp-sec').forEach(b =>
     b.classList.toggle('active', parseInt(b.textContent) === impulseDelay)
   );
+  document.querySelectorAll('.label-style-btn').forEach(b =>
+    b.classList.toggle('selected', b.dataset.style === timeLabelStyle)
+  );
+}
+function setTimeLabelStyle(style) {
+  timeLabelStyle = style;
+  document.querySelectorAll('.label-style-btn').forEach(b =>
+    b.classList.toggle('selected', b.dataset.style === style)
+  );
+  saveSettings();
 }
 function toggleTTS() {
   ttsOn = !ttsOn;
