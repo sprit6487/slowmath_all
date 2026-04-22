@@ -191,7 +191,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 .scene-area{width:100%;margin-bottom:14px;display:flex;justify-content:center;align-items:center;}
 .scene-area svg{max-width:210px;max-height:210px;width:100%;}
 .scene-text-question{font-size:2.6rem;font-weight:900;color:var(--warm-700);padding:22px 16px 18px;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;line-height:1.25;letter-spacing:.5px;background:#FAF5EE;border:2px solid var(--border);border-radius:20px;width:100%;max-width:260px;box-sizing:border-box;}
-.count-icons{display:flex;flex-wrap:wrap;justify-content:center;gap:3px 5px;font-size:1.55rem;line-height:1;letter-spacing:0;font-weight:400;max-width:100%;}
+.count-icons{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:1.55rem;line-height:1;letter-spacing:0;font-weight:400;}
+.count-row{display:flex;justify-content:center;gap:5px;}
 .count-icons span{display:inline-block;line-height:1;}
 .sub-preview-text{font-size:.8rem;font-weight:900;color:var(--warm-700);padding:4px 8px;background:#FAF5EE;border:1.5px solid var(--border);border-radius:10px;line-height:1;white-space:nowrap;}
 
@@ -561,8 +562,13 @@ const UNIT_EMOJI = {
 };
 function renderCountIcons(n, unitKey) {
   const emoji = UNIT_EMOJI[unitKey] || '⭐';
-  const items = Array(n).fill(`<span>${emoji}</span>`).join('');
-  return `<div class="count-icons">${items}</div>`;
+  const rows = [];
+  for (let i = 0; i < n; i += 5) {
+    const count = Math.min(5, n - i);
+    const items = Array(count).fill(`<span>${emoji}</span>`).join('');
+    rows.push(`<div class="count-row">${items}</div>`);
+  }
+  return `<div class="count-icons">${rows.join('')}</div>`;
 }
 
 /* ══ 세는 말 포맷 ══ */
