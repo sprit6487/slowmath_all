@@ -1569,7 +1569,20 @@ var _SM_RECO = [
 ];
 function _showRecoPopup() {
   if (!_SM_RECO.length) return;
-  var item = _SM_RECO[Math.floor(Math.random() * _SM_RECO.length)];
+  var _m = window.location.pathname.match(/slowmath_[a-z0-9]+/g) || ['app'];
+  var base = _m[_m.length - 1];
+  var COUNT_KEY = 'sm_reco_count_' + base;
+  var SHOWN_KEY = 'sm_reco_shown_' + base;
+  var count = (parseInt(localStorage.getItem(COUNT_KEY)) || 0) + 1;
+  try { localStorage.setItem(COUNT_KEY, String(count)); } catch(e) {}
+  if (count % 2 !== 0) return;
+  var shown = [];
+  try { shown = JSON.parse(localStorage.getItem(SHOWN_KEY)) || []; } catch(e) {}
+  var pool = _SM_RECO.filter(function(app) { return shown.indexOf(app.url) === -1; });
+  if (pool.length === 0) return;
+  var item = pool[Math.floor(Math.random() * pool.length)];
+  shown.push(item.url);
+  try { localStorage.setItem(SHOWN_KEY, JSON.stringify(shown)); } catch(e) {}
   document.getElementById('sm-reco-emoji').innerHTML = item.emoji;
   document.getElementById('sm-reco-title').textContent = item.title;
   document.getElementById('sm-reco-desc').innerHTML = item.desc;
