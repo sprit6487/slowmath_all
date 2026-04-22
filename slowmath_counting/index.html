@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>느린아이 시계 보기</title>
+<title>느린아이 우리말 세기</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -274,9 +274,9 @@ body:not(.sm-loggedin) #share-bubble { display: none !important; }
         </svg>
     </div>
     <h1 class="splash-title">
-        <span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">시계 보기</span>
+        <span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">우리말 세기</span>
     </h1>
-    <p class="splash-subtitle">시계를 읽는 연습을 해보아요</p>
+    <p class="splash-subtitle">우리말로 세는 연습을 해보아요</p>
 </div>
 <script>
 setTimeout(function() {
@@ -312,8 +312,8 @@ setTimeout(function() {
                 <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity="0.4"/>
                 <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-            <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">시계 보기</span></h1>
-            <p class="login-subtitle">시계를 읽는 연습을 해보아요</p>
+            <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">우리말 세기</span></h1>
+            <p class="login-subtitle">우리말로 세는 연습을 해보아요</p>
         </div>
           <p class="login-trial">가입하시고 하루 동안 모든 기능을<br>무료로 체험해보세요</p>
 <div class="login-buttons">
@@ -358,81 +358,11 @@ setTimeout(function() {
       <circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/>
       <path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/>
     </svg>
-    <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">시계 보기</span></h1>
-    <p class="brand-sub">시계를 읽는 연습을 해보아요</p>
+    <h1><span style="color:#6BADE8;">느린</span><span style="color:#F0A050;">아이</span> <span style="color:#4A4035;">우리말 세기</span></h1>
+    <p class="brand-sub">우리말로 세는 연습을 해보아요</p>
   </div>
 
   <div class="clock-sections">
-    <!-- 전자시계 -->
-    <div class="clock-type-section">
-      <div class="clock-type-header">
-        <span class="clock-type-icon">🔢</span>
-        <span class="clock-type-title">전자시계</span>
-      </div>
-      <div class="sub-mode-grid">
-        <button class="sub-mode-btn" onclick="startGame('hour','digital')">
-          <div class="sub-preview" id="sprev-d-hour"></div>
-          <div class="sub-mode-label">정시 맞추기</div>
-        </button>
-        <button class="sub-mode-btn" onclick="startGame('half','digital')">
-          <div class="sub-preview" id="sprev-d-half"></div>
-          <div class="sub-mode-label">30분 맞추기</div>
-        </button>
-        <button class="sub-mode-btn" onclick="startGame('quarter','digital')">
-          <div class="sub-preview" id="sprev-d-quarter"></div>
-          <div class="sub-mode-label">15분 맞추기</div>
-        </button>
-        <button class="sub-mode-btn" onclick="startGame('three_quarter','digital')">
-          <div class="sub-preview" id="sprev-d-three_quarter"></div>
-          <div class="sub-mode-label">45분 맞추기</div>
-        </button>
-      </div>
-    </div>
-    <!-- 바늘시계 -->
-    <div class="clock-type-section">
-      <div class="clock-type-header">
-        <span class="clock-type-icon">🕐</span>
-        <span class="clock-type-title">바늘시계</span>
-      </div>
-      <div class="sub-mode-grid">
-        <button class="sub-mode-btn" onclick="startGame('hour','analog')">
-          <div class="sub-preview" id="sprev-a-hour"></div>
-          <div class="sub-mode-label">정시 맞추기</div>
-        </button>
-        <button class="sub-mode-btn" onclick="startGame('half','analog')">
-          <div class="sub-preview" id="sprev-a-half"></div>
-          <div class="sub-mode-label">30분 맞추기</div>
-        </button>
-        <button class="sub-mode-btn" onclick="startGame('quarter','analog')">
-          <div class="sub-preview" id="sprev-a-quarter"></div>
-          <div class="sub-mode-label">15분 맞추기</div>
-        </button>
-        <button class="sub-mode-btn" onclick="startGame('three_quarter','analog')">
-          <div class="sub-preview" id="sprev-a-three_quarter"></div>
-          <div class="sub-mode-label">45분 맞추기</div>
-        </button>
-      </div>
-    </div>
-  </div>
-
-    <!-- 전자 ↔ 바늘 매칭 -->
-    <div class="clock-type-section">
-      <div class="clock-type-header">
-        <span class="clock-type-icon">🔄</span>
-        <span class="clock-type-title">전자 ↔ 바늘 매칭</span>
-      </div>
-      <div class="sub-mode-grid">
-        <button class="sub-mode-btn" onclick="startGame('cross_d2a')">
-          <div class="sub-preview" id="sprev-cross-d2a"></div>
-          <div class="sub-mode-label">전자→바늘</div>
-        </button>
-        <button class="sub-mode-btn" onclick="startGame('cross_a2d')">
-          <div class="sub-preview" id="sprev-cross-a2d"></div>
-          <div class="sub-mode-label">바늘→전자</div>
-        </button>
-      </div>
-    </div>
-
     <!-- 우리말 → 숫자 맞추기 -->
     <div class="clock-type-section">
       <div class="clock-type-header">
@@ -440,21 +370,37 @@ setTimeout(function() {
         <span class="clock-type-title">우리말 → 숫자 맞추기</span>
       </div>
       <div class="sub-mode-grid">
-        <button class="sub-mode-btn" onclick="startGame('hour','kornum')">
-          <div class="sub-preview" id="sprev-kn-hour"></div>
-          <div class="sub-mode-label">정시 맞추기</div>
+        <button class="sub-mode-btn" onclick="startGame('myeong','kornum')">
+          <div class="sub-preview" id="sprev-kn-myeong"></div>
+          <div class="sub-mode-label">사람</div>
         </button>
-        <button class="sub-mode-btn" onclick="startGame('half','kornum')">
-          <div class="sub-preview" id="sprev-kn-half"></div>
-          <div class="sub-mode-label">30분 맞추기</div>
+        <button class="sub-mode-btn" onclick="startGame('gae','kornum')">
+          <div class="sub-preview" id="sprev-kn-gae"></div>
+          <div class="sub-mode-label">물건</div>
         </button>
-        <button class="sub-mode-btn" onclick="startGame('quarter','kornum')">
-          <div class="sub-preview" id="sprev-kn-quarter"></div>
-          <div class="sub-mode-label">15분 맞추기</div>
+        <button class="sub-mode-btn" onclick="startGame('mari','kornum')">
+          <div class="sub-preview" id="sprev-kn-mari"></div>
+          <div class="sub-mode-label">동물</div>
         </button>
-        <button class="sub-mode-btn" onclick="startGame('three_quarter','kornum')">
-          <div class="sub-preview" id="sprev-kn-three_quarter"></div>
-          <div class="sub-mode-label">45분 맞추기</div>
+        <button class="sub-mode-btn" onclick="startGame('dae','kornum')">
+          <div class="sub-preview" id="sprev-kn-dae"></div>
+          <div class="sub-mode-label">자동차</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('jang','kornum')">
+          <div class="sub-preview" id="sprev-kn-jang"></div>
+          <div class="sub-mode-label">종이</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('byeong','kornum')">
+          <div class="sub-preview" id="sprev-kn-byeong"></div>
+          <div class="sub-mode-label">음료</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('al','kornum')">
+          <div class="sub-preview" id="sprev-kn-al"></div>
+          <div class="sub-mode-label">달걀</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('jan','kornum')">
+          <div class="sub-preview" id="sprev-kn-jan"></div>
+          <div class="sub-mode-label">컵</div>
         </button>
       </div>
     </div>
@@ -466,43 +412,44 @@ setTimeout(function() {
         <span class="clock-type-title">숫자 → 우리말 맞추기</span>
       </div>
       <div class="sub-mode-grid">
-        <button class="sub-mode-btn" onclick="startGame('hour','numkor')">
-          <div class="sub-preview" id="sprev-nk-hour"></div>
-          <div class="sub-mode-label">정시 맞추기</div>
+        <button class="sub-mode-btn" onclick="startGame('myeong','numkor')">
+          <div class="sub-preview" id="sprev-nk-myeong"></div>
+          <div class="sub-mode-label">사람</div>
         </button>
-        <button class="sub-mode-btn" onclick="startGame('half','numkor')">
-          <div class="sub-preview" id="sprev-nk-half"></div>
-          <div class="sub-mode-label">30분 맞추기</div>
+        <button class="sub-mode-btn" onclick="startGame('gae','numkor')">
+          <div class="sub-preview" id="sprev-nk-gae"></div>
+          <div class="sub-mode-label">물건</div>
         </button>
-        <button class="sub-mode-btn" onclick="startGame('quarter','numkor')">
-          <div class="sub-preview" id="sprev-nk-quarter"></div>
-          <div class="sub-mode-label">15분 맞추기</div>
+        <button class="sub-mode-btn" onclick="startGame('mari','numkor')">
+          <div class="sub-preview" id="sprev-nk-mari"></div>
+          <div class="sub-mode-label">동물</div>
         </button>
-        <button class="sub-mode-btn" onclick="startGame('three_quarter','numkor')">
-          <div class="sub-preview" id="sprev-nk-three_quarter"></div>
-          <div class="sub-mode-label">45분 맞추기</div>
+        <button class="sub-mode-btn" onclick="startGame('dae','numkor')">
+          <div class="sub-preview" id="sprev-nk-dae"></div>
+          <div class="sub-mode-label">자동차</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('jang','numkor')">
+          <div class="sub-preview" id="sprev-nk-jang"></div>
+          <div class="sub-mode-label">종이</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('byeong','numkor')">
+          <div class="sub-preview" id="sprev-nk-byeong"></div>
+          <div class="sub-mode-label">음료</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('al','numkor')">
+          <div class="sub-preview" id="sprev-nk-al"></div>
+          <div class="sub-mode-label">달걀</div>
+        </button>
+        <button class="sub-mode-btn" onclick="startGame('jan','numkor')">
+          <div class="sub-preview" id="sprev-nk-jan"></div>
+          <div class="sub-mode-label">컵</div>
         </button>
       </div>
     </div>
+  </div>
 
   <!-- 설정 -->
   <div class="settings-section">
-    <div class="setting-row" style="align-items:flex-start;">
-      <div style="flex:1;">
-        <div class="setting-label">보기 표시</div>
-        <div class="setting-desc">시간 보기를 우리말 또는 숫자로 보여줘요</div>
-        <div class="label-style-options">
-          <button class="label-style-btn selected" onclick="setTimeLabelStyle('korean')" data-style="korean">
-            <span class="label-style-title">우리말</span>
-            <span class="label-style-sample">다섯시 삼십분</span>
-          </button>
-          <button class="label-style-btn" onclick="setTimeLabelStyle('numeric')" data-style="numeric">
-            <span class="label-style-title">숫자</span>
-            <span class="label-style-sample">5시 30분</span>
-          </button>
-        </div>
-      </div>
-    </div>
     <div class="setting-row">
       <div>
         <div class="setting-label">음성</div>
@@ -560,7 +507,7 @@ setTimeout(function() {
     <div class="play-score" id="play-score">0점</div>
   </div>
   <div class="game-container">
-    <div class="question-prompt" id="question-prompt">몇 시 몇 분일까요?</div>
+    <div class="question-prompt" id="question-prompt">우리말로 어떻게 셀까요?</div>
     <div class="scene-area" id="scene-area"></div>
     <div class="compare-row" id="compare-row"></div>
     <div class="feedback" id="feedback"></div>
@@ -585,238 +532,46 @@ setTimeout(function() {
 <script>
 /* ══ 상수 ══ */
 const Q_PER_GAME = 10;
-const MODE_MINUTES = {
-  hour:          [0],
-  half:          [30],
-  quarter:       [15],
-  three_quarter: [45],
-  random:        [0, 15, 30, 45],
-  cross_d2a:     [0, 15, 30, 45],  // 문제는 랜덤 분, 선지는 같은 분·다른 시
-  cross_a2d:     [0, 15, 30, 45]
+const COUNTER_UNITS = {
+  myeong: { label:'명 (사람)',   ko:'명' },
+  gae:    { label:'개 (물건)',   ko:'개' },
+  mari:   { label:'마리 (동물)', ko:'마리' },
+  dae:    { label:'대 (자동차)', ko:'대' },
+  jang:   { label:'장 (종이)',   ko:'장' },
+  byeong: { label:'병 (음료)',   ko:'병' },
+  al:     { label:'알 (달걀)',   ko:'알' },
+  jan:    { label:'잔 (컵)',     ko:'잔' }
 };
+const NUM_MAX = 10;  // 연습 범위: 1~10
 
 /* ══ 상태 ══ */
 let curMode, curDisplayType, curQuestions, qIdx, score, curQ, locked;
 let ttsOn = true, impulsePrevention = true, impulseMode = 'hide', impulseDelay = 5;
-let timeLabelStyle = 'korean';
 let delayTimer = null;
 
-/* ══ 우리말 시간 표현 ══ */
-const HOUR_KR = ['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열','열한','열두'];
-const MIN_KR = {15:'십오', 30:'삼십', 45:'사십오'};
+/* ══ 우리말 수 표현 (셀 때 쓰는 형태: 한, 두, 세...) ══ */
+const NUM_KR = ['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열'];
 
-/* ══ 시계 SVG 그리기 ══ */
-function clockHand(cx, cy, angleDeg, len, backLen, width, color) {
-  const a = angleDeg * Math.PI / 180;
-  const p = a + Math.PI / 2;
-  const hw = width / 2;
-  const tx = (cx + Math.cos(a) * len).toFixed(2);
-  const ty = (cy + Math.sin(a) * len).toFixed(2);
-  const bx = (cx - Math.cos(a) * backLen).toFixed(2);
-  const by = (cy - Math.sin(a) * backLen).toFixed(2);
-  const l1x = (cx + Math.cos(p) * hw).toFixed(2);
-  const l1y = (cy + Math.sin(p) * hw).toFixed(2);
-  const l2x = (cx - Math.cos(p) * hw).toFixed(2);
-  const l2y = (cy - Math.sin(p) * hw).toFixed(2);
-  return `<polygon points="${tx},${ty} ${l1x},${l1y} ${bx},${by} ${l2x},${l2y}" fill="${color}" opacity="0.95"/>`;
+/* ══ 세는 말 포맷 ══ */
+function formatCounterKorean(n, unitKey) {
+  const unit = (COUNTER_UNITS[unitKey] && COUNTER_UNITS[unitKey].ko) || unitKey;
+  const numWord = NUM_KR[n] || String(n);
+  return `${numWord}${unit}`;
 }
-
-function clockSVG(h, m, isSmall, customSz) {
-  const sz = customSz !== undefined ? customSz : (isSmall ? 56 : 220);
-  const cx = sz / 2, cy = sz / 2;
-  const R = sz / 2 - (isSmall ? 1 : 2);
-  const fR = R - (isSmall ? 4 : 10);
-  const nR = fR - (isSmall ? 8 : 18);
-
-  const hAng = ((h % 12) * 60 + m) / 720 * 360 - 90;
-  const mAng = m / 60 * 360 - 90;
-
-  /* Tick marks */
-  let ticks = '';
-  for (let i = 0; i < 60; i++) {
-    const a = (i * 6 - 90) * Math.PI / 180;
-    const isH = i % 5 === 0;
-    const r1 = fR - (isH ? (isSmall ? 4 : 12) : (isSmall ? 2 : 6));
-    const x1 = (cx + Math.cos(a) * r1).toFixed(2);
-    const y1 = (cy + Math.sin(a) * r1).toFixed(2);
-    const x2 = (cx + Math.cos(a) * fR).toFixed(2);
-    const y2 = (cy + Math.sin(a) * fR).toFixed(2);
-    const sw = isH ? (isSmall ? 1.5 : 2.5) : (isSmall ? 0.8 : 1.2);
-    const col = isH ? '#777' : '#CCC';
-    ticks += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="${sw}" stroke-linecap="round"/>`;
-  }
-
-  /* Numbers */
-  let nums = '';
-  if (!isSmall) {
-    for (let i = 1; i <= 12; i++) {
-      const a = (i * 30 - 90) * Math.PI / 180;
-      const nx = (cx + Math.cos(a) * nR).toFixed(2);
-      const ny = (cy + Math.sin(a) * nR).toFixed(2);
-      nums += `<text x="${nx}" y="${ny}" text-anchor="middle" dominant-baseline="central" font-size="18" font-weight="700" fill="#333" font-family="'Noto Sans KR',sans-serif">${i}</text>`;
-    }
-  }
-
-  /* Hand dimensions */
-  const hLen   = fR * (isSmall ? 0.50 : 0.52);
-  const mLen   = fR * (isSmall ? 0.72 : 0.76);
-  const hBack  = fR * 0.12;
-  const mBack  = fR * 0.10;
-  const hW     = sz * (isSmall ? 0.065 : 0.040);
-  const mW     = sz * (isSmall ? 0.040 : 0.026);
-  const dotR   = (sz * 0.032).toFixed(2);
-  const dotR2  = (sz * 0.016).toFixed(2);
-
-  return `<svg viewBox="0 0 ${sz} ${sz}" width="${isSmall ? sz : '100%'}" height="${isSmall ? sz : '100%'}" xmlns="http://www.w3.org/2000/svg"${isSmall ? '' : ' style="max-width:210px;max-height:210px;"'}>
-  <circle cx="${cx}" cy="${cy}" r="${R}" fill="#A8D8EE"/>
-  <circle cx="${cx}" cy="${cy}" r="${fR}" fill="white"/>
-  <circle cx="${cx}" cy="${cy}" r="${fR}" fill="none" stroke="#6BADE8" stroke-width="${isSmall ? 1.5 : 2.5}"/>
-  ${ticks}
-  ${nums}
-  ${clockHand(cx, cy, mAng, mLen, mBack, mW, '#E05050')}
-  ${clockHand(cx, cy, hAng, hLen, hBack, hW, '#3A9B6A')}
-  <circle cx="${cx}" cy="${cy}" r="${dotR}" fill="#6BADE8"/>
-  <circle cx="${cx}" cy="${cy}" r="${dotR2}" fill="white"/>
-</svg>`;
-}
-
-/* ══ 시간 포맷 ══ */
-function formatTimeNumeric(h, m) {
-  if (m === 0) return `${h}시`;
-  return `${h}시 ${m}분`;
-}
-function formatTimeKorean(h, m) {
-  const hw = HOUR_KR[h] || String(h);
-  if (m === 0) return `${hw}시`;
-  const mw = MIN_KR[m] || String(m);
-  return `${hw}시 ${mw}분`;
-}
-function formatTime(h, m) {
-  return timeLabelStyle === 'korean' ? formatTimeKorean(h, m) : formatTimeNumeric(h, m);
-}
-function formatDigital(h, m) {
-  return `${h}:${String(m).padStart(2, '0')}`;
-}
-
-/* ══ 전자 알람시계 아이콘 SVG (헤더용) ══ */
-function digitalAlarmSVG(h, m) {
-  const txt = formatDigital(h, m);
-  return `<svg viewBox="0 0 80 62" width="68" height="53" xmlns="http://www.w3.org/2000/svg">
-  <rect x="5" y="11" width="70" height="44" rx="8" fill="rgba(0,0,0,0.10)"/>
-  <rect x="4" y="9" width="70" height="44" rx="8" fill="#4A4035"/>
-  <rect x="7" y="10" width="64" height="9" rx="5" fill="white" opacity="0.07"/>
-  <rect x="10" y="15" width="60" height="28" rx="5" fill="#1A1410"/>
-  <rect x="13" y="18" width="54" height="22" rx="3" fill="#98E6A0"/>
-  <rect x="14" y="19" width="26" height="5" rx="2" fill="white" opacity="0.18"/>
-  <text x="40" y="29.5" text-anchor="middle" dominant-baseline="central"
-        font-family="'Courier New',monospace" font-size="16" font-weight="900"
-        fill="#0C3B18" letter-spacing="3">${txt}</text>
-  <circle cx="16" cy="8" r="6.5" fill="#3A3028" stroke="#2A2018" stroke-width="1"/>
-  <circle cx="16" cy="8" r="3" fill="#2A2018"/>
-  <path d="M12 5.5 Q16 2.5 20 5.5" fill="none" stroke="#5A5040" stroke-width="1.5" stroke-linecap="round"/>
-  <circle cx="64" cy="8" r="6.5" fill="#3A3028" stroke="#2A2018" stroke-width="1"/>
-  <circle cx="64" cy="8" r="3" fill="#2A2018"/>
-  <path d="M60 5.5 Q64 2.5 68 5.5" fill="none" stroke="#5A5040" stroke-width="1.5" stroke-linecap="round"/>
-  <rect x="28" y="5" width="24" height="7" rx="3.5" fill="#3A3028" stroke="#2A2018" stroke-width="0.5"/>
-  <rect x="11" y="51" width="18" height="9" rx="4.5" fill="#3A3028"/>
-  <rect x="51" y="51" width="18" height="9" rx="4.5" fill="#3A3028"/>
-</svg>`;
-}
-
-/* ══ 전자시계 선택지 SVG (cross_a2d 보기용, 중간 크기) ══ */
-function digitalChoiceSVG(h, m) {
-  const txt = formatDigital(h, m);
-  return `<svg viewBox="0 0 110 46" width="110" height="46" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="0" width="110" height="46" rx="8" fill="#3DA858"/>
-  <rect x="5" y="5" width="100" height="36" rx="5" fill="white"/>
-  <text x="55" y="23" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="900" font-family="monospace,'Courier New',sans-serif" fill="#1A1A1A" letter-spacing="3">${txt}</text>
-</svg>`;
-}
-
-/* ══ 전자 시계 SVG ══ */
-function digitalClockSVG(h, m, isSmall) {
-  const txt = formatDigital(h, m);
-  if (isSmall) {
-    return `<svg viewBox="0 0 64 30" width="64" height="30" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="0" width="64" height="30" rx="6" fill="#3DA858"/>
-  <rect x="5" y="4" width="54" height="22" rx="4" fill="white"/>
-  <text x="32" y="15" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="900" font-family="monospace,'Courier New',sans-serif" fill="#1A1A1A" letter-spacing="1">${txt}</text>
-</svg>`;
-  } else {
-    return `<svg viewBox="0 0 260 108" width="100%" style="max-width:260px;max-height:108px;" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="0" width="260" height="108" rx="14" fill="#3DA858"/>
-  <rect x="10" y="10" width="240" height="88" rx="10" fill="white"/>
-  <text x="130" y="54" text-anchor="middle" dominant-baseline="central" font-size="58" font-weight="900" font-family="monospace,'Courier New',sans-serif" fill="#1A1A1A" letter-spacing="4">${txt}</text>
-</svg>`;
-  }
+function formatCounterNumeric(n, unitKey) {
+  const unit = (COUNTER_UNITS[unitKey] && COUNTER_UNITS[unitKey].ko) || unitKey;
+  return `${n}${unit}`;
 }
 
 /* ══ 모드 카드 미리보기 초기화 ══ */
 function initPreviews() {
-  const times = { hour:[1,0], half:[1,30], quarter:[1,15], three_quarter:[1,45] };
-  for (const [mode, [h, m]] of Object.entries(times)) {
-    const da = document.getElementById(`sprev-d-${mode}`);
-    if (da) da.innerHTML = digitalClockSVG(h, m, true);
-    const aa = document.getElementById(`sprev-a-${mode}`);
-    if (aa) aa.innerHTML = clockSVG(h, m, true);
-  }
-  const cd2a = document.getElementById('sprev-cross-d2a');
-  if (cd2a) cd2a.innerHTML = digitalClockSVG(1, 0, true);
-  const ca2d = document.getElementById('sprev-cross-a2d');
-  if (ca2d) ca2d.innerHTML = clockSVG(1, 0, true);
-  /* 우리말→숫자: 문제는 우리말 / 숫자→우리말: 문제는 숫자 */
-  const krTimes = { hour:[1,0], half:[1,30], quarter:[1,15], three_quarter:[1,45] };
-  for (const [mode, [h, m]] of Object.entries(krTimes)) {
-    const kn = document.getElementById(`sprev-kn-${mode}`);
-    if (kn) kn.innerHTML = `<span class="sub-preview-text">${formatTimeKorean(h, m)}</span>`;
-    const nk = document.getElementById(`sprev-nk-${mode}`);
-    if (nk) nk.innerHTML = `<span class="sub-preview-text">${formatTimeNumeric(h, m)}</span>`;
-  }
-}
-
-/* ══ 바늘시계 헤더 아이콘 SVG (100×100 뷰박스, 비율 최적화) ══ */
-function clockIconSVG(h, m) {
-  const cx = 50, cy = 50;
-  const hAng = ((h % 12) * 60 + m) / 720 * 360 - 90;
-  const mAng = m / 60 * 360 - 90;
-  let ticks = '';
-  for (let i = 0; i < 12; i++) {
-    const a = (i * 30 - 90) * Math.PI / 180;
-    const r1 = i % 3 === 0 ? 35 : 38;
-    ticks += `<line x1="${(cx+Math.cos(a)*r1).toFixed(1)}" y1="${(cy+Math.sin(a)*r1).toFixed(1)}" x2="${(cx+Math.cos(a)*41).toFixed(1)}" y2="${(cy+Math.sin(a)*41).toFixed(1)}" stroke="${i%3===0?'#666':'#C0C0C0'}" stroke-width="${i%3===0?2.5:1.2}" stroke-linecap="round"/>`;
-  }
-  let nums = '';
-  for (let i = 1; i <= 12; i++) {
-    const a = (i * 30 - 90) * Math.PI / 180;
-    nums += `<text x="${(cx+Math.cos(a)*29).toFixed(1)}" y="${(cy+Math.sin(a)*29).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="9.5" font-weight="700" fill="#333" font-family="'Noto Sans KR',sans-serif">${i}</text>`;
-  }
-  function hand(ang, len, back, w, col) {
-    const a = ang * Math.PI / 180, p = a + Math.PI / 2, hw = w / 2;
-    const f = n => n.toFixed(2);
-    const tx=cx+Math.cos(a)*len, ty=cy+Math.sin(a)*len;
-    const bx=cx-Math.cos(a)*back, by=cy-Math.sin(a)*back;
-    const l1x=cx+Math.cos(p)*hw, l1y=cy+Math.sin(p)*hw;
-    const l2x=cx-Math.cos(p)*hw, l2y=cy-Math.sin(p)*hw;
-    return `<polygon points="${f(tx)},${f(ty)} ${f(l1x)},${f(l1y)} ${f(bx)},${f(by)} ${f(l2x)},${f(l2y)}" fill="${col}" opacity="0.95"/>`;
-  }
-  return `<svg viewBox="0 0 100 100" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="50" cy="50" r="49" fill="#A8D8EE"/>
-  <circle cx="50" cy="50" r="43" fill="white"/>
-  <circle cx="50" cy="50" r="43" fill="none" stroke="#6BADE8" stroke-width="2"/>
-  ${ticks}${nums}
-  ${hand(mAng,34,4,2.5,'#E05050')}
-  ${hand(hAng,22,5,4,'#3A9B6A')}
-  <circle cx="50" cy="50" r="4" fill="#6BADE8"/>
-  <circle cx="50" cy="50" r="1.8" fill="white"/>
-</svg>`;
-}
-
-/* ══ 섹션 헤더 아이콘 초기화 ══ */
-function initHeaderIcons() {
-  const dig = document.getElementById('header-icon-digital');
-  if (dig) dig.innerHTML = digitalAlarmSVG(3, 0);
-  const ana = document.getElementById('header-icon-analog');
-  if (ana) ana.innerHTML = clockIconSVG(10, 10);
+  /* 각 단위 카드마다 대표 시간(한X / 1X) 텍스트 칩을 보여줘요 */
+  Object.keys(COUNTER_UNITS).forEach(unitKey => {
+    const kn = document.getElementById(`sprev-kn-${unitKey}`);
+    if (kn) kn.innerHTML = `<span class="sub-preview-text">${formatCounterKorean(1, unitKey)}</span>`;
+    const nk = document.getElementById(`sprev-nk-${unitKey}`);
+    if (nk) nk.innerHTML = `<span class="sub-preview-text">${formatCounterNumeric(1, unitKey)}</span>`;
+  });
 }
 
 /* ══ 문제 생성 ══ */
@@ -830,45 +585,27 @@ function shuffle(arr) {
   return a;
 }
 
-function buildQuestions(mode) {
-  const minsPool = MODE_MINUTES[mode];
+function buildQuestions(unitKey) {
   const qs = [];
   const used = new Set();
 
   while (qs.length < Q_PER_GAME) {
-    const m = minsPool[rndInt(minsPool.length)];
-    const h = rndInt(12) + 1;
-    const key = `${h}:${m}`;
-    if (used.has(key)) continue;
-    used.add(key);
+    const n = rndInt(NUM_MAX) + 1;
+    if (used.has(n)) continue;
+    used.add(n);
 
-    /* Distractors: same minute, 3 different hours */
-    const otherHours = shuffle(
-      Array.from({length: 12}, (_, i) => i + 1).filter(x => x !== h)
+    /* 오답: 같은 단위, 다른 숫자 3개 */
+    const otherNums = shuffle(
+      Array.from({length: NUM_MAX}, (_, i) => i + 1).filter(x => x !== n)
     );
-    let choices;
-    if (mode === 'random') {
-      /* Random mode: vary minutes too */
-      const usedC = new Set([key]);
-      choices = [{h, m}];
-      let tries = 0;
-      while (choices.length < 4 && ++tries < 200) {
-        const dm = minsPool[rndInt(minsPool.length)];
-        const dh = rndInt(12) + 1;
-        const dk = `${dh}:${dm}`;
-        if (!usedC.has(dk)) { usedC.add(dk); choices.push({h: dh, m: dm}); }
-      }
-    } else {
-      choices = [
-        {h, m},
-        {h: otherHours[0], m},
-        {h: otherHours[1], m},
-        {h: otherHours[2], m}
-      ];
-    }
-    choices = shuffle(choices);
-    const correctIdx = choices.findIndex(c => c.h === h && c.m === m);
-    qs.push({h, m, choices, correctIdx});
+    const choices = shuffle([
+      {n, unit: unitKey},
+      {n: otherNums[0], unit: unitKey},
+      {n: otherNums[1], unit: unitKey},
+      {n: otherNums[2], unit: unitKey}
+    ]);
+    const correctIdx = choices.findIndex(c => c.n === n);
+    qs.push({n, unit: unitKey, choices, correctIdx});
   }
   return qs;
 }
@@ -879,7 +616,7 @@ function showView(id) {
     document.getElementById(v).classList.toggle('hidden', v !== id)
   );
   const lb = document.getElementById('logout-btn');
-  if (lb) lb.style.display = id === 'start-view' && localStorage.getItem('slowmath_clock_login') ? 'block' : 'none';
+  if (lb) lb.style.display = id === 'start-view' && localStorage.getItem('slowmath_counting_login') ? 'block' : 'none';
 }
 
 // init: 비로그인 시에도 메인화면 표시
@@ -887,7 +624,7 @@ showView('start-view'); // init
 
 /* ══ 로그인 ══ */
 function socialLogin(provider) {
-  localStorage.setItem('slowmath_clock_login', provider);
+  localStorage.setItem('slowmath_counting_login', provider);
   const _sp = sessionStorage.getItem('_sp');
   if (_sp) {
     sessionStorage.removeItem('_sp');
@@ -897,7 +634,7 @@ function socialLogin(provider) {
   showView('start-view');
 }
 function logout() {
-  localStorage.removeItem('slowmath_clock_login');
+  localStorage.removeItem('slowmath_counting_login');
   showView('start-view');
 }
 function goHome() {
@@ -909,19 +646,18 @@ if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
 
 /* ══ 설정 ══ */
 function saveSettings() {
-  localStorage.setItem('slowmath_clock_settings', JSON.stringify(
-    {ttsOn, impulsePrevention, impulseMode, impulseDelay, timeLabelStyle}
+  localStorage.setItem('slowmath_counting_settings', JSON.stringify(
+    {ttsOn, impulsePrevention, impulseMode, impulseDelay}
   ));
 }
 function loadSettings() {
   try {
-    const s = JSON.parse(localStorage.getItem('slowmath_clock_settings'));
+    const s = JSON.parse(localStorage.getItem('slowmath_counting_settings'));
     if (!s) return;
     if (s.ttsOn !== undefined) ttsOn = s.ttsOn;
     if (s.impulsePrevention !== undefined) impulsePrevention = s.impulsePrevention;
     if (s.impulseMode) impulseMode = s.impulseMode;
     if (s.impulseDelay) impulseDelay = s.impulseDelay;
-    if (s.timeLabelStyle) timeLabelStyle = s.timeLabelStyle;
   } catch(e) {}
 }
 function applySettingsUI() {
@@ -935,16 +671,6 @@ function applySettingsUI() {
   document.querySelectorAll('.imp-sec').forEach(b =>
     b.classList.toggle('active', parseInt(b.textContent) === impulseDelay)
   );
-  document.querySelectorAll('.label-style-btn').forEach(b =>
-    b.classList.toggle('selected', b.dataset.style === timeLabelStyle)
-  );
-}
-function setTimeLabelStyle(style) {
-  timeLabelStyle = style;
-  document.querySelectorAll('.label-style-btn').forEach(b =>
-    b.classList.toggle('selected', b.dataset.style === style)
-  );
-  saveSettings();
 }
 function toggleTTS() {
   ttsOn = !ttsOn;
@@ -1009,13 +735,13 @@ function shareApp() {
 
 /* ══ 게임 시작 ══ */
 function startGame(mode, displayType) {
-  if (!localStorage.getItem('slowmath_clock_login')) {
+  if (!localStorage.getItem('slowmath_counting_login')) {
     sessionStorage.setItem('_sp', JSON.stringify([mode, displayType]));
     showView('login-view');
     return;
   }
   curMode = mode;
-  curDisplayType = displayType || 'analog';
+  curDisplayType = displayType || 'numkor';
   curQuestions = buildQuestions(mode);
   qIdx = 0;
   score = 0;
@@ -1039,48 +765,24 @@ function renderQ() {
 
   const row = document.getElementById('compare-row');
 
-  if (curMode === 'cross_d2a') {
-    document.getElementById('question-prompt').textContent = '같은 시간의 바늘시계는?';
-    document.getElementById('scene-area').innerHTML = digitalClockSVG(q.h, q.m, false);
-    row.innerHTML = q.choices.map((c, i) =>
-      `<div class="item-card clock-choice" id="card-${i}" onclick="selectCard(${i})">
-        ${clockSVG(c.h, c.m, false)}
-      </div>`
-    ).join('');
-  } else if (curMode === 'cross_a2d') {
-    document.getElementById('question-prompt').textContent = '같은 시간의 전자시계는?';
-    document.getElementById('scene-area').innerHTML = clockSVG(q.h, q.m, false);
-    row.innerHTML = q.choices.map((c, i) =>
-      `<div class="item-card digital-choice" id="card-${i}" onclick="selectCard(${i})">
-        ${digitalChoiceSVG(c.h, c.m)}
-      </div>`
-    ).join('');
-  } else if (curDisplayType === 'numkor') {
-    document.getElementById('question-prompt').textContent = '같은 시간을 우리말로?';
+  if (curDisplayType === 'kornum') {
+    /* 우리말 → 숫자 */
+    document.getElementById('question-prompt').textContent = '숫자로 어떻게 쓸까요?';
     document.getElementById('scene-area').innerHTML =
-      `<div class="scene-text-question">${formatTimeNumeric(q.h, q.m)}</div>`;
+      `<div class="scene-text-question">${formatCounterKorean(q.n, q.unit)}</div>`;
     row.innerHTML = q.choices.map((c, i) =>
       `<div class="item-card" id="card-${i}" onclick="selectCard(${i})">
-        <span class="time-label">${formatTimeKorean(c.h, c.m)}</span>
-      </div>`
-    ).join('');
-  } else if (curDisplayType === 'kornum') {
-    document.getElementById('question-prompt').textContent = '같은 시간을 숫자로?';
-    document.getElementById('scene-area').innerHTML =
-      `<div class="scene-text-question">${formatTimeKorean(q.h, q.m)}</div>`;
-    row.innerHTML = q.choices.map((c, i) =>
-      `<div class="item-card" id="card-${i}" onclick="selectCard(${i})">
-        <span class="time-label">${formatTimeNumeric(c.h, c.m)}</span>
+        <span class="time-label">${formatCounterNumeric(c.n, c.unit)}</span>
       </div>`
     ).join('');
   } else {
-    document.getElementById('question-prompt').textContent = '몇 시 몇 분일까요?';
-    document.getElementById('scene-area').innerHTML = curDisplayType === 'digital'
-      ? digitalClockSVG(q.h, q.m, false)
-      : clockSVG(q.h, q.m, false);
+    /* numkor: 숫자 → 우리말 */
+    document.getElementById('question-prompt').textContent = '우리말로 어떻게 셀까요?';
+    document.getElementById('scene-area').innerHTML =
+      `<div class="scene-text-question">${formatCounterNumeric(q.n, q.unit)}</div>`;
     row.innerHTML = q.choices.map((c, i) =>
       `<div class="item-card" id="card-${i}" onclick="selectCard(${i})">
-        <span class="time-label">${formatTime(c.h, c.m)}</span>
+        <span class="time-label">${formatCounterKorean(c.n, c.unit)}</span>
       </div>`
     ).join('');
   }
@@ -1161,7 +863,7 @@ _smGameCompleted=true;
   document.getElementById('result-emoji').textContent = score === Q_PER_GAME ? '🏆' : '👏';
   document.getElementById('result-msg').textContent = `${Q_PER_GAME}문제 완료!`;
   document.getElementById('result-detail').textContent = `${Q_PER_GAME}문제 중 ${score}개 정답`;
-  document.getElementById('result-retry-btn').onclick = () => startGame(curMode);
+  document.getElementById('result-retry-btn').onclick = () => startGame(curMode, curDisplayType);
 }
 
 /* ══ TTS ══ */
@@ -1178,7 +880,6 @@ function speak(text) {
   loadSettings();
   applySettingsUI();
   initPreviews();
-  initHeaderIcons();
 
   const splash = document.getElementById('splash');
   setTimeout(() => {
@@ -1191,7 +892,7 @@ function speak(text) {
 
 // Share visibility: hide when logged out
 (function() {
-  var _SM_KEY = 'slowmath_clock_login';
+  var _SM_KEY = 'slowmath_counting_login';
   function _updateShareVis() {
     var loggedIn = !!localStorage.getItem(_SM_KEY);
     var days = parseInt(localStorage.getItem('slowmath_share_days') || '0');
@@ -1224,10 +925,9 @@ function speak(text) {
 /* ====== App Recommendation ====== */
 var _smGameCompleted = false;
 var _SM_RECO = [
-  {title:'우리말 세기',emoji:'🧮',url:'https://sprit6487.github.io/slowmath_counting/',desc:'한 명·두 명 우리말로 세는 연습을 해보아요'},
-  {title:'숫자 익히기',emoji:'🔢',url:'https://sprit6487.github.io/slowmath_number/',desc:'숫자를 순서대로 배워보세요'},
+  {title:'시계 보기',emoji:'🕐',url:'https://sprit6487.github.io/slowmath_clock/',desc:'우리말로 시간을 읽는 연습을 해보아요'},
   {title:'세기',emoji:'🎲',url:'https://sprit6487.github.io/slowmath_dice/',desc:'손가락, 주사위, 카드를 세어보세요'},
-  {title:'패턴 연습',emoji:'🧩',url:'https://sprit6487.github.io/slowmath_pattern/',desc:'규칙을 찾아 다음에 올 것을 맞혀보세요'}
+  {title:'숫자 익히기',emoji:'🔢',url:'https://sprit6487.github.io/slowmath_number/',desc:'숫자를 순서대로 배워보세요'}
 ];
 function _showRecoPopup() {
   if (!_SM_RECO.length) return;
@@ -1247,9 +947,9 @@ function _showRecoPopup() {
 if(document.getElementById('sm-tab-bar')) return;
 
 /* ── 앱 설정 ── */
-var _LK  = 'slowmath_clock_login';
+var _LK  = 'slowmath_counting_login';
 var _RFN = 'showResult';
-var _AK  = 'slowmath_clock';
+var _AK  = 'slowmath_counting';
 
 /* ── 앱 목록 ── */
 var _APPS=[
@@ -1265,6 +965,7 @@ var _APPS=[
   {k:'slowmath_comparing', e:'⚖️',n:'비교하기 기초'},
   {k:'slowmath_comparing2',e:'⚖️',n:'비교하기 기초 2'},
   {k:'slowmath_clock',     e:'🕐',n:'시계 보기'},
+  {k:'slowmath_counting',  e:'🔢',n:'우리말 세기'},
   {k:'slowmath_combining', e:'🟠',n:'모으기 연습'},
   {k:'slowmath_splitting', e:'✂️',n:'가르기 연습'},
   {k:'slowmath_complement',e:'🔟',n:'보수 연습'},
