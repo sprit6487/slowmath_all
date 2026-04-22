@@ -377,6 +377,38 @@
     background: none; border: 2.5px dashed var(--warm-300);
     opacity: 0.45; width: 30px; height: 30px;
   }
+  .dot.orange-source {
+    background: var(--app-orange); opacity: 0.9;
+    cursor: grab; touch-action: none;
+    box-shadow: 0 2px 4px rgba(240,160,80,0.25);
+    transition: opacity 0.15s;
+  }
+  .dot.orange-source:active { cursor: grabbing; }
+  .dot.orange-source.used { visibility: hidden; }
+  .orange-ghost {
+    position: fixed; border-radius: 50%;
+    background: var(--app-orange); opacity: 0.9;
+    z-index: 1000; pointer-events: none;
+    box-shadow: 0 6px 16px rgba(240,160,80,0.45);
+  }
+  .dot.empty.filled-orange {
+    background: var(--app-orange);
+    border: 2.5px solid var(--app-orange);
+    opacity: 0.9;
+    animation: popIn 0.3s ease;
+    cursor: pointer;
+  }
+  .drag-hint {
+    font-size: 0.8rem; color: var(--app-orange);
+    font-weight: 600; margin: 2px 0 6px;
+    text-align: center;
+  }
+  .circles-row.orange-pool {
+    margin: 4px 0 12px;
+    padding: 8px 6px;
+    background: var(--app-orange-soft);
+    border-radius: 14px;
+  }
 
   /* Choices */
   .choices-grid {
@@ -1140,8 +1172,14 @@ function nextQuiz() {
   if (showCircles) {
     let dots = '';
     for (let i = 0; i < num; i++) dots += '<div class="dot"></div>';
-    for (let i = num; i < 10; i++) dots += '<div class="dot empty"></div>';
-    circlesHTML = `<div class="circles-row">${dots}</div>`;
+    for (let i = num; i < 10; i++) dots += '<div class="dot empty" data-slot="1"></div>';
+    let oranges = '';
+    for (let i = 0; i < 10; i++) oranges += '<div class="dot orange-source"></div>';
+    circlesHTML = `
+      <div class="circles-row">${dots}</div>
+      <div class="drag-hint">주황색 원을 점선 안으로 옮겨봐요!</div>
+      <div class="circles-row orange-pool">${oranges}</div>
+    `;
   }
 
   gc.innerHTML = `
@@ -1219,6 +1257,84 @@ function nextQuiz() {
         updateScoreUI();
         document.getElementById('next-q-btn').style.display='';
       }
+    });
+  });
+
+  if (showCircles) setupOrangeDrag();
+}
+
+function setupOrangeDrag() {
+  const sources = Array.from(document.querySelectorAll('.dot.orange-source'));
+  const slots = Array.from(document.querySelectorAll('.dot.empty'));
+  let filledCount = 0;
+
+  sources.forEach(orange => {
+    let ghost = null, startX = 0, startY = 0, dragging = false;
+
+    const onDown = (e) => {
+      if (orange.classList.contains('used') || locked) return;
+      e.preventDefault();
+      const rect = orange.getBoundingClientRect();
+      ghost = document.createElement('div');
+      ghost.className = 'orange-ghost';
+      ghost.style.width = rect.width + 'px';
+      ghost.style.height = rect.height + 'px';
+      ghost.style.left = rect.left + 'px';
+      ghost.style.top = rect.top + 'px';
+      document.body.appendChild(ghost);
+      orange.style.visibility = 'hidden';
+      startX = e.clientX;
+      startY = e.clientY;
+      dragging = true;
+      try { orange.setPointerCapture(e.pointerId); } catch (_) {}
+    };
+
+    const onMove = (e) => {
+      if (!dragging || !ghost) return;
+      e.preventDefault();
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      ghost.style.transform = `translate(${dx}px, ${dy}px)`;
+    };
+
+    const onUp = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      const x = e.clientX, y = e.clientY;
+      let hit = null;
+      for (const slot of slots) {
+        if (slot.classList.contains('filled-orange')) continue;
+        const r = slot.getBoundingClientRect();
+        const cx = (r.left + r.right) / 2;
+        const cy = (r.top + r.bottom) / 2;
+        const radius = Math.max(r.width, r.height) / 2 + 10;
+        if (Math.hypot(x - cx, y - cy) <= radius) { hit = slot; break; }
+      }
+      if (ghost) { ghost.remove(); ghost = null; }
+      if (hit && !locked) {
+        hit.classList.add('filled-orange');
+        orange.classList.add('used');
+        orange.style.visibility = '';
+        filledCount++;
+      } else {
+        orange.style.visibility = '';
+      }
+    };
+
+    orange.addEventListener('pointerdown', onDown);
+    orange.addEventListener('pointermove', onMove);
+    orange.addEventListener('pointerup', onUp);
+    orange.addEventListener('pointercancel', onUp);
+  });
+
+  slots.forEach(slot => {
+    slot.addEventListener('click', () => {
+      if (!slot.classList.contains('filled-orange') || locked) return;
+      slot.classList.remove('filled-orange');
+      const usedList = document.querySelectorAll('.dot.orange-source.used');
+      const last = usedList[usedList.length - 1];
+      if (last) last.classList.remove('used');
+      filledCount--;
     });
   });
 }
