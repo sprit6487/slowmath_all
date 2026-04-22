@@ -1414,6 +1414,7 @@ function goHome() {
   isWnPractice = false;
   showView('start-view');
   refreshWnUi();
+  if (lastGameCompleted) { lastGameCompleted = false; setTimeout(_showRecoPopup, 350); }
 }
 function replay() {
   if (gameMode === 'game') startGame(lastRange, lastStart);
@@ -1443,6 +1444,37 @@ function init() {
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
+</script>
+
+<!-- ====== App Recommendation Popup ====== -->
+<div id="sm-reco-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.52);z-index:500;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">
+  <div style="background:#FFFDF8;border-radius:24px;padding:28px 22px 22px;max-width: 300px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.18);animation:_smPop .32s cubic-bezier(.34,1.56,.64,1) both;">
+    <div style="font-size:0.72rem;font-weight:700;color:#C4AA82;letter-spacing:.08em;margin-bottom:14px;">도움이 될만한 앱을 소개드려요!</div>
+    <div id="sm-reco-emoji" style="font-size:2.75rem;margin-bottom:10px;line-height:1;"></div>
+    <div id="sm-reco-title" style="font-size:1.15rem;font-weight:900;color:#4A4035;margin-bottom:8px;"></div>
+    <div id="sm-reco-desc" style="font-size:0.84rem;color:#7B6545;line-height:1.65;margin-bottom:20px;"></div>
+    <a id="sm-reco-link" href="#" style="display:block;background:#6BADE8;color:#fff;border-radius:14px;padding:15px 0;font-size:0.975rem;font-weight:700;text-decoration:none;font-family:inherit;margin-bottom:10px;box-shadow:0 4px 12px rgba(107,173,232,.3);">바로 해보기 →</a>
+    <button onclick="document.getElementById('sm-reco-overlay').style.display='none'" style="background:none;border:none;color:#C4AA82;font-size:0.84rem;cursor:pointer;font-family:inherit;padding:6px;">다음에 할게요</button>
+  </div>
+</div>
+<style>@keyframes _smPop{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}</style>
+
+<script>
+/* ====== App Recommendation ====== */
+var _SM_RECO = [
+  {title:'숫자 쓰기',emoji:'✍️',url:'https://sprit6487.github.io/slowmath_numberdraw/',desc:'숫자를 직접 따라 써보아요'},
+  {title:'세기',emoji:'🎲',url:'https://sprit6487.github.io/slowmath_dice/',desc:'손가락, 주사위, 카드를 세어보세요'},
+  {title:'우리말 세기',emoji:'🧮',url:'https://sprit6487.github.io/slowmath_counting/',desc:'한 명·두 명 우리말로 세는 연습을 해보아요'}
+];
+function _showRecoPopup() {
+  if (!_SM_RECO.length) return;
+  var item = _SM_RECO[Math.floor(Math.random() * _SM_RECO.length)];
+  document.getElementById('sm-reco-emoji').textContent = item.emoji;
+  document.getElementById('sm-reco-title').textContent = item.title;
+  document.getElementById('sm-reco-desc').innerHTML = item.desc;
+  document.getElementById('sm-reco-link').href = item.url;
+  document.getElementById('sm-reco-overlay').style.display = 'flex';
+}
 </script>
 
 <!-- ===== 느린아이 탭바 시스템 ===== -->
