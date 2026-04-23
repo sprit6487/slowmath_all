@@ -281,6 +281,27 @@
     'body{padding-bottom:0 !important;}'
   ].join('');
 
+  // iframe 내부의 "추천 팝업(바로 해보기)" 클릭을 쉘이 가로채 정상 selectApp 경로로 연결.
+  // 그대로 두면 iframe이 외부 URL로 navigate해 쉘 상태가 어긋남.
+  var RECO_INTERCEPT_SCRIPT = [
+    '(function(){',
+    '  function intercept(e){',
+    '    var t=e.target; if(!t) return;',
+    '    var el=t.closest?t.closest("#sm-reco-link,a[href*=\\"slowmath_\\"]"):null;',
+    '    if(!el) return;',
+    '    var href=el.getAttribute("href")||"";',
+    '    var m=href.match(/slowmath_([a-z0-9]+)/);',
+    '    if(!m) return;',
+    '    e.preventDefault();',
+    '    e.stopPropagation();',
+    '    var ov=document.getElementById("sm-reco-overlay");',
+    '    if(ov) ov.style.display="none";',
+    '    try{ parent.postMessage({source:"sm-subapp",type:"reco-selected",payload:{appId:m[1]}},"*"); }catch(err){}',
+    '  }',
+    '  document.addEventListener("click", intercept, true);',
+    '})();'
+  ].join('');
+
   // iframe 내부에서 login-view 가시성을 감시해 parent에 알리는 스크립트.
   // MutationObserver + 클릭 리스너 + 500ms 인터벌 폴링 → 어떤 타이밍에서도 확실히 감지.
   var LOGIN_NOTIFIER_SCRIPT = [
@@ -351,6 +372,12 @@
         var notifier = doc.createElement('script');
         notifier.textContent = LOGIN_NOTIFIER_SCRIPT;
         doc.head.appendChild(notifier);
+      } catch (e) { /* noop */ }
+      // iframe 내부 추천 팝업 "바로 해보기" 클릭 인터셉트 스크립트 주입
+      try {
+        var recoScript = doc.createElement('script');
+        recoScript.textContent = RECO_INTERCEPT_SCRIPT;
+        doc.head.appendChild(recoScript);
       } catch (e) { /* noop */ }
     } catch (e) {
       console.warn('[shell] iframe 주입 실패:', e && e.message);
@@ -440,6 +467,12 @@
       case 'login-view-hidden':
         // iframe 내부 login-view 사라짐 (로그인 성공 등)
         if (state.activeTab === 'home') updateLoginViewVisibility();
+        break;
+      case 'reco-selected':
+        // 추천 팝업에서 고른 앱으로 쉘이 정식 경로로 전환
+        if (data.payload && data.payload.appId && window.SM_FIND_APP(data.payload.appId)) {
+          selectApp(data.payload.appId);
+        }
         break;
       default:
         // 알 수 없는 타입은 무시

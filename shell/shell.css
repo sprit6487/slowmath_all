@@ -226,66 +226,12 @@ body {
    - body.tab-home.share-ok 이면 버튼 표시
    - + body.bubble-ok (5회 미만 공유) 이면 말풍선도 표시
    - body.splash-active / body.game-active 이면 !important 로 강제 숨김 */
-.share-btn {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  background: #fff;
-  border: 2px solid #E8E2DA;
-  border-radius: 10px;
-  width: 36px;
-  height: 36px;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #8C8070;
-  z-index: 200;
-  padding: 0;
-}
-.share-btn:active { transform: scale(0.94); }
-.share-bubble {
-  position: fixed;
-  top: 56px;
-  right: 12px;
-  background: #FFF8F0;
-  border: 1.5px solid #EDD080;
-  border-radius: 12px;
-  padding: 8px 12px;
-  font-size: 0.62rem;
-  color: #7B6545;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(220, 160, 50, 0.18);
-  z-index: 199;
-  line-height: 1.5;
-  text-align: right;
-  max-width: 200px;
-  display: none;
-}
-
-/* 가시성은 JS(updateShareVisibility)가 인라인 style.display로 단독 관리.
-   CSS에는 display 룰을 두지 않음 — 여러 body 클래스 룰과의 specificity/타이밍 레이스 원천 차단. */
+/* 가시성은 JS(updateShareVisibility)가 인라인 style.display로 단독 관리 */
 
 /* 연습 플레이 중에는 하단 탭바 숨김 + iframe이 풀스크린으로 확장 */
 body.game-active .sm-tabbar { display: none !important; }
 body.game-active .home-iframe-wrap { bottom: 0 !important; }
-.share-bubble::before {
-  content: '';
-  position: absolute;
-  top: -8px; right: 10px;
-  border: 4px solid transparent;
-  border-bottom: 7px solid #EDD080;
-  border-top: 0;
-}
-.share-bubble::after {
-  content: '';
-  position: absolute;
-  top: -6px; right: 11px;
-  border: 3px solid transparent;
-  border-bottom: 6px solid #FFF8F0;
-  border-top: 0;
-  z-index: 1;
-}
+
 @media (max-width: 480px) {
   .share-bubble { font-size: 0.62rem; max-width: 165px; padding: 7px 9px; }
 }
@@ -310,11 +256,11 @@ body.game-active .home-iframe-wrap { bottom: 0 !important; }
   white-space: nowrap;
 }
 .series-header h1 {
-  font-size: 1.6rem;
+  font-size: 1.45rem;
   font-weight: 900;
   color: #4A4035;
   letter-spacing: -0.01em;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   padding-top: 4px;
 }
 .series-header h1 .blue { color: #6BADE8; }
@@ -322,8 +268,8 @@ body.game-active .home-iframe-wrap { bottom: 0 !important; }
 .series-header .lead {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.9rem;
+  gap: 5px;
+  font-size: 0.85rem;
   color: #B8AD9E;
 }
 .series-header .lead svg { flex: none; }
