@@ -2,193 +2,160 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#ffffff">
   <title>느린아이 시리즈</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f5f5f5;
-      min-height: 100vh;
-      padding: 40px 20px;
-    }
-    h1 {
-      text-align: center;
-      font-size: 2rem;
-      margin-bottom: 32px;
-    }
-    h1 .blue { color: #4a90d9; }
-    h1 .orange { color: #F0A050; }
-    h1 .black { color: #333; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      max-width: 960px;
-      margin: 0 auto;
-    }
-    @media (min-width: 600px) {
-      .grid {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      }
-    }
-    .grid a {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 20px 16px;
-      min-height: 140px;
-      background: #fff;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      text-decoration: none;
-      color: #333;
-      font-size: 0.95rem;
-      font-weight: 600;
-      transition: background 0.15s, border-color 0.15s, transform 0.15s;
-      text-align: center;
-      -webkit-tap-highlight-color: rgba(74, 144, 217, 0.18);
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .grid a:hover {
-        background: #4a90d9;
-        border-color: #4a90d9;
-        color: #fff;
-        transform: translateY(-2px);
-      }
-      .grid a:hover svg * {
-        fill: #fff;
-        stroke: #fff;
-      }
-    }
-    .grid a:active {
-      transform: scale(0.98);
-    }
-    .icon { font-size: 2rem; line-height: 1; height: 56px; display: flex; align-items: center; justify-content: center; }
-    .icon svg { display: block; }
-  </style>
+  <link rel="stylesheet" href="./shell/shell.css?v=27">
 </head>
-<body>
-  <h1><span class="blue">느린</span><span class="orange">아이</span> <span class="black">시리즈</span></h1>
-  <div class="grid">
+<body class="splash-active tab-series">
 
-    <!-- ① 기초 인지 -->
-    <a href="./slowmath_color/">
-      <span class="icon">🌈</span>
-      색깔 익히기
-    </a>
-
-    <a href="./slowmath_linedraw/">
-      <span class="icon">✏️</span>
-      선 긋기
-    </a>
-
-    <a href="./slowmath_dot2dot/">
-      <span class="icon">···</span>
-      점선 따라 그리기
-    </a>
-
-    <a href="./slowmath_colorcopy/">
-      <span class="icon">🪞</span>
-      똑같이 맞추기
-    </a>
-
-    <a href="./slowmath_pattern/">
-      <span class="icon">🧩</span>
-      패턴 연습
-    </a>
-
-    <!-- ② 수 개념 -->
-    <a href="./slowmath_number/">
-      <span class="icon">🔢</span>
-      숫자 익히기
-    </a>
-
-    <a href="./slowmath_numberdraw/">
-      <span class="icon">5️⃣</span>
-      숫자 쓰기
-    </a>
-
-    <a href="./slowmath_dice/">
-      <span class="icon">🎲</span>
-      세기
-    </a>
-
-    <a href="./slowmath_matching/">
-      <span class="icon">🎯</span>
-      숫자 매칭
-    </a>
-
-    <!-- ③ 수 관계 -->
-    <a href="./slowmath_comparing/">
-      <span class="icon">⚖️</span>
-      비교하기 기초
-    </a>
-
-    <a href="./slowmath_comparing2/">
-      <span class="icon">⚖️</span>
-      비교하기 기초 2
-    </a>
-
-    <a href="./slowmath_clock/">
-      <span class="icon">🕐</span>
-      시계 보기
-    </a>
-
-    <a href="./slowmath_counting/">
-      <span class="icon">🧮</span>
-      우리말 세기
-    </a>
-
-    <!-- ④ 덧셈 전 개념 -->
-    <a href="./slowmath_combining/">
-      <span class="icon">🫱</span>
-      모으기 연습
-    </a>
-
-    <a href="./slowmath_splitting/">
-      <span class="icon">✂️</span>
-      가르기 연습
-    </a>
-
-    <a href="./slowmath_complement/">
-      <span class="icon">🔟</span>
-      보수 연습
-    </a>
-
-    <!-- ⑤ 연산 -->
-    <a href="./slowmath_plusone/">
-      <span class="icon">1️⃣</span>
-      더하기 1
-    </a>
-
-    <a href="./slowmath_plustwo/">
-      <span class="icon">2️⃣</span>
-      더하기 2
-    </a>
-
-    <a href="./slowmath_plusthree/">
-      <span class="icon">3️⃣</span>
-      더하기 3
-    </a>
-
-    <a href="./slowmath_easy/">
-      <span class="icon">➕</span>
-      한 자리 덧셈
-    </a>
-
-    <a href="./slowmath_circle/">
-      <span class="icon">➕</span>
-      한 자리 덧셈 연습
-    </a>
-
-    <a href="./slowmath_timestables/">
-      <span class="icon">✖️</span>
-      구구단 연습
-    </a>
-
+  <!-- 스플래시 -->
+  <div id="sm-splash">
+    <div class="turtle">
+      <svg viewBox="0 0 120 100" width="140" height="117" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/><ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/><ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/><path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/><ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/><ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/><path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/><ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/><ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/><ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/><circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/><circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/><circle cx="101" cy="33" r="1" fill="white"/><circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/><path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <div class="logo">
+      <span class="blue">느린</span><span class="orange">아이</span> <span class="black">시리즈</span>
+    </div>
+    <div class="tagline">한 걸음씩 제대로 배우는 수학</div>
   </div>
+
+  <!-- 앱 본체 -->
+  <div id="sm-app">
+    <div class="sm-view">
+
+      <!-- 홈 탭 -->
+      <div class="sm-panel home-panel" data-tab="home">
+        <div id="home-iframe-wrap" class="home-iframe-wrap" style="display:none;"></div>
+        <div id="home-empty" class="home-empty">
+          <div class="emoji">🎒</div>
+          <div class="msg">시리즈에서 연습을 골라주세요</div>
+          <div class="sub">선택한 연습이 홈에 열립니다</div>
+          <button id="home-goto-series" type="button">시리즈 보러가기</button>
+        </div>
+      </div>
+
+      <!-- 기록 탭 (picker → detail 2단계) -->
+      <div class="sm-panel" data-tab="records">
+        <div id="sm-records-mount"></div>
+      </div>
+
+      <!-- 시리즈 탭 (랜딩) -->
+      <div class="sm-panel active" data-tab="series">
+        <div class="series-header">
+          <button class="share-btn" id="sm-share-btn" type="button" title="공유하기" aria-label="공유하기" style="display:none">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+          </button>
+          <div id="sm-share-bubble" class="share-bubble" style="display:none">지금 지인에게 공유하시면<br>하루 무료 이용권을 드려요</div>
+          <h1><span class="blue">느린</span><span class="orange">아이</span> 시리즈</h1>
+          <div class="lead">
+            하나씩 차근차근 배워가요
+            <svg viewBox="0 0 120 100" width="34" height="28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/><ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/><ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/><path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/><ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/><ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/><path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/><ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/><ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/><ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/><circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/><circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/><circle cx="101" cy="33" r="1" fill="white"/><circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/><path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div id="sm-series-sections"></div>
+      </div>
+
+      <!-- 마이 탭 -->
+      <div class="sm-panel" data-tab="my">
+        <div class="my-header"><h2>마이</h2></div>
+        <div class="sm-my-wrap">
+          <div class="sm-my-sec">
+            <div class="sm-my-tit">계정 정보</div>
+            <div class="sm-my-card">
+              <div class="sm-my-row"><span class="sm-my-lbl">이메일</span><span class="sm-my-val" id="sm-my-em">-</span></div>
+              <div class="sm-my-row"><span class="sm-my-lbl">로그인 방식</span><span class="sm-my-val" id="sm-my-pv">-</span></div>
+            </div>
+          </div>
+          <div class="sm-my-sec">
+            <div class="sm-my-tit">이용권 정보</div>
+            <div class="sm-my-card">
+              <div class="sm-my-row"><span class="sm-my-lbl">이용권 종류</span><span class="sm-my-val"><span class="sm-my-tag">유료 이용권</span></span></div>
+              <div class="sm-my-row"><span class="sm-my-lbl">이용 가능 기간</span><span class="sm-my-val">~2026년 5월 15일</span></div>
+              <div class="sm-my-row"><span class="sm-my-lbl">남은 기간</span><span class="sm-my-val">29일</span></div>
+            </div>
+          </div>
+          <div class="sm-my-sec">
+            <div class="sm-my-tit">결제 정보</div>
+            <div class="sm-my-card">
+              <div class="sm-my-row"><span class="sm-my-lbl">최근 결제일</span><span class="sm-my-val">2026년 4월 15일</span></div>
+              <div class="sm-my-row"><span class="sm-my-lbl">결제 금액</span><span class="sm-my-val">4,900원 / 월</span></div>
+              <div class="sm-my-row"><span class="sm-my-lbl">다음 결제일</span><span class="sm-my-val">2026년 5월 15일</span></div>
+            </div>
+          </div>
+          <button class="sm-lg-btn" id="sm-my-logout" type="button">로그아웃</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 하단 탭바 (순서: 시리즈 / 연습 / 기록 / 마이) -->
+    <nav class="sm-tabbar">
+      <button type="button" class="tab active" data-tab="series">
+        <span class="ic">📚</span><span>시리즈</span><span class="dot"></span>
+      </button>
+      <button type="button" class="tab" data-tab="home">
+        <span class="ic">🌱</span><span>연습</span><span class="dot"></span>
+      </button>
+      <button type="button" class="tab" data-tab="records">
+        <span class="ic">📅</span><span>기록</span><span class="dot"></span>
+      </button>
+      <button type="button" class="tab" data-tab="my">
+        <span class="ic">👤</span><span>마이</span><span class="dot"></span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- 풀스크린 로그인 뷰 (마이/기록 탭 진입 시 로그아웃 상태면 오버레이) -->
+  <div id="sm-login-view" class="sm-login-view" style="display:none">
+    <div class="sm-login-logo">
+      <svg viewBox="0 0 120 100" width="120" height="100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><ellipse cx="30" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-20 30 72)"/><ellipse cx="78" cy="76" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(15 78 76)"/><ellipse cx="28" cy="54" rx="9" ry="5.5" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(-10 28 54)"/><path d="M18 60 L10 55" stroke="#F2DC8C" stroke-width="4" stroke-linecap="round"/><ellipse cx="55" cy="58" rx="35" ry="20" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/><ellipse cx="52" cy="42" rx="32" ry="28" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2.5"/><path d="M52 18 L42 32 L42 48 L52 58 L62 48 L62 32 Z" fill="none" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><line x1="42" y1="32" x2="24" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><line x1="62" y1="32" x2="80" y2="38" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><line x1="42" y1="48" x2="26" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><line x1="62" y1="48" x2="78" y2="56" stroke="#3A9B6A" stroke-width="1.3" opacity=".35"/><ellipse cx="42" cy="26" rx="6" ry="4" fill="white" opacity=".35" transform="rotate(-15 42 26)"/><ellipse cx="62" cy="36" rx="4" ry="3" fill="white" opacity=".2"/><ellipse cx="92" cy="40" rx="17" ry="15" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2.5"/><ellipse cx="82" cy="72" rx="10" ry="6" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="2" transform="rotate(10 82 72)"/><circle cx="99" cy="35" r="4" fill="white" stroke="#3A9B6A" stroke-width="1.5"/><circle cx="100" cy="34" r="2.5" fill="#3A9B6A"/><circle cx="101" cy="33" r="1" fill="white"/><circle cx="100" cy="44" r="3.5" fill="#F0A050" opacity=".4"/><path d="M94 46 Q98 50 103 46" fill="none" stroke="#3A9B6A" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <h1><span style="color:#6BADE8">느린</span><span style="color:#F0A050">아이</span> <span style="color:#4A4035"> 시리즈</span></h1>
+      <p class="sm-login-subtitle">한 걸음씩 제대로 배우는 수학</p>
+    </div>
+    <p class="sm-login-trial">가입하시고 하루 동안 모든 기능을<br>무료로 체험해보세요</p>
+    <div class="sm-login-buttons">
+      <button class="sm-login-btn kakao" id="sm-login-kakao" type="button">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 1C4.477 1 0 4.477 0 8.667c0 2.7 1.753 5.072 4.393 6.413-.192.717-.694 2.6-.794 3.004-.124.497.182.49.383.356.158-.105 2.51-1.708 3.525-2.398.8.118 1.628.18 2.493.18 5.523 0 10-3.477 10-7.555C20 4.477 15.523 1 10 1z" fill="#191919"/></svg>
+        카카오로 시작하기
+      </button>
+      <button class="sm-login-btn google" id="sm-login-google" type="button">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" fill="#FFC107"/><path d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" fill="#FF3D00"/><path d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" fill="#4CAF50"/><path d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.001-.001 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" fill="#1976D2"/></svg>
+        Google로 시작하기
+      </button>
+    </div>
+  </div>
+
+  <!-- 로그인 모달 (placeholder) -->
+  <div id="sm-modal-login" class="sm-modal-mask">
+    <div class="sm-modal">
+      <h3>로그인이 필요해요</h3>
+      <p>서비스를 이용하려면 로그인이 필요합니다. 현재는 개발용 더미 로그인만 제공됩니다.</p>
+      <div class="btns">
+        <button id="sm-login-cancel" type="button" class="secondary">취소</button>
+        <button id="sm-login-ok" type="button" class="primary">로그인 (임시)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 결제 모달 (placeholder) -->
+  <div id="sm-modal-payment" class="sm-modal-mask">
+    <div class="sm-modal">
+      <h3>이용권이 필요해요</h3>
+      <p>이 연습을 하려면 이용권 구매가 필요합니다. 정식 출시 시 인앱결제로 연결될 예정입니다.</p>
+      <div class="btns">
+        <button id="sm-pay-cancel" type="button" class="secondary">나중에</button>
+        <button id="sm-pay-ok" type="button" class="primary">구매 (임시)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 공유 토스트 (시리즈 탭의 공유 버튼이 성공 시 표시) -->
+  <div id="sm-share-toast" class="share-toast"></div>
+
+  <script src="./shell/apps.js?v=27"></script>
+  <script src="./shell/shell.js?v=27"></script>
 </body>
 </html>
