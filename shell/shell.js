@@ -335,6 +335,10 @@
     try {
       var doc = state.iframeEl.contentDocument;
       if (!doc) return;
+      // iframe을 appendChild 하면 src 설정 전 about:blank에서 'load'가 먼저 발생.
+      // 이 시점에 <link rel=stylesheet>를 상대경로로 주입하면 base URL이 없어 404 발생.
+      // (실제 서브앱 로드 시 두 번째 load에서 다시 주입되므로 초기 load는 스킵)
+      if (doc.location && doc.location.href === 'about:blank') return;
 
       // ① 인라인 <style> 동기 주입 (최우선)
       var prevInline = doc.getElementById('__sm_shell_embed_inline');
@@ -350,7 +354,7 @@
       var link = doc.createElement('link');
       link.id = '__sm_shell_embed_css';
       link.rel = 'stylesheet';
-      link.href = '../shell/embedded.css?v=5';
+      link.href = '../shell/embedded.css?v=6';
       doc.head.appendChild(link);
 
       // 쉘 상태 전달
