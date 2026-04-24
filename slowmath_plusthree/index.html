@@ -519,12 +519,12 @@ setTimeout(function() {
                     <div class="mode-desc">숫자판에서 3 큰 수를 찾아요</div>
                 </div>
                 <div class="range-buttons">
-                    <button class="range-btn" onclick="startGame(1, 9, 'numboard')">1 ~ 9</button>
-                    <button class="range-btn" onclick="startGame(1, 19, 'numboard')">1 ~ 19</button>
-                    <button class="range-btn" onclick="startGame(1, 29, 'numboard')">1 ~ 29</button>
-                    <button class="range-btn" onclick="startGame(1, 39, 'numboard')">1 ~ 39</button>
+                    <button class="range-btn" onclick="startGame(1, 10, 'numboard')">1 ~ 10</button>
+                    <button class="range-btn" onclick="startGame(1, 20, 'numboard')">1 ~ 20</button>
+                    <button class="range-btn" onclick="startGame(1, 30, 'numboard')">1 ~ 30</button>
+                    <button class="range-btn" onclick="startGame(1, 40, 'numboard')">1 ~ 40</button>
                     <button class="range-btn" onclick="startGame(1, 50, 'numboard')">1 ~ 50</button>
-                    <button class="range-btn" onclick="startGame(51, 98, 'numboard')">51 ~ 98</button>
+                    <button class="range-btn" onclick="startGame(51, 100, 'numboard')">51 ~ 100</button>
                 </div>
             </div>
 
@@ -546,12 +546,12 @@ setTimeout(function() {
                     <div class="mode-desc">숫자를 보고 3 큰 수를 골라요</div>
                 </div>
                 <div class="range-buttons no-bottom-radius">
-                    <button class="range-btn" onclick="startGame(1, 9, 'nextnext')">1 ~ 9</button>
-                    <button class="range-btn" onclick="startGame(1, 19, 'nextnext')">1 ~ 19</button>
-                    <button class="range-btn" onclick="startGame(1, 29, 'nextnext')">1 ~ 29</button>
-                    <button class="range-btn" onclick="startGame(1, 39, 'nextnext')">1 ~ 39</button>
+                    <button class="range-btn" onclick="startGame(1, 10, 'nextnext')">1 ~ 10</button>
+                    <button class="range-btn" onclick="startGame(1, 20, 'nextnext')">1 ~ 20</button>
+                    <button class="range-btn" onclick="startGame(1, 30, 'nextnext')">1 ~ 30</button>
+                    <button class="range-btn" onclick="startGame(1, 40, 'nextnext')">1 ~ 40</button>
                     <button class="range-btn" onclick="startGame(1, 50, 'nextnext')">1 ~ 50</button>
-                    <button class="range-btn" onclick="startGame(1, 99, 'nextnext')">1 ~ 99</button>
+                    <button class="range-btn" onclick="startGame(51, 100, 'nextnext')">51 ~ 100</button>
                 </div>
                 <div class="mode-hint-row">
                     <div>
@@ -582,12 +582,12 @@ setTimeout(function() {
                     <div class="mode-desc">1부터 차례대로 3을 더해요</div>
                 </div>
                 <div class="range-buttons">
-                    <button class="range-btn" onclick="startGame(1, 9, 'sequential')">1 ~ 9</button>
-                    <button class="range-btn" onclick="startGame(1, 19, 'sequential')">1 ~ 19</button>
-                    <button class="range-btn" onclick="startGame(1, 29, 'sequential')">1 ~ 29</button>
-                    <button class="range-btn" onclick="startGame(1, 39, 'sequential')">1 ~ 39</button>
+                    <button class="range-btn" onclick="startGame(1, 10, 'sequential')">1 ~ 10</button>
+                    <button class="range-btn" onclick="startGame(1, 20, 'sequential')">1 ~ 20</button>
+                    <button class="range-btn" onclick="startGame(1, 30, 'sequential')">1 ~ 30</button>
+                    <button class="range-btn" onclick="startGame(1, 40, 'sequential')">1 ~ 40</button>
                     <button class="range-btn" onclick="startGame(1, 50, 'sequential')">1 ~ 50</button>
-                    <button class="range-btn" onclick="startGame(51, 98, 'sequential')">51 ~ 98</button>
+                    <button class="range-btn" onclick="startGame(51, 100, 'sequential')">51 ~ 100</button>
                 </div>
             </div>
 
@@ -614,12 +614,12 @@ setTimeout(function() {
                     <div class="mode-desc">숫자를 보고 3을 더한 답을 골라요</div>
                 </div>
                 <div class="range-buttons">
-                    <button class="range-btn" onclick="startGame(1, 9, 'random')">1 ~ 9</button>
-                    <button class="range-btn" onclick="startGame(1, 19, 'random')">1 ~ 19</button>
-                    <button class="range-btn" onclick="startGame(1, 29, 'random')">1 ~ 29</button>
-                    <button class="range-btn" onclick="startGame(1, 39, 'random')">1 ~ 39</button>
+                    <button class="range-btn" onclick="startGame(1, 10, 'random')">1 ~ 10</button>
+                    <button class="range-btn" onclick="startGame(1, 20, 'random')">1 ~ 20</button>
+                    <button class="range-btn" onclick="startGame(1, 30, 'random')">1 ~ 30</button>
+                    <button class="range-btn" onclick="startGame(1, 40, 'random')">1 ~ 40</button>
                     <button class="range-btn" onclick="startGame(1, 50, 'random')">1 ~ 50</button>
-                    <button class="range-btn" onclick="startGame(51, 98, 'random')">51 ~ 98</button>
+                    <button class="range-btn" onclick="startGame(51, 100, 'random')">51 ~ 100</button>
                 </div>
             </div>
         </div>
@@ -941,6 +941,8 @@ function renderNumberBoard(boardMin, boardMax, givenNum, answerNum) {
 function startGame(min, max, mode) {
     if (!localStorage.getItem('slowmath_plusthree_login')) { sessionStorage.setItem('_sp',JSON.stringify([min,max,mode])); showView('login-view'); return; }
         isWrongNotePractice = false;
+    /* 답 범위 캡 */
+    max = Math.min(max, 97);
     if (mode === 'nextnext') {
         gameType = 'nextnext';
         generateQuestions(min, max, 'random');
