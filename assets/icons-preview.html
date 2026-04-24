@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>느린아이 시리즈 — 아이콘 배리에이션</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+  background: #f3f4f6;
+  color: #1f2937;
+  padding: 32px 24px 80px;
+}
+h1 {
+  text-align: center;
+  font-size: 1.6rem;
+  margin-bottom: 6px;
+  color: #111827;
+}
+.lead {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin-bottom: 36px;
+}
+.grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 28px;
+}
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.card h2 {
+  font-size: 1.05rem;
+  color: #111827;
+  text-align: center;
+}
+.card .sub {
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-align: center;
+  min-height: 2.4em;
+}
+.big {
+  width: 200px;
+  height: 200px;
+  border-radius: 44px; /* iOS squircle 근사 */
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+.big img { width: 100%; height: 100%; display: block; }
+.sizes {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  padding-top: 6px;
+}
+.sizes .s {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.sizes .s img {
+  display: block;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.sizes .s .px { font-size: 0.7rem; color: #9ca3af; }
+.sz-120 { width: 120px; height: 120px; border-radius: 26px; overflow: hidden; }
+.sz-60 { width: 60px; height: 60px; border-radius: 13px; overflow: hidden; }
+.sz-40 { width: 40px; height: 40px; border-radius: 9px; overflow: hidden; }
+
+.mock {
+  margin-top: 8px;
+  padding: 10px 14px;
+  background: linear-gradient(180deg, #5d8ec7, #89b4df);
+  border-radius: 16px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.mock .icon-slot { width: 56px; height: 56px; border-radius: 13px; overflow: hidden; }
+.mock .label { color: white; font-size: 0.78rem; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+
+footer {
+  max-width: 1100px;
+  margin: 50px auto 0;
+  padding: 22px 24px;
+  background: #fff;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  color: #374151;
+  line-height: 1.7;
+}
+footer b { color: #111827; }
+footer code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+</style>
+</head>
+<body>
+
+<h1>느린아이 시리즈 — 앱 아이콘 배리에이션</h1>
+<p class="lead">각 카드의 좌측이 마스터 아이콘, 우측은 실제 홈스크린 크기(120·60·40px)로 시뮬레이션한 모습입니다.</p>
+
+<div class="grid">
+
+  <div class="card">
+    <h2>① 크림 그라데이션</h2>
+    <div class="sub">따뜻하고 차분한 느낌 — 현재 앱 UI 웜톤과 가장 잘 어울림</div>
+    <div class="big"><img src="./icon-1-cream.svg" alt="크림"></div>
+    <div class="sizes">
+      <div class="s"><div class="sz-120"><img src="./icon-1-cream.svg" width="120" height="120"></div><div class="px">120</div></div>
+      <div class="s"><div class="sz-60"><img src="./icon-1-cream.svg" width="60" height="60"></div><div class="px">60</div></div>
+      <div class="s"><div class="sz-40"><img src="./icon-1-cream.svg" width="40" height="40"></div><div class="px">40</div></div>
+    </div>
+    <div class="mock"><div class="icon-slot"><img src="./icon-1-cream.svg" width="56" height="56"></div><div class="label">느린아이 시리즈</div></div>
+  </div>
+
+  <div class="card">
+    <h2>② 스카이블루</h2>
+    <div class="sub">브랜드 블루(#6BADE8) 강조 — 홈스크린에서 눈에 잘 띔</div>
+    <div class="big"><img src="./icon-2-sky.svg" alt="스카이블루"></div>
+    <div class="sizes">
+      <div class="s"><div class="sz-120"><img src="./icon-2-sky.svg" width="120" height="120"></div><div class="px">120</div></div>
+      <div class="s"><div class="sz-60"><img src="./icon-2-sky.svg" width="60" height="60"></div><div class="px">60</div></div>
+      <div class="s"><div class="sz-40"><img src="./icon-2-sky.svg" width="40" height="40"></div><div class="px">40</div></div>
+    </div>
+    <div class="mock"><div class="icon-slot"><img src="./icon-2-sky.svg" width="56" height="56"></div><div class="label">느린아이 시리즈</div></div>
+  </div>
+
+  <div class="card">
+    <h2>③ 순백 미니멀</h2>
+    <div class="sub">어떤 배경에도 무난 — 거북이 자체에 가장 집중</div>
+    <div class="big"><img src="./icon-3-white.svg" alt="화이트"></div>
+    <div class="sizes">
+      <div class="s"><div class="sz-120"><img src="./icon-3-white.svg" width="120" height="120"></div><div class="px">120</div></div>
+      <div class="s"><div class="sz-60"><img src="./icon-3-white.svg" width="60" height="60"></div><div class="px">60</div></div>
+      <div class="s"><div class="sz-40"><img src="./icon-3-white.svg" width="40" height="40"></div><div class="px">40</div></div>
+    </div>
+    <div class="mock"><div class="icon-slot"><img src="./icon-3-white.svg" width="56" height="56"></div><div class="label">느린아이 시리즈</div></div>
+  </div>
+
+  <div class="card">
+    <h2>④ 민트 그라데이션</h2>
+    <div class="sub">거북이 셸 색과 조화 — 성장·자연스러운 느낌</div>
+    <div class="big"><img src="./icon-4-mint.svg" alt="민트"></div>
+    <div class="sizes">
+      <div class="s"><div class="sz-120"><img src="./icon-4-mint.svg" width="120" height="120"></div><div class="px">120</div></div>
+      <div class="s"><div class="sz-60"><img src="./icon-4-mint.svg" width="60" height="60"></div><div class="px">60</div></div>
+      <div class="s"><div class="sz-40"><img src="./icon-4-mint.svg" width="40" height="40"></div><div class="px">40</div></div>
+    </div>
+    <div class="mock"><div class="icon-slot"><img src="./icon-4-mint.svg" width="56" height="56"></div><div class="label">느린아이 시리즈</div></div>
+  </div>
+
+  <div class="card">
+    <h2>⑤ 네이비 (야경)</h2>
+    <div class="sub">어두운 배경 + 대비 pop — 고급감, 다른 교육앱과 차별</div>
+    <div class="big"><img src="./icon-5-navy.svg" alt="네이비"></div>
+    <div class="sizes">
+      <div class="s"><div class="sz-120"><img src="./icon-5-navy.svg" width="120" height="120"></div><div class="px">120</div></div>
+      <div class="s"><div class="sz-60"><img src="./icon-5-navy.svg" width="60" height="60"></div><div class="px">60</div></div>
+      <div class="s"><div class="sz-40"><img src="./icon-5-navy.svg" width="40" height="40"></div><div class="px">40</div></div>
+    </div>
+    <div class="mock"><div class="icon-slot"><img src="./icon-5-navy.svg" width="56" height="56"></div><div class="label">느린아이 시리즈</div></div>
+  </div>
+
+  <div class="card">
+    <h2>⑥ 듀오톤 (블루→오렌지)</h2>
+    <div class="sub">"느린(블루)·아이(오렌지)" 브랜드 두 색의 그라데이션</div>
+    <div class="big"><img src="./icon-6-duo.svg" alt="듀오톤"></div>
+    <div class="sizes">
+      <div class="s"><div class="sz-120"><img src="./icon-6-duo.svg" width="120" height="120"></div><div class="px">120</div></div>
+      <div class="s"><div class="sz-60"><img src="./icon-6-duo.svg" width="60" height="60"></div><div class="px">60</div></div>
+      <div class="s"><div class="sz-40"><img src="./icon-6-duo.svg" width="40" height="40"></div><div class="px">40</div></div>
+    </div>
+    <div class="mock"><div class="icon-slot"><img src="./icon-6-duo.svg" width="56" height="56"></div><div class="label">느린아이 시리즈</div></div>
+  </div>
+
+</div>
+
+<footer>
+  <b>SVG → PNG 내보내기 안내</b><br>
+  Capacitor 빌드엔 PNG가 필요합니다. 고른 SVG를 1024×1024 PNG로 변환 후 <code>npx @capacitor/assets generate --iconOnly</code> 명령으로 iOS·Android 전체 사이즈 자동 생성 가능.<br>
+  간단한 방법:
+  <ul style="margin: 6px 0 0 20px;">
+    <li>온라인: CloudConvert·Vectr·Figma 등에 SVG 업로드 → 1024px PNG export</li>
+    <li>CLI: <code>npx svgexport icon-1-cream.svg icon.png 1024:1024</code> (svgexport 설치 필요)</li>
+    <li>Inkscape: <code>inkscape icon-1-cream.svg --export-type=png --export-width=1024</code></li>
+  </ul>
+</footer>
+
+</body>
+</html>
