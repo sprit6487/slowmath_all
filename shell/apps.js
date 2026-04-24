@@ -29,6 +29,7 @@
     { id: 'plusthree',  name: '더하기 3',         icon: '3️⃣',  category: '연산' },
     { id: 'easy',       name: '한 자리 덧셈',     icon: '➕',  category: '연산' },
     { id: 'circle',     name: '한 자리 덧셈 연습',icon: '➕',  category: '연산' },
+    { id: 'minusone',   name: '빼기 1',           icon: '➖',  category: '연산' },
     { id: 'timestables',name: '구구단 연습',      icon: '✖️',  category: '연산' }
   ];
 

@@ -506,17 +506,21 @@
     if (v) v.style.display = 'none';
   }
   // 서브앱이 login-view를 "보이려고" 하는지 검사.
-  // 서브앱들은 대부분 'hidden' 클래스 추가/제거로 토글하므로 그것만 체크.
-  // ('smh'는 쉘이 초기 강제 숨김용으로 쓰기도 했으나 서브앱 startGame과 충돌해 제거함)
+  // 서브앱마다 토글 방식이 다름:
+  //   - 일부는 classList.add/remove('hidden')
+  //   - 일부는 showView()에서 el.style.display = 'flex'/'none' 로 직접 설정
+  // 인라인 style이 명시되면 class보다 우선 판정 (class 기반 선제 숨김이 오판하지 않도록).
   function isSubappLoginViewActive() {
     try {
       var doc = state.iframeEl && state.iframeEl.contentDocument;
       if (!doc) return false;
       var lv = doc.getElementById('login-view') || doc.querySelector('.login-view');
       if (!lv) return false;
-      if (lv.style.display === 'none') return false;
-      if (lv.classList.contains('hidden')) return false;
-      return true;
+      var sd = lv.style.display;
+      if (sd && sd !== 'none' && sd !== '') return true;   // 서브앱이 명시적으로 노출 의도
+      if (sd === 'none') return false;                      // 서브앱이 명시적으로 숨김
+      if (lv.classList.contains('hidden')) return false;    // class 기반 숨김
+      return true;                                           // 기본 노출 상태
     } catch (e) { return false; }
   }
 
