@@ -197,12 +197,13 @@
         @keyframes piA { 0%,40% { opacity:0; transform:scale(0); } 50% { opacity:1; transform:scale(1.3); } 55%,80% { opacity:1; transform:scale(1); } 90%,100% { opacity:0; transform:scale(0); } }
 
         /* ── 2 큰 수 힌트 박스 ── */
-        .hint-boxes { display: flex; justify-content: center; gap: 8px; margin-top: 20px; margin-bottom: 10px; }
-        .hint-box { width: 64px; height: 64px; border-radius: 14px; border: 2.5px solid #E8E2DA; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: #4A4035; background: #FAF5EE; }
+        .hint-boxes { display: flex; justify-content: center; gap: 8px; margin-top: 20px; margin-bottom: 10px; position: relative; padding-bottom: 46px; }
+        .hint-box { width: 64px; height: 64px; flex-shrink: 0; border-radius: 14px; border: 2.5px solid #E8E2DA; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: #4A4035; background: #FAF5EE; }
         .hint-box.blank { border-style: dashed; border-color: #C4AA82; color: #D8D2C8; background: white; }
         .hint-box.revealed { border-style: solid; border-color: #5BC886; background: #D4F5E0; color: #1A7A3A; animation: popIn 0.4s ease; }
-        .hint-box.base { border-color: #FF9500; border-width: 3px; background: #FFF5E6; position: relative; }
-        .hint-box.base::after { content: '▲'; position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 0.65rem; color: #FF9500; }
+        .hint-box.base { border-color: #FF9500; border-width: 3px; background: #FFF5E6; }
+        /* base → 마지막 blank(정답) 화살표 — 고정 크기 + 중앙 정렬 (translateX) */
+        .hint-arrow { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: block; pointer-events: none; }
         @media (min-width: 768px) {
             .hint-box { width: 76px; height: 76px; font-size: 1.75rem; }
         }
@@ -986,8 +987,14 @@ function loadQuestion() {
         var hintHtml = hintEnabled ? '<div class="hint-boxes">' +
                 '<div class="hint-box">' + (num - 1) + '</div>' +
                 '<div class="hint-box base">' + num + '</div>' +
-                '<div class="hint-box blank" id="hint-answer1">?</div>' +
+                '<div class="hint-box blank" id="hint-answer1"></div>' +
                 '<div class="hint-box blank" id="hint-answer2">?</div>' +
+                /* base → 마지막 blank(정답) 직각 꺾임 화살표 + "+2" 라벨 (반응형) */
+                '<svg class="hint-arrow" viewBox="0 0 280 42" width="280" height="42" xmlns="http://www.w3.org/2000/svg">' +
+                  '<path d="M 104 4 L 104 22 L 248 22 L 248 10" stroke="#FF9500" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
+                  '<path d="M 248 2 L 242.5 12 L 253.5 12 Z" fill="#FF9500"/>' +
+                  '<text x="176" y="38" text-anchor="middle" font-size="15" font-weight="800" fill="#FF9500" font-family="inherit">+2</text>' +
+                '</svg>' +
             '</div>' : '';
         qd.innerHTML = '<div style="font-size:3.5rem;font-weight:900;color:#6BADE8;line-height:1;">' + num + '</div>' +
             '<div class="hint" style="font-size:1.2rem;font-weight:700;margin-top:12px;">2 큰 수는?</div>' +
@@ -1093,7 +1100,7 @@ function pickAnswer(btn, picked, answer) {
                 if (hintEl1) { hintEl1.textContent = num + 1; hintEl1.className = 'hint-box'; }
                 if (hintEl2) { hintEl2.textContent = num + 2; hintEl2.className = 'hint-box revealed'; }
             }
-            fb.textContent = '정답! ' + num + ' 2 큰 수는 ' + answer;
+            fb.textContent = '정답! ' + num + ' 보다 2 큰 수는 ' + answer;
         } else if (gameType === 'numboard') {
             const blankEl = document.getElementById('nb-blank-cell');
             if (blankEl) { blankEl.textContent = answer; blankEl.classList.add('revealed'); }
@@ -1101,7 +1108,7 @@ function pickAnswer(btn, picked, answer) {
                 el.textContent = el.getAttribute('data-val');
                 el.classList.add('revealed');
             });
-            fb.textContent = '정답! ' + num + ' 에서 2 큰 수는 ' + answer;
+            fb.textContent = '정답! ' + num + ' 보다 2 큰 수는 ' + answer;
         } else {
             fb.textContent = '정답! ' + num + ' + 2 = ' + answer;
         }
