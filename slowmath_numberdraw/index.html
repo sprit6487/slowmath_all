@@ -240,10 +240,33 @@
         .result-header p { font-size: .85rem; color: #B8AD9E; margin: 0; }
         .next-btn { margin-top: 8px; padding: 14px 36px; border: none; border-radius: 12px; background: #6BADE8; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform 0.12s; }
         .next-btn:active { transform: scale(0.96); }
-        .result-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 24px; }
+        .result-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
         .result-cell { border: 2px solid #E8E2DA; border-radius: 12px; overflow: hidden; background: #FAFAF8; position: relative; }
-        .result-cell img { width: 100%; display: block; }
-        .result-cell .result-label { position: absolute; top: 4px; left: 6px; font-size: .65rem; font-weight: 700; color: #B8AD9E; }
+        .result-cell .img-wrap { position: relative; aspect-ratio: 1 / 1; }
+        .result-cell img { width: 100%; height: 100%; display: block; object-fit: contain; }
+        .result-cell .ghost-overlay { position: absolute; inset: 0; pointer-events: none; }
+        .result-cell .result-label { position: absolute; top: 4px; left: 6px; font-size: .65rem; font-weight: 700; color: #B8AD9E; z-index: 2; }
+        .result-cell .result-score-mini { position: absolute; top: 4px; right: 6px; font-size: .62rem; font-weight: 800; background: rgba(255,255,255,0.92); border-radius: 6px; padding: 1px 5px; z-index: 2; }
+        .result-cell .result-score-mini.s-good { color: #3A9B6A; }
+        .result-cell .result-score-mini.s-mid  { color: #C88030; }
+        .result-cell .result-score-mini.s-low  { color: #C46060; }
+
+        /* ── Score bars ── */
+        .score-bars { background: #FFFDF8; border: 2px solid #EDE0CC; border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; animation: fadeUp .4s ease-out; }
+        .score-bars .sb-title { font-size: 0.76rem; font-weight: 700; color: #C4AA82; letter-spacing: .04em; margin-bottom: 10px; text-align: center; }
+        .bar-row { display: grid; grid-template-columns: 56px 1fr 32px; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .bar-row:last-child { margin-bottom: 0; }
+        .bar-label { font-size: 0.78rem; font-weight: 700; color: #7B6545; }
+        .bar-track { height: 10px; background: #F0EAD8; border-radius: 5px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #F0A050, #F5C878); transition: width 0.7s ease-out; }
+        .bar-value { font-size: 0.78rem; font-weight: 700; color: #7B6545; text-align: right; font-variant-numeric: tabular-nums; }
+
+        /* ── Summary tips ── */
+        .summary-tips { background: #F0F6FF; border: 2px solid #BDD5F5; border-radius: 16px; padding: 14px 18px; margin-bottom: 18px; font-size: 0.86rem; color: #3A5A8C; line-height: 1.7; animation: fadeUp .5s ease-out; }
+        .summary-tips .tip-row { margin-bottom: 6px; }
+        .summary-tips .tip-row:last-child { margin-bottom: 0; }
+        .summary-tips .tip-label { font-weight: 700; color: #6A8FBF; margin-right: 4px; }
+        .summary-tips .tip-empty { color: #6A8FBF; text-align: center; font-weight: 700; }
         .result-actions { display: flex; gap: 10px; max-width: 320px; margin: 0 auto; }
         .result-actions button { flex: 1; padding: 13px 0; border-radius: 12px; font-family: 'Noto Sans KR', sans-serif; font-size: .9rem; font-weight: 700; cursor: pointer; transition: transform .1s; }
         .result-actions button:active { transform: scale(.97); }
@@ -526,9 +549,9 @@ setTimeout(function() {
                 <h2 id="result-title">연습 완료!</h2>
                 <p id="result-subtitle">10개의 숫자를 모두 써봤어요</p>
             </div>
+            <div class="score-bars" id="score-bars"></div>
             <div class="result-grid" id="result-grid"></div>
-
-            <div class="writing-feedback" id="writing-feedback"></div>
+            <div class="summary-tips" id="summary-tips"></div>
 
             <div class="result-actions">
                 <button class="next-btn" onclick="startAgain()">다시 하기</button>
@@ -1344,94 +1367,273 @@ function nextTurn() {
 }
 
 // ── Writing Analysis ──
-function analyzeWriting(history, canvasW, canvasH) {
-    if (!history || history.length === 0) return null;
+/* ════════════════════════════════════════════════════════════
+   쓰기 평가 (4축: 모양 / 크기 / 부드러움 / 비례) + 숫자별 특화 검증
+   ════════════════════════════════════════════════════════════ */
+// 숫자별 (가로/세로) 비율 권장값
+const IDEAL_AR = { 0:0.7, 1:0.22, 2:0.65, 3:0.62, 4:0.72, 5:0.65, 6:0.65, 7:0.65, 8:0.6, 9:0.62 };
 
-    let totalShakiness = 0, shakyCount = 0;
-    let totalBBoxRatioW = 0, totalBBoxRatioH = 0, bboxCount = 0;
-    let extraStrokeTurns = 0;
-    let veryShortStrokeTurns = 0;
-
-    history.forEach(item => {
-        const strokes = item.strokes || [];
-        if (strokes.length === 0) return;
-
-        // 떨림(shakiness): 각 점이 전후 점의 중간에서 얼마나 벗어나는지
-        let turnShakiness = 0, turnPts = 0;
-        strokes.forEach(pts => {
-            if (pts.length < 3) return;
-            for (let i = 1; i < pts.length - 1; i++) {
-                const ex = (pts[i-1].x + pts[i+1].x) / 2;
-                const ey = (pts[i-1].y + pts[i+1].y) / 2;
-                turnShakiness += Math.hypot(pts[i].x - ex, pts[i].y - ey);
-                turnPts++;
-            }
-        });
-        if (turnPts > 0) {
-            totalShakiness += turnShakiness / turnPts;
-            shakyCount++;
-        }
-
-        // 크기(bounding box)
-        const allPts = strokes.flat();
-        if (allPts.length > 1) {
-            const xs = allPts.map(p => p.x), ys = allPts.map(p => p.y);
-            totalBBoxRatioW += (Math.max(...xs) - Math.min(...xs)) / canvasW;
-            totalBBoxRatioH += (Math.max(...ys) - Math.min(...ys)) / canvasH;
-            bboxCount++;
-        }
-
-        // 획 수: 기대보다 2배 이상 많이 떼면 이슈
-        const expected = (NUM_STROKES[item.num] || []).length;
-        if (expected > 0 && strokes.length > expected * 2) extraStrokeTurns++;
-
-        // 획이 너무 짧으면(조심스럽게 씀)
-        const totalLen = strokes.flat().reduce((acc, _, i, arr) => {
-            if (i === 0) return 0;
-            return acc + Math.hypot(arr[i].x - arr[i-1].x, arr[i].y - arr[i-1].y);
-        }, 0);
-        if (totalLen < canvasW * 0.3) veryShortStrokeTurns++;
-    });
-
-    const avgShakiness = shakyCount > 0 ? totalShakiness / shakyCount : 0;
-    const avgBBoxW = bboxCount > 0 ? totalBBoxRatioW / bboxCount : 0;
-    const avgBBoxH = bboxCount > 0 ? totalBBoxRatioH / bboxCount : 0;
-    const extraRate = extraStrokeTurns / history.length;
-    const shortRate = veryShortStrokeTurns / history.length;
-
-    const lines = [];
-
-    // 떨림/힘 조절
-    if (avgShakiness > 5) {
-        lines.push('선이 많이 떨려요. 연필을 너무 꽉 쥐고 있는 건 아닐까요?');
-        lines.push('손에 힘을 빼고 편하게 잡아보세요.');
-    } else if (avgShakiness > 2.5) {
-        lines.push('선이 조금 흔들려요. 팔꿈치를 책상에 살짝 올려놓고 천천히 써보세요.');
-    } else if (avgShakiness < 0.8 && avgShakiness >= 0) {
-        lines.push('선이 안정적으로 잘 그어졌어요! 자세와 힘 조절이 좋아요.');
-    }
-
-    // 크기
-    if (avgBBoxW < 0.2 || avgBBoxH < 0.2) {
-        lines.push('숫자를 더 크게 써보세요.');
-        lines.push('공간을 넓게 활용하면 더 보기 좋아요.');
-    } else if (avgBBoxW > 0.85 && avgBBoxH > 0.85) {
-        lines.push('공간을 꽉 채워서 크고 시원하게 썼어요!');
-    }
-
-    // 획을 자주 떼는 경우
-    if (extraRate > 0.4) {
-        lines.push('획을 자주 끊고 있어요. 가능하면 이어서 한 번에 쓰는 연습을 해보세요.');
-    }
-
-    // 너무 짧게/조심스럽게 쓰는 경우
-    if (shortRate > 0.5 && lines.length < 2) {
-        lines.push('너무 조심스럽게 쓰는 것 같아요. 좀 더 자신 있게, 힘을 줘서 써보세요.');
-    }
-
-    if (lines.length === 0) return '균형 잡힌 글씨예요! 자세와 힘 조절 모두 잘 하고 있어요.';
-    return lines.slice(0, 2).join('<br>');
+function _bbox(pts) {
+    let minX=Infinity, maxX=-Infinity, minY=Infinity, maxY=-Infinity;
+    pts.forEach(p => { if(p.x<minX)minX=p.x; if(p.x>maxX)maxX=p.x; if(p.y<minY)minY=p.y; if(p.y>maxY)maxY=p.y; });
+    return { minX, maxX, minY, maxY, w: maxX-minX, h: maxY-minY };
 }
+
+// 사용자 stroke를 0~1 정규화 (가로세로 비율 보존, 단위 정사각형 중앙 배치)
+function _normStrokes(strokes) {
+    const all = strokes.flat();
+    if (all.length === 0) return strokes;
+    const bb = _bbox(all);
+    const scale = Math.max(bb.w, bb.h, 1);
+    const ox = (1 - bb.w/scale) / 2;
+    const oy = (1 - bb.h/scale) / 2;
+    return strokes.map(s => s.map(p => ({ x: ox + (p.x - bb.minX)/scale, y: oy + (p.y - bb.minY)/scale })));
+}
+
+// 균등 거리 리샘플링 → n개 점
+function _resample(pts, n) {
+    if (pts.length === 0) return [];
+    if (pts.length === 1) return Array(n).fill({ x: pts[0].x, y: pts[0].y });
+    const cum = [0];
+    for (let i=1; i<pts.length; i++) cum.push(cum[i-1] + Math.hypot(pts[i].x-pts[i-1].x, pts[i].y-pts[i-1].y));
+    const total = cum[cum.length-1];
+    if (total === 0) return Array(n).fill({ x: pts[0].x, y: pts[0].y });
+    const step = total / (n-1);
+    const out = [{ x: pts[0].x, y: pts[0].y }];
+    let j = 0;
+    for (let i=1; i<n-1; i++) {
+        const target = i * step;
+        while (j < cum.length-2 && cum[j+1] < target) j++;
+        const seg = cum[j+1] - cum[j];
+        const t = seg > 0 ? (target - cum[j]) / seg : 0;
+        out.push({ x: pts[j].x + (pts[j+1].x-pts[j].x)*t, y: pts[j].y + (pts[j+1].y-pts[j].y)*t });
+    }
+    out.push({ x: pts[pts.length-1].x, y: pts[pts.length-1].y });
+    return out;
+}
+
+// 두 stroke 평균 점거리 (정/역 방향 중 작은 값 — DTW 단순화 버전)
+function _strokeDist(a, b, n) {
+    n = n || 28;
+    const ra = _resample(a, n), rb = _resample(b, n);
+    let df = 0, dr = 0;
+    for (let i=0; i<n; i++) {
+        df += Math.hypot(ra[i].x - rb[i].x, ra[i].y - rb[i].y);
+        dr += Math.hypot(ra[i].x - rb[n-1-i].x, ra[i].y - rb[n-1-i].y);
+    }
+    return Math.min(df, dr) / n;
+}
+
+// 모양 점수 (0~100): 사용자 stroke ↔ NUM_STROKES 평균 거리 → 점수
+// (1) 전체 경로 직접 비교 + (2) 획별 매칭 — 둘 중 더 좋은 거리 사용
+// → 단일획으로 흘려쓴 8/9 등이 부당하게 페널티 받지 않도록
+function scoreShape(num, userStrokes) {
+    const ref = NUM_STROKES[num];
+    if (!ref || !userStrokes || userStrokes.length === 0) return 0;
+    const userN = _normStrokes(userStrokes);
+
+    // (1) 전체 경로 비교
+    const userFull = userN.flat();
+    const refFull = ref.flat();
+    const fullDist = _strokeDist(userFull, refFull, 60);
+
+    // (2) 획별 그리디 매칭
+    const used = new Set();
+    let total = 0, matched = 0;
+    ref.forEach((rs) => {
+        let best = -1, bestD = Infinity;
+        for (let ui=0; ui<userN.length; ui++) {
+            if (used.has(ui)) continue;
+            const d = _strokeDist(userN[ui], rs);
+            if (d < bestD) { bestD = d; best = ui; }
+        }
+        if (best >= 0) { used.add(best); total += bestD; matched++; }
+    });
+    const perStrokeAvg = matched > 0 ? total / matched : Infinity;
+
+    // 더 좋은 (작은) 거리 사용
+    let bestDist = Math.min(fullDist, perStrokeAvg);
+
+    // 획 수 차이 페널티는 약하게만 (±1까지 관대)
+    const cntDiff = Math.max(0, Math.abs(ref.length - userStrokes.length) - 1);
+    const penalty = cntDiff * 0.04;
+    return Math.max(0, Math.min(100, Math.round(100 - (bestDist + penalty) * 333)));
+}
+
+// 크기 점수 (0~100): 캔버스의 50~85% 사용을 이상적으로
+function scoreSize(strokes, canvasW, canvasH) {
+    const all = strokes.flat();
+    if (all.length === 0) return 0;
+    const bb = _bbox(all);
+    const m = Math.max(bb.w/canvasW, bb.h/canvasH);
+    if (m < 0.18) return 25;
+    if (m < 0.30) return 50;
+    if (m < 0.42) return 70;
+    if (m < 0.55) return 88;
+    if (m <= 0.92) return 96;
+    return 88;
+}
+
+// 부드러움 점수 (0~100): 떨림 역수 — 캔버스 크기에 정규화
+function scoreSmooth(strokes, canvasW) {
+    let total = 0, count = 0;
+    strokes.forEach(pts => {
+        if (pts.length < 3) return;
+        for (let i=1; i<pts.length-1; i++) {
+            const ex = (pts[i-1].x + pts[i+1].x) / 2;
+            const ey = (pts[i-1].y + pts[i+1].y) / 2;
+            total += Math.hypot(pts[i].x - ex, pts[i].y - ey);
+            count++;
+        }
+    });
+    if (count === 0) return 70;
+    const avg = total / count;
+    const ratio = avg / Math.max(canvasW, 1);  // 캔버스 폭 대비
+    // ratio 0 → 100, 0.025+ → 30 부근
+    return Math.max(15, Math.min(100, Math.round(100 - ratio * 3200)));
+}
+
+// 비례 점수 (0~100): 가로/세로 비율 + 숫자별 특화 검증
+function scoreProportion(num, strokes) {
+    const all = strokes.flat();
+    if (all.length === 0) return 0;
+    const bb = _bbox(all);
+    const ar = bb.w / Math.max(bb.h, 1);
+    const target = IDEAL_AR[num] || 0.65;
+    const diff = Math.abs(ar - target) / target;
+    let s = Math.max(0, 100 - diff * 180);
+
+    // 숫자별 특화
+    if (num === 8 && strokes.length >= 2) {
+        // 위 고리와 아래 고리 크기 균형
+        const t = _bbox(strokes[0]), b = _bbox(strokes[1]);
+        const ratio = Math.min(t.h, b.h) / Math.max(t.h, b.h, 1);
+        s = (s + ratio * 100) / 2;
+    } else if (num === 1) {
+        // 직선성: 점들의 기울기 일관성
+        const pts = strokes.flat();
+        if (pts.length >= 2) {
+            const xs = pts.map(p => p.x);
+            const xspread = (Math.max(...xs) - Math.min(...xs));
+            // 가로 진폭이 세로 진폭의 25% 이하면 직선에 가까움
+            const verticality = 1 - Math.min(1, xspread / Math.max(bb.h, 1) / 0.25);
+            s = (s + verticality * 100) / 2;
+        }
+    } else if (num === 0) {
+        // 0: 폐곡선 닫힘 정도 (시작-끝 점이 가까운지)
+        if (strokes[0] && strokes[0].length > 1) {
+            const s0 = strokes[0];
+            const startEnd = Math.hypot(s0[0].x - s0[s0.length-1].x, s0[0].y - s0[s0.length-1].y);
+            const closure = Math.max(0, 1 - startEnd / Math.max(bb.h, 1) / 0.4);
+            s = s * 0.5 + closure * 100 * 0.5;
+        }
+    }
+    // 9: 윗고리 폐곡선 — 단일획이든 다획이든 경로 안에서 자기-근접 점쌍이 있는지로 판정
+    // (윗 고리가 닫혔으면 어느 시점에서 경로가 시작점 근처로 돌아옴)
+    else if (num === 9) {
+        const pts = strokes.flat();
+        if (pts.length >= 12) {
+            // 인덱스로 30% 이상 떨어진 점 쌍의 최소 공간거리
+            const minIdxGap = Math.floor(pts.length * 0.3);
+            let minD = Infinity;
+            for (let i = 0; i < pts.length; i++) {
+                for (let j = i + minIdxGap; j < pts.length; j++) {
+                    const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
+                    if (d < minD) minD = d;
+                }
+            }
+            const diag = Math.max(bb.w, bb.h, 1);
+            const norm = minD / diag;
+            const closure = Math.max(0, 1 - norm / 0.12);  // 12% 이내면 닫힘
+            s = s * 0.55 + closure * 100 * 0.45;
+        }
+    } else if (num === 4 && strokes.length >= 2) {
+        // 두 획이 교차해야 자연스러움 — 두 stroke의 bbox 겹침
+        const a = _bbox(strokes[0]), b = _bbox(strokes[1]);
+        const overlapX = Math.max(0, Math.min(a.maxX, b.maxX) - Math.max(a.minX, b.minX));
+        const overlapY = Math.max(0, Math.min(a.maxY, b.maxY) - Math.max(a.minY, b.minY));
+        const cross = (overlapX > 0 && overlapY > 0) ? 100 : 50;
+        s = (s + cross) / 2;
+    } else if (num === 7) {
+        // 가로 부분과 사선 부분의 길이 비율 — 첫 stroke의 가로 진폭 vs 세로 진폭
+        // 한 획이면 시작에서 가로 → 사선 패턴
+        // 단순화: 가로/세로 진폭이 비슷하면 좋음
+        const allPts = strokes.flat();
+        const xs = allPts.map(p => p.x), ys = allPts.map(p => p.y);
+        const wsp = Math.max(...xs) - Math.min(...xs);
+        const hsp = Math.max(...ys) - Math.min(...ys);
+        if (hsp > 0) {
+            const r = wsp / hsp;
+            const balance = Math.max(0, 1 - Math.abs(r - 0.7) / 0.7);
+            s = (s + balance * 100) / 2;
+        }
+    }
+    return Math.max(0, Math.min(100, Math.round(s)));
+}
+
+function evaluateTurn(item, canvasW, canvasH) {
+    const strokes = item.strokes || [];
+    return {
+        num: item.num,
+        shape: scoreShape(item.num, strokes),
+        size: scoreSize(strokes, canvasW, canvasH),
+        smooth: scoreSmooth(strokes, canvasW),
+        prop: scoreProportion(item.num, strokes),
+    };
+}
+
+// 숫자별 특화 코멘트 — 가장 약한 축 1개를 골라 한 줄로
+// 단, 크기가 60 미만이면 항상 크기를 우선 (어린이에게 가장 행동 가능한 피드백)
+function digitTip(num, sc) {
+    if (sc.size < 60) {
+        return num + '을 더 크게, 칸을 시원하게 써보세요.';
+    }
+    const weakest = ['shape','prop','smooth','size']
+        .map(k => ({ k, v: sc[k] })).sort((a,b) => a.v - b.v)[0];
+    if (weakest.v >= 75) return null;
+    if (weakest.k === 'shape') {
+        const map = {
+            0:'0은 위에서 시작해 한 번에 동그랗게 그려보세요.',
+            1:'1은 위에서 아래로 곧게 한 번에 그어보세요.',
+            2:'2는 위쪽 둥근 부분과 아래 가로 받침을 또렷하게 써보세요.',
+            3:'3은 위·아래 둥근 부분의 크기가 비슷하도록 그려보세요.',
+            4:'4의 모양을 또렷하게 그려보세요.',
+            5:'5는 위 가로선을 먼저 긋고 아래로 내려와 곡선을 만들어요.',
+            6:'6의 아래쪽 동그라미를 충분히 크고 또렷하게 그려보세요.',
+            7:'7은 가로 한 번, 사선 한 번으로 또렷하게 써보세요.',
+            8:'8은 위·아래 동그라미를 또렷하게 두 개로 그려보세요.',
+            9:'9는 위쪽 동그라미를 먼저 닫고 아래로 꼬리를 내려요.',
+        };
+        return map[num];
+    }
+    if (weakest.k === 'prop') {
+        if (num === 8) return '8은 위 동그라미와 아래 동그라미 크기를 비슷하게 해보세요.';
+        if (num === 1) return '1은 옆으로 흔들리지 않게 곧게 세워서 써보세요.';
+        if (num === 0) return '0의 동그라미가 끝까지 닿도록 닫아주세요.';
+        if (num === 9) return '9의 윗 동그라미가 끝까지 닿도록 닫아주세요.';
+        if (num === 6) return '6은 좌우 폭이 너무 좁지 않게 그려보세요.';
+        if (num === 4) return '4를 너무 좁거나 넓지 않게 그려보세요.';
+        if (num === 7) return '7은 가로획과 사선의 길이 비율을 비슷하게 해보세요.';
+        return num + '의 가로/세로 비율을 더 신경써 보세요.';
+    }
+    if (weakest.k === 'smooth') return num + '을 쓸 때 손에 힘을 빼고 천천히 그어보세요.';
+    if (weakest.k === 'size')   return num + '을 더 크게, 칸을 시원하게 써보세요.';
+    return null;
+}
+
+// 정답 모양 SVG (반투명 고스트 — 결과 카드 오버레이)
+function ghostSVG(num) {
+    const ref = NUM_STROKES[num];
+    if (!ref) return '';
+    const paths = ref.map(stroke => {
+        if (stroke.length === 0) return '';
+        const d = stroke.map((p, i) => (i===0 ? 'M' : 'L') + (p.x*100).toFixed(1) + ',' + (p.y*100).toFixed(1)).join(' ');
+        return '<path d="'+d+'" fill="none" stroke="#5BC886" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.18"/>';
+    }).join('');
+    return '<svg class="ghost-overlay" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">'+paths+'</svg>';
+}
+
+function _scoreClass(v) { return v >= 80 ? 's-good' : v >= 60 ? 's-mid' : 's-low'; }
 
 function showResults() {
 _smGameCompleted=true;
@@ -1442,30 +1644,95 @@ _smGameCompleted=true;
     document.getElementById('result-subtitle').textContent = G.nums.length === 1
         ? '숫자 ' + G.nums[0] + '을(를) ' + TOTAL_TURNS + '번 써봤어요'
         : TOTAL_TURNS + '개의 숫자를 모두 써봤어요';
+
+    // ── 모든 턴 평가 ──
+    const evals = G.history.map(item => evaluateTurn(item, LW, LH));
+
+    // ── 결과 그리드 (썸네일 + 정답 고스트 + 점수 배지) ──
     const grid = document.getElementById('result-grid');
     grid.innerHTML = '';
     G.history.forEach((item, i) => {
         const cell = document.createElement('div');
         cell.className = 'result-cell';
-        const label = document.createElement('div');
-        label.className = 'result-label';
-        label.textContent = item.num;
-        const img = document.createElement('img');
-        img.src = item.dataURL;
-        cell.appendChild(label);
-        cell.appendChild(img);
+        cell.innerHTML =
+            '<div class="result-label">' + item.num + '</div>' +
+            '<div class="img-wrap">' +
+                ghostSVG(item.num) +
+                '<img src="' + item.dataURL + '" alt="' + item.num + '">' +
+            '</div>';
         grid.appendChild(cell);
     });
 
-    // ── Writing feedback (스트로크 분석) ──
-    const feedback = analyzeWriting(G.history, LW, LH);
-    const fbEl = document.getElementById('writing-feedback');
-    if (feedback) {
-        fbEl.innerHTML = '<div class="feedback-label">✏️ 쓰기 피드백</div>' + feedback;
-        fbEl.style.display = '';
-    } else {
-        fbEl.style.display = 'none';
+    // ── 4축 평균 + 막대 ──
+    const axes = ['shape','size','smooth','prop'];
+    const labels = { shape:'모양', size:'크기', smooth:'부드러움', prop:'비례' };
+    const avg = {};
+    axes.forEach(k => {
+        avg[k] = Math.round(evals.reduce((s, e) => s + e[k], 0) / Math.max(evals.length, 1));
+    });
+    const sb = document.getElementById('score-bars');
+    sb.innerHTML =
+        '<div class="sb-title">✏️ 쓰기 평가</div>' +
+        axes.map(k =>
+            '<div class="bar-row">' +
+              '<span class="bar-label">' + labels[k] + '</span>' +
+              '<div class="bar-track"><div class="bar-fill" style="width:' + avg[k] + '%"></div></div>' +
+              '<span class="bar-value">' + avg[k] + '</span>' +
+            '</div>'
+        ).join('');
+
+    // ── 요약 팁: 가장 잘 쓴 / 연습 필요 / 한 줄 코멘트 ──
+    const overalls = evals.map(e => ({
+        num: e.num,
+        v: (e.shape + e.size + e.smooth + e.prop) / 4,
+        e
+    }));
+    const best = overalls.slice().sort((a,b) => b.v - a.v).slice(0, 2);
+    // 크기가 매우 작은 숫자(< 55)가 있으면 평균 점수와 무관하게 그 숫자를 worst로 우선 선정
+    const tooSmall = overalls.filter(o => o.e.size < 55);
+    const worst = tooSmall.length > 0
+        ? tooSmall.slice().sort((a,b) => a.e.size - b.e.size).slice(0, 1)
+        : overalls.slice().sort((a,b) => a.v - b.v).slice(0, 1);
+    const _uniq = arr => Array.from(new Set(arr));
+    const bestNums = _uniq(best.map(o => o.num)).slice(0, 2);
+    const worstNum = worst[0] ? worst[0].num : null;
+
+    // 가장 약한 축에 대한 한 줄 팁 (worst 숫자 기준)
+    let perTip = null;
+    if (worst[0]) perTip = digitTip(worst[0].num, worst[0].e);
+
+    // 전체 약축 기반 일반 팁
+    const weakestAxis = axes.slice().sort((a,b) => avg[a] - avg[b])[0];
+    const generalTips = {
+        shape: '모양을 신경 써서 또렷하게 그려보세요.',
+        size:  '글자를 칸의 절반 이상 크게 써보세요.',
+        smooth:'손에 힘을 빼고 천천히 한 번에 그어보세요.',
+        prop:  '글자의 가로/세로 비율을 자연스럽게 맞춰보세요.',
+    };
+
+    const tipsEl = document.getElementById('summary-tips');
+    let html = '';
+    const goodBest = best.filter(o => {
+        if (o.v < 75) return false;
+        const minAxis = Math.min(o.e.shape, o.e.size, o.e.smooth, o.e.prop);
+        return minAxis >= 60;  // 한 축이라도 심하게 약하면 "잘 쓴"에서 제외
+    }).map(o => o.num);
+    const goodBestUniq = _uniq(goodBest).slice(0, 2);
+    if (goodBestUniq.length > 0) {
+        html += '<div class="tip-row"><span class="tip-label">잘 쓴 숫자</span>' + goodBestUniq.join(', ') + '</div>';
     }
+    if (worstNum != null && (worst[0].v < 68 || worst[0].e.size < 55)) {
+        html += '<div class="tip-row"><span class="tip-label">더 연습해요</span>' + worstNum + '</div>';
+    }
+    if (perTip) {
+        html += '<div class="tip-row"><span class="tip-label">팁</span>' + perTip + '</div>';
+    } else if (avg[weakestAxis] < 80) {
+        html += '<div class="tip-row"><span class="tip-label">팁</span>' + generalTips[weakestAxis] + '</div>';
+    }
+    if (!html) {
+        html = '<div class="tip-empty">균형 잡힌 글씨예요! 자세와 힘 조절 모두 잘 하고 있어요.</div>';
+    }
+    tipsEl.innerHTML = html;
 }
 
 function startAgain() {
