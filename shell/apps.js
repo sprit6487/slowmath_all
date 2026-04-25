@@ -38,7 +38,7 @@
   var CATEGORY_ORDER = ['기초 인지', '수 개념', '수 관계', '덧셈 전 개념', '연산'];
 
   // 서브앱 index.html은 쉘의 ?v=N과 별개로 캐시되므로 iframe URL에도 버전 파라미터를 붙임
-  var SUBAPP_VERSION = '37';
+  var SUBAPP_VERSION = '39';
   function path(id) {
     return './slowmath_' + id + '/?embedded=1&sv=' + SUBAPP_VERSION;
   }

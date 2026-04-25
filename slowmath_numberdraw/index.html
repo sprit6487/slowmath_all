@@ -1501,7 +1501,8 @@ function scoreProportion(num, strokes) {
     const ar = bb.w / Math.max(bb.h, 1);
     const target = IDEAL_AR[num] || 0.65;
     const diff = Math.abs(ar - target) / target;
-    let s = Math.max(0, 100 - diff * 180);
+    // 페널티 완화 (180 → 110) — 정상 손글씨 비율 변동을 너무 가혹하게 깎지 않도록
+    let s = Math.max(0, 100 - diff * 110);
 
     // 숫자별 특화
     if (num === 8 && strokes.length >= 2) {
@@ -1510,14 +1511,14 @@ function scoreProportion(num, strokes) {
         const ratio = Math.min(t.h, b.h) / Math.max(t.h, b.h, 1);
         s = (s + ratio * 100) / 2;
     } else if (num === 1) {
-        // 직선성: 점들의 기울기 일관성
+        // 1은 좁고 곧을수록 좋음 — aspect는 무시하고 직선성만으로 평가
         const pts = strokes.flat();
         if (pts.length >= 2) {
             const xs = pts.map(p => p.x);
             const xspread = (Math.max(...xs) - Math.min(...xs));
-            // 가로 진폭이 세로 진폭의 25% 이하면 직선에 가까움
-            const verticality = 1 - Math.min(1, xspread / Math.max(bb.h, 1) / 0.25);
-            s = (s + verticality * 100) / 2;
+            // 가로 진폭이 세로 진폭의 30% 이하면 직선에 가까움 (1.0 만점)
+            const verticality = Math.max(0, 1 - xspread / Math.max(bb.h, 1) / 0.3);
+            s = verticality * 100;
         }
     } else if (num === 0) {
         // 0: 폐곡선 닫힘 정도 (시작-끝 점이 가까운지)
@@ -1688,20 +1689,30 @@ _smGameCompleted=true;
         e
     }));
     const best = overalls.slice().sort((a,b) => b.v - a.v).slice(0, 2);
-    // 크기가 매우 작은 숫자(< 55)가 있으면 평균 점수와 무관하게 그 숫자를 worst로 우선 선정
-    const tooSmall = overalls.filter(o => o.e.size < 55);
-    const worst = tooSmall.length > 0
-        ? tooSmall.slice().sort((a,b) => a.e.size - b.e.size).slice(0, 1)
-        : overalls.slice().sort((a,b) => a.v - b.v).slice(0, 1);
+    // 더 연습해요: 크기 critical(<55) | 모양 critical(<55) | 평균 < 72 인 숫자들을 모아 최대 3개까지
     const _uniq = arr => Array.from(new Set(arr));
+    const tooSmall   = overalls.filter(o => o.e.size  < 55);
+    const weakShape  = overalls.filter(o => o.e.shape < 55 && !tooSmall.includes(o));
+    const lowAvg     = overalls.filter(o => o.v < 72 && !tooSmall.includes(o) && !weakShape.includes(o));
+    tooSmall.sort((a,b) => a.e.size - b.e.size);
+    weakShape.sort((a,b) => a.e.shape - b.e.shape);
+    lowAvg.sort((a,b) => a.v - b.v);
+    const worsts = tooSmall.concat(weakShape, lowAvg).slice(0, 3);
     const bestNums = _uniq(best.map(o => o.num)).slice(0, 2);
-    const worstNum = worst[0] ? worst[0].num : null;
+    const worstNums = _uniq(worsts.map(o => o.num));
 
-    // 가장 약한 축에 대한 한 줄 팁 (worst 숫자 기준)
-    let perTip = null;
-    if (worst[0]) perTip = digitTip(worst[0].num, worst[0].e);
+    // 모든 worst 숫자에 대해 디짓 팁 생성 (중복 제거)
+    const perTips = [];
+    const seenTips = new Set();
+    worsts.forEach(o => {
+        const tip = digitTip(o.num, o.e);
+        if (tip && !seenTips.has(tip)) {
+            perTips.push(tip);
+            seenTips.add(tip);
+        }
+    });
 
-    // 전체 약축 기반 일반 팁
+    // 전체 약축 기반 일반 팁 (worsts가 없을 때만 fallback)
     const weakestAxis = axes.slice().sort((a,b) => avg[a] - avg[b])[0];
     const generalTips = {
         shape: '모양을 신경 써서 또렷하게 그려보세요.',
@@ -1721,11 +1732,13 @@ _smGameCompleted=true;
     if (goodBestUniq.length > 0) {
         html += '<div class="tip-row"><span class="tip-label">잘 쓴 숫자</span>' + goodBestUniq.join(', ') + '</div>';
     }
-    if (worstNum != null && (worst[0].v < 68 || worst[0].e.size < 55)) {
-        html += '<div class="tip-row"><span class="tip-label">더 연습해요</span>' + worstNum + '</div>';
+    if (worstNums.length > 0) {
+        html += '<div class="tip-row"><span class="tip-label">더 연습해요</span>' + worstNums.join(', ') + '</div>';
     }
-    if (perTip) {
-        html += '<div class="tip-row"><span class="tip-label">팁</span>' + perTip + '</div>';
+    if (perTips.length > 0) {
+        perTips.forEach(t => {
+            html += '<div class="tip-row"><span class="tip-label">팁</span>' + t + '</div>';
+        });
     } else if (avg[weakestAxis] < 80) {
         html += '<div class="tip-row"><span class="tip-label">팁</span>' + generalTips[weakestAxis] + '</div>';
     }
