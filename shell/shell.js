@@ -25,7 +25,7 @@
     shareDays:  'sm.shell.share_days'
   };
 
-  var SHARE_MAX = 5;
+  var SHARE_MAX = 10;
 
   var SPLASH_MS = 2400;  // 서브앱과 동일 — floating 애니메이션(2.4s/주기) 1주기 노출
 

@@ -1118,7 +1118,7 @@ setTimeout(function() {
     /* ─── 공유하기 ─── */
     function shareApp() {
         const SHARE_KEY = 'slowmath_times_share_days';
-        const MAX_DAYS = 5;
+        const MAX_DAYS = 10;
         const bubble = document.getElementById('share-bubble');
         function onShared() {
             let days = parseInt(localStorage.getItem(SHARE_KEY) || '0');
@@ -1145,7 +1145,7 @@ setTimeout(function() {
     function updateShareVis() {
         const loggedIn = !!localStorage.getItem('slowmath_times_login');
         const days = parseInt(localStorage.getItem('slowmath_times_share_days') || '0');
-        document.body.classList.toggle('sm-loggedin', loggedIn && days < 5);
+        document.body.classList.toggle('sm-loggedin', loggedIn && days < 10);
     }
 
     /* ─── 초기화 ─── */
@@ -1161,7 +1161,7 @@ setTimeout(function() {
 
         // 공유 버블 초기화
         const days = parseInt(localStorage.getItem('slowmath_times_share_days') || '0');
-        if (days >= 5) {
+        if (days >= 10) {
             const b = document.getElementById('share-bubble');
             if (b) b.style.display = 'none';
         }

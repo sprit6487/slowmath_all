@@ -720,7 +720,7 @@ function setImpulseDelay(s) {
 /* ══ 공유 ══ */
 function shareApp() {
   var SHARE_KEY = 'slowmath_share_days';
-  var MAX_DAYS = 5;
+  var MAX_DAYS = 10;
   var bubble = document.getElementById('share-bubble');
   function onShared() {
     var days = parseInt(localStorage.getItem(SHARE_KEY) || '0');
@@ -748,7 +748,7 @@ function shareApp() {
   /* ══ 공유 버블 초기화 ══ */
   document.addEventListener('DOMContentLoaded', function() {
     var days = parseInt(localStorage.getItem('slowmath_share_days') || '0');
-    if (days >= 5) { var b = document.getElementById('share-bubble'); if (b) b.style.display = 'none'; }
+    if (days >= 10) { var b = document.getElementById('share-bubble'); if (b) b.style.display = 'none'; }
   });
 
 /* ══ 게임 시작 ══ */
@@ -914,7 +914,7 @@ function speak(text) {
   function _updateShareVis() {
     var loggedIn = !!localStorage.getItem(_SM_KEY);
     var days = parseInt(localStorage.getItem('slowmath_share_days') || '0');
-    document.body.classList.toggle('sm-loggedin', loggedIn && days < 5);
+    document.body.classList.toggle('sm-loggedin', loggedIn && days < 10);
   }
   _updateShareVis();
   ['socialLogin','socialLogout','goLogin'].forEach(function(fn) {

@@ -583,7 +583,7 @@ if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
 /* ══ 공유 ══ */
 function shareApp() {
   var SHARE_KEY = 'slowmath_color_share_days';
-  var MAX_DAYS = 5;
+  var MAX_DAYS = 10;
   var bubble = document.getElementById('share-bubble');
   function onShared() {
     var days = parseInt(localStorage.getItem(SHARE_KEY) || '0');
@@ -608,7 +608,7 @@ function shareApp() {
 }
 document.addEventListener('DOMContentLoaded', function() {
   var days = parseInt(localStorage.getItem('slowmath_color_share_days') || '0');
-  if (days >= 5) { var b = document.getElementById('share-bubble'); if (b) b.style.display = 'none'; }
+  if (days >= 10) { var b = document.getElementById('share-bubble'); if (b) b.style.display = 'none'; }
 });
 
 /* ══ 문제 생성 ══ */
