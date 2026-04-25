@@ -1555,6 +1555,20 @@ function scoreProportion(num, strokes) {
         const overlapY = Math.max(0, Math.min(a.maxY, b.maxY) - Math.max(a.minY, b.minY));
         const cross = (overlapX > 0 && overlapY > 0) ? 100 : 50;
         s = (s + cross) / 2;
+    } else if (num === 6) {
+        // 6 위쪽 갈고리 검사 — (a) 가장 위쪽 점이 우측에 있는지 + (b) 위 1/3 영역에 점이 충분한지
+        // (a)는 갈고리 존재, (b)는 갈고리가 너무 작지 않은지(아래 동그라미가 비대하지 않은지) 검사
+        // 가중치: base aspect 50% + 두 hook 검사 50% — 정상 6 prop이 다른 숫자 대비 과대평가되지 않도록
+        if (all.length > 5) {
+            const top = all.reduce((a, p) => p.y < a.y ? p : a);
+            const topNorX = (top.x - bb.minX) / Math.max(bb.w, 1);
+            const hookScore = Math.max(0, Math.min(1, (topNorX - 0.4) / 0.25));
+            const upperY = bb.minY + bb.h / 3;
+            const upperPts = all.filter(p => p.y < upperY).length;
+            const upperRatio = upperPts / all.length;
+            const hookSizeScore = Math.max(0, Math.min(1, (upperRatio - 0.05) / 0.15));
+            s = s * 0.5 + (hookScore * 25) + (hookSizeScore * 25);
+        }
     } else if (num === 7) {
         // 가로 부분과 사선 부분의 길이 비율 — 첫 stroke의 가로 진폭 vs 세로 진폭
         // 한 획이면 시작에서 가로 → 사선 패턴
@@ -1574,13 +1588,32 @@ function scoreProportion(num, strokes) {
 
 function evaluateTurn(item, canvasW, canvasH) {
     const strokes = item.strokes || [];
-    return {
+    const r = {
         num: item.num,
         shape: scoreShape(item.num, strokes),
         size: scoreSize(strokes, canvasW, canvasH),
         smooth: scoreSmooth(strokes, canvasW),
         prop: scoreProportion(item.num, strokes),
     };
+    // 2 sub-score: 아래쪽 가로 받침 충실도 (메시지 분리용)
+    if (item.num === 2 && strokes.length > 0) {
+        const all = strokes.flat();
+        if (all.length >= 3) {
+            const bb = _bbox(all);
+            const lowerY = bb.minY + bb.h * 0.75;
+            const lowerPts = all.filter(p => p.y >= lowerY);
+            if (lowerPts.length >= 2) {
+                const xs = lowerPts.map(p => p.x);
+                const xspread = Math.max(...xs) - Math.min(...xs);
+                const ratio = xspread / Math.max(bb.w, 1);
+                // 받침 폭이 전체 폭의 30% 이하 → 약함, 70%+ → 충실함
+                r.bottom2 = Math.round(Math.max(0, Math.min(1, (ratio - 0.3) / 0.4)) * 100);
+            } else {
+                r.bottom2 = 0;
+            }
+        }
+    }
+    return r;
 }
 
 // 숫자별 특화 코멘트 — 가장 약한 축 1개를 골라 한 줄로
@@ -1593,14 +1626,20 @@ function digitTip(num, sc) {
         .map(k => ({ k, v: sc[k] })).sort((a,b) => a.v - b.v)[0];
     if (weakest.v >= 75) return null;
     if (weakest.k === 'shape') {
+        // 2: 아래쪽 받침이 약하면 받침 메시지, 아니면 위쪽 곡선 메시지
+        if (num === 2) {
+            if (sc.bottom2 != null && sc.bottom2 < 60) {
+                return '2의 아래쪽을 가로로 길게 받쳐주세요.';
+            }
+            return '2의 위쪽을 동그랗게 굴려주세요.';
+        }
         const map = {
             0:'0은 위에서 시작해 한 번에 동그랗게 그려보세요.',
             1:'1은 위에서 아래로 곧게 한 번에 그어보세요.',
-            2:'2는 위쪽 둥근 부분과 아래 가로 받침을 또렷하게 써보세요.',
             3:'3은 위·아래 둥근 부분의 크기가 비슷하도록 그려보세요.',
-            4:'4의 모양을 또렷하게 그려보세요.',
+            4:'4의 가로선이 가운데를 가로지르도록 그려보세요.',
             5:'5는 위 가로선을 먼저 긋고 아래로 내려와 곡선을 만들어요.',
-            6:'6의 아래쪽 동그라미를 충분히 크고 또렷하게 그려보세요.',
+            6:'6의 위쪽 갈고리를 충분히 길게 그려보세요.',
             7:'7은 가로 한 번, 사선 한 번으로 또렷하게 써보세요.',
             8:'8은 위·아래 동그라미를 또렷하게 두 개로 그려보세요.',
             9:'9는 위쪽 동그라미를 먼저 닫고 아래로 꼬리를 내려요.',
@@ -1612,7 +1651,7 @@ function digitTip(num, sc) {
         if (num === 1) return '1은 옆으로 흔들리지 않게 곧게 세워서 써보세요.';
         if (num === 0) return '0의 동그라미가 끝까지 닿도록 닫아주세요.';
         if (num === 9) return '9의 윗 동그라미가 끝까지 닿도록 닫아주세요.';
-        if (num === 6) return '6은 좌우 폭이 너무 좁지 않게 그려보세요.';
+        if (num === 6) return '6의 위쪽 갈고리를 충분히 길게 그려보세요.';
         if (num === 4) return '4를 너무 좁거나 넓지 않게 그려보세요.';
         if (num === 7) return '7은 가로획과 사선의 길이 비율을 비슷하게 해보세요.';
         return num + '의 가로/세로 비율을 더 신경써 보세요.';
@@ -1692,7 +1731,7 @@ _smGameCompleted=true;
     // 더 연습해요: 크기 critical(<55) | 모양 critical(<55) | 평균 < 72 인 숫자들을 모아 최대 3개까지
     const _uniq = arr => Array.from(new Set(arr));
     const tooSmall   = overalls.filter(o => o.e.size  < 55);
-    const weakShape  = overalls.filter(o => o.e.shape < 55 && !tooSmall.includes(o));
+    const weakShape  = overalls.filter(o => o.e.shape < 60 && !tooSmall.includes(o));
     const lowAvg     = overalls.filter(o => o.v < 72 && !tooSmall.includes(o) && !weakShape.includes(o));
     tooSmall.sort((a,b) => a.e.size - b.e.size);
     weakShape.sort((a,b) => a.e.shape - b.e.shape);
@@ -1700,11 +1739,13 @@ _smGameCompleted=true;
     const worsts = tooSmall.concat(weakShape, lowAvg).slice(0, 3);
     const bestNums = _uniq(best.map(o => o.num)).slice(0, 2);
     const worstNums = _uniq(worsts.map(o => o.num));
+    // 표시 순서는 숫자 오름차순으로 통일
+    const worstsSorted = worsts.slice().sort((a, b) => a.num - b.num);
 
-    // 모든 worst 숫자에 대해 디짓 팁 생성 (중복 제거)
+    // 모든 worst 숫자에 대해 디짓 팁 생성 (숫자 오름차순, 중복 제거)
     const perTips = [];
     const seenTips = new Set();
-    worsts.forEach(o => {
+    worstsSorted.forEach(o => {
         const tip = digitTip(o.num, o.e);
         if (tip && !seenTips.has(tip)) {
             perTips.push(tip);
@@ -1728,12 +1769,13 @@ _smGameCompleted=true;
         const minAxis = Math.min(o.e.shape, o.e.size, o.e.smooth, o.e.prop);
         return minAxis >= 60;  // 한 축이라도 심하게 약하면 "잘 쓴"에서 제외
     }).map(o => o.num);
-    const goodBestUniq = _uniq(goodBest).slice(0, 2);
+    const goodBestUniq = _uniq(goodBest).slice(0, 2).sort((a, b) => a - b);
+    const worstNumsSorted = worstNums.slice().sort((a, b) => a - b);
     if (goodBestUniq.length > 0) {
         html += '<div class="tip-row"><span class="tip-label">잘 쓴 숫자</span>' + goodBestUniq.join(', ') + '</div>';
     }
-    if (worstNums.length > 0) {
-        html += '<div class="tip-row"><span class="tip-label">더 연습해요</span>' + worstNums.join(', ') + '</div>';
+    if (worstNumsSorted.length > 0) {
+        html += '<div class="tip-row"><span class="tip-label">더 연습해요</span>' + worstNumsSorted.join(', ') + '</div>';
     }
     if (perTips.length > 0) {
         perTips.forEach(t => {
