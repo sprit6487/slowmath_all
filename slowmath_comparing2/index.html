@@ -469,6 +469,35 @@ setTimeout(function() {
         <button class="mode-btn" onclick="startGame('left_right','mix3')">3개 비교</button>
       </div>
     </div>
+    <!-- 무거워요/가벼워요 -->
+    <div class="mode-card">
+      <div class="mode-card-top">
+        <div class="mode-preview-wrap">
+          <svg viewBox="0 0 76 56" width="76" height="52" fill="none">
+            <!-- 시소 받침 (삼각형) -->
+            <polygon points="22,50 54,50 38,32" fill="#FFCE3A" stroke="#2A2A2A" stroke-width="1.4" stroke-linejoin="round"/>
+            <!-- 빔 + 도형 (좌측이 무거워 좌하향) -->
+            <g transform="rotate(-10 38 34)">
+              <!-- 시소 판자 -->
+              <rect x="6" y="32" width="64" height="5" rx="1.5" fill="#FFCE3A" stroke="#2A2A2A" stroke-width="1.3"/>
+              <!-- 좌측 도형 (큰 원 - 무거움, 판자 끝 가까이) -->
+              <circle cx="11" cy="23" r="8" fill="#F07070" opacity=".9"/>
+              <!-- 우측 도형 (작은 사각 - 가벼움, 판자 끝 더 가까이) -->
+              <rect x="62" y="22" width="10" height="10" rx="1.2" fill="#5BC886" opacity=".9"/>
+            </g>
+          </svg>
+        </div>
+        <div class="mode-info">
+          <div class="mode-title">무거워요 / 가벼워요</div>
+          <div class="mode-desc">무게를 비교해요</div>
+        </div>
+      </div>
+      <div class="mode-btns" style="grid-template-columns:1fr 1fr 1fr;">
+        <button class="mode-btn" onclick="startGame('heavy_light','a')">무거워요</button>
+        <button class="mode-btn" onclick="startGame('heavy_light','b')">가벼워요</button>
+        <button class="mode-btn" onclick="startGame('heavy_light','mix')">2개 비교</button>
+      </div>
+    </div>
   </div>
 
   <!-- 설정 -->
@@ -569,6 +598,8 @@ const CONCEPTS = {
                 qA3:'가장 높이 있는 것은?', qB3:'가장 낮게 있는 것은?', qMid3:'가운데에 있는 것은?' },
   left_right: { nameA:'왼쪽에 있어요', nameB:'오른쪽에 있어요', qA:'왼쪽에 있는 것은?', qB:'오른쪽에 있는 것은?',
                 qA3:'가장 왼쪽에 있는 것은?', qB3:'가장 오른쪽에 있는 것은?', qMid3:'가운데에 있는 것은?' },
+  heavy_light:{ nameA:'무거워요',     nameB:'가벼워요',         qA:'더 무거운 것은?',     qB:'더 가벼운 것은?',
+                qA3:null,            qB3:null,                 qMid3:null },
 };
 
 /* ══ 상태 ══ */
@@ -798,6 +829,39 @@ function renderScene(conceptId, a, b) {
         ${shapeAt(b.shape, 208, cyB, r, b.color)}
       </svg>`;
     }
+    case 'heavy_light': {
+      // 시소 — 무거운 쪽이 내려감
+      const swap = Math.random() < 0.5;
+      const [leftItem, rightItem] = swap ? [b, a] : [a, b];
+      const tilt = swap ? 9 : -9;
+      const rA = a.size, rB = b.size;
+      const lr = leftItem === a ? rA : rB;
+      const rr = rightItem === a ? rA : rB;
+      const BEAM_TOP = 158;
+      const FULC_APEX = 158;
+      const FILL = '#FFCE3A', STROKE = '#2A2A2A', SW = 2.5;
+      // 도형별 (중심→바닥) 거리 / r 비율 — 시소 위에 도형 바닥이 닿도록
+      const BOTTOM_RATIO = { circle: 1.0, square: 0.875, triangle: 0.95, star: 0.809, heart: 1.0 };
+      const shapeCy = (shape, r) => BEAM_TOP - BOTTOM_RATIO[shape] * r - 2;
+      const lcy = shapeCy(leftItem.shape, lr);
+      const rcy = shapeCy(rightItem.shape, rr);
+      return `<svg viewBox="0 0 280 240" width="100%" style="max-height:240px">
+        <!-- 시소 받침 (삼각형) -->
+        <polygon points="80,222 200,222 140,${FULC_APEX}"
+                 fill="${FILL}" stroke="${STROKE}" stroke-width="${SW}"
+                 stroke-linejoin="round"/>
+        <!-- 빔 + 도형 (일체 회전) -->
+        <g transform="rotate(${tilt} 140 ${FULC_APEX + 6})">
+          <!-- 시소 판자 -->
+          <rect x="30" y="${BEAM_TOP}" width="220" height="12" rx="4"
+                fill="${FILL}" stroke="${STROKE}" stroke-width="${SW}"/>
+          <!-- 좌측 도형 (가벼운 쪽이면 끝에 더 가까이) -->
+          ${shapeAt(leftItem.shape, leftItem === a ? 55 : 42, lcy, lr, leftItem.color)}
+          <!-- 우측 도형 -->
+          ${shapeAt(rightItem.shape, rightItem === a ? 225 : 238, rcy, rr, rightItem.color)}
+        </g>
+      </svg>`;
+    }
   }
   return '';
 }
@@ -946,6 +1010,18 @@ function buildQuestions(n) {
       );
       const a = { shape: SHAPES[sA], color: COLORS[cA] };
       const b = { shape: SHAPES[sB], color: COLORS[cB] };
+      // heavy_light: a = 무거움(큰 면적), b = 가벼움(작은 면적)
+      if (curConcept === 'heavy_light') {
+        // 노란 시소와 시각적으로 충돌하는 노랑/주황 계열은 도형 색에서 제외
+        const HL_EXCLUDE = ['#EDD050', '#F0A050'];
+        const HL_COLORS = COLORS.filter(c => !HL_EXCLUDE.includes(c));
+        if (HL_EXCLUDE.includes(a.color)) a.color = HL_COLORS[rnd(HL_COLORS.length)];
+        if (HL_EXCLUDE.includes(b.color) || b.color === a.color) {
+          do { b.color = HL_COLORS[rnd(HL_COLORS.length)]; } while (b.color === a.color);
+        }
+        a.size = 30 + rnd(6);  // 30~35 (heavy)
+        b.size = 16 + rnd(5);  // 16~20 (light)
+      }
       let askA;
       if (curType === 'a') askA = true;
       else if (curType === 'b') askA = false;
@@ -1073,7 +1149,7 @@ function selectCard(idx) {
     document.getElementById('play-score').textContent = `${score}점`;
     document.getElementById('next-q-btn').classList.remove('hidden');
   } else {
-    document.getElementById(`card-${idx}`).classList.add('card-wrong card-locked');
+    document.getElementById(`card-${idx}`).classList.add('card-wrong', 'card-locked');
     locked = false;
     fb.textContent = '다시 골라보세요';
     fb.className = 'feedback wrong';
