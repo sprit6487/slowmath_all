@@ -1505,11 +1505,27 @@ function scoreProportion(num, strokes) {
     let s = Math.max(0, 100 - diff * 110);
 
     // 숫자별 특화
-    if (num === 8 && strokes.length >= 2) {
-        // 위 고리와 아래 고리 크기 균형
-        const t = _bbox(strokes[0]), b = _bbox(strokes[1]);
-        const ratio = Math.min(t.h, b.h) / Math.max(t.h, b.h, 1);
-        s = (s + ratio * 100) / 2;
+    if (num === 8) {
+        // 위·아래 고리 크기 균형 — 단일획이든 다획이든 y 중간으로 분할해 비교
+        let topBB, botBB;
+        if (strokes.length >= 2) {
+            topBB = _bbox(strokes[0]);
+            botBB = _bbox(strokes[1]);
+        } else if (all.length >= 6) {
+            const midY = bb.minY + bb.h / 2;
+            const topPts = all.filter(p => p.y < midY);
+            const botPts = all.filter(p => p.y >= midY);
+            if (topPts.length >= 3 && botPts.length >= 3) {
+                topBB = _bbox(topPts);
+                botBB = _bbox(botPts);
+            }
+        }
+        if (topBB && botBB) {
+            const tArea = topBB.w * topBB.h;
+            const bArea = botBB.w * botBB.h;
+            const ratio = Math.min(tArea, bArea) / Math.max(tArea, bArea, 1);
+            s = (s + ratio * 100) / 2;
+        }
     } else if (num === 1) {
         // 1은 좁고 곧을수록 좋음 — aspect는 무시하고 직선성만으로 평가
         const pts = strokes.flat();
@@ -1571,9 +1587,7 @@ function scoreProportion(num, strokes) {
         const cross = (overlapX > 0 && overlapY > 0) ? 100 : 50;
         s = (s + cross) / 2;
     } else if (num === 6) {
-        // 6 위쪽 갈고리 검사 — (a) 가장 위쪽 점이 우측에 있는지 + (b) 위/아래 균형
-        // upperRatio가 정상 밴드(0.18~0.40) 양쪽으로 벗어나면 모두 페널티
-        // → 갈고리 빈약(< 0.18)도, 아래 동그라미 빈약(> 0.40)도 잡아냄
+        // 6 검사 — (a) 갈고리 우측 위치 + (b) 위/아래 균형 + (c) 아래 동그라미 폐곡선
         if (all.length > 5) {
             const top = all.reduce((a, p) => p.y < a.y ? p : a);
             const topNorX = (top.x - bb.minX) / Math.max(bb.w, 1);
@@ -1582,10 +1596,24 @@ function scoreProportion(num, strokes) {
             const upperPts = all.filter(p => p.y < upperY).length;
             const upperRatio = upperPts / all.length;
             let balanceScore;
-            if (upperRatio < 0.18) balanceScore = upperRatio / 0.18;          // 갈고리 빈약
-            else if (upperRatio > 0.40) balanceScore = Math.max(0, 1 - (upperRatio - 0.40) / 0.30); // 아래 빈약
-            else balanceScore = 1;                                             // 정상
-            s = s * 0.5 + (hookScore * 25) + (balanceScore * 25);
+            if (upperRatio < 0.18) balanceScore = upperRatio / 0.18;
+            else if (upperRatio > 0.40) balanceScore = Math.max(0, 1 - (upperRatio - 0.40) / 0.30);
+            else balanceScore = 1;
+            // 폐곡선: 경로 안에서 인덱스 40% 이상 떨어진 점쌍의 최소 공간거리
+            let closure6 = 1;
+            if (all.length >= 12) {
+                const minIdxGap = Math.floor(all.length * 0.4);
+                let minD = Infinity;
+                for (let i = 0; i < all.length; i++) {
+                    for (let j = i + minIdxGap; j < all.length; j++) {
+                        const d = Math.hypot(all[i].x - all[j].x, all[i].y - all[j].y);
+                        if (d < minD) minD = d;
+                    }
+                }
+                const diag = Math.max(bb.w, bb.h, 1);
+                closure6 = Math.max(0, 1 - (minD / diag) / 0.20);
+            }
+            s = s * 0.4 + (hookScore * 20) + (balanceScore * 20) + (closure6 * 20);
         }
     } else if (num === 7) {
         // 가로 부분과 사선 부분의 길이 비율 — 첫 stroke의 가로 진폭 vs 세로 진폭
@@ -1613,6 +1641,15 @@ function evaluateTurn(item, canvasW, canvasH) {
         smooth: scoreSmooth(strokes, canvasW),
         prop: scoreProportion(item.num, strokes),
     };
+    // 4 sub-score: 세로선이 너무 긴지 (가로/세로 비율)
+    if (item.num === 4 && strokes.length > 0) {
+        const all = strokes.flat();
+        if (all.length >= 3) {
+            const bb = _bbox(all);
+            const ar = bb.w / Math.max(bb.h, 1);
+            r.tallness4 = ar;  // 정상 ~0.72, < 0.5면 세로가 너무 긺
+        }
+    }
     // 9 sub-score: 윗 동그라미 크기 — 작으면 "동그라미를 크게, 꼬리 짧게" 메시지
     if (item.num === 9 && strokes.length > 0) {
         const all = strokes.flat();
@@ -1635,7 +1672,7 @@ function evaluateTurn(item, canvasW, canvasH) {
             r.topLoop9 = topLoop;
         }
     }
-    // 6 sub-score: 아래쪽 동그라미 충실도 (위쪽 점 비율이 너무 높으면 아래 빈약)
+    // 6 sub-score: 아래쪽 동그라미 충실도 + 폐곡선
     if (item.num === 6 && strokes.length > 0) {
         const all = strokes.flat();
         if (all.length >= 5) {
@@ -1643,10 +1680,24 @@ function evaluateTurn(item, canvasW, canvasH) {
             const upperY = bb.minY + bb.h / 3;
             const upperPts = all.filter(p => p.y < upperY).length;
             const upperRatio = upperPts / all.length;
-            // upperRatio > 0.40 이면 아래 빈약 (수치가 클수록 빈약)
             r.bottomLoop6 = upperRatio > 0.40
                 ? Math.max(0, Math.round(100 - (upperRatio - 0.40) * 250))
                 : 100;
+            // 폐곡선
+            if (all.length >= 12) {
+                const minIdxGap = Math.floor(all.length * 0.4);
+                let minD = Infinity;
+                for (let i = 0; i < all.length; i++) {
+                    for (let j = i + minIdxGap; j < all.length; j++) {
+                        const d = Math.hypot(all[i].x - all[j].x, all[i].y - all[j].y);
+                        if (d < minD) minD = d;
+                    }
+                }
+                const diag = Math.max(bb.w, bb.h, 1);
+                r.bottomClosure6 = Math.round(Math.max(0, Math.min(1, 1 - (minD / diag) / 0.20)) * 100);
+            } else {
+                r.bottomClosure6 = 100;
+            }
         }
     }
     // 2 sub-score: 아래쪽 가로 받침 충실도 (메시지 분리용)
@@ -1687,25 +1738,34 @@ function digitTip(num, sc) {
             }
             return '2의 위쪽을 동그랗게 굴려주세요.';
         }
-        // 6: 아래쪽 동그라미가 빈약하면 동그라미 메시지, 아니면 갈고리 메시지
+        // 6: 폐곡선 미달 → 닫기 / 아래 빈약 → 크기 / 그 외 → 갈고리
         if (num === 6) {
+            if (sc.bottomClosure6 != null && sc.bottomClosure6 < 60) {
+                return '6의 아래쪽 동그라미를 끝까지 닿도록 닫아주세요.';
+            }
             if (sc.bottomLoop6 != null && sc.bottomLoop6 < 60) {
                 return '6의 아래쪽 동그라미를 또렷하고 충분히 크게 그려주세요.';
             }
             return '6의 위쪽 갈고리를 충분히 길게 그려보세요.';
         }
-        // 9: 윗 동그라미가 너무 작으면 크기 메시지, 아니면 폐곡선 메시지
+        // 9: 윗 동그라미가 너무 작으면 크기 메시지, 아니면 일반적인 모양 메시지
         if (num === 9) {
             if (sc.topLoop9 != null && sc.topLoop9 < 60) {
                 return '9의 위쪽 동그라미를 더 크게 그리고 아래 꼬리를 짧게 내려보세요.';
             }
-            return '9는 위쪽 동그라미를 먼저 닫고 아래로 꼬리를 내려요.';
+            return '9는 위쪽 동그라미를 둥글게 그리고 매끄럽게 아래로 꼬리를 내려보세요.';
+        }
+        // 4: 세로가 너무 길면 길이 메시지, 아니면 가로선 메시지
+        if (num === 4) {
+            if (sc.tallness4 != null && sc.tallness4 < 0.5) {
+                return '4의 세로선이 너무 길지 않게 그려보세요.';
+            }
+            return '4의 가로선이 가운데를 가로지르도록 그려보세요.';
         }
         const map = {
             0:'0은 위에서 시작해 한 번에 동그랗게 그려보세요.',
             1:'1은 위에서 아래로 곧게 한 번에 그어보세요.',
-            3:'3은 위·아래 둥근 부분의 크기가 비슷하도록 그려보세요.',
-            4:'4의 가로선이 가운데를 가로지르도록 그려보세요.',
+            3:'3은 위·아래 둥근 부분을 매끄럽게 굴려서 그려보세요.',
             5:'5는 위 가로선을 먼저 긋고 아래로 내려와 곡선을 만들어요.',
             7:'7은 가로 한 번, 사선 한 번으로 또렷하게 써보세요.',
             8:'8은 위·아래 동그라미를 또렷하게 두 개로 그려보세요.',
@@ -1723,12 +1783,20 @@ function digitTip(num, sc) {
             return '9의 윗 동그라미가 끝까지 닿도록 닫아주세요.';
         }
         if (num === 6) {
+            if (sc.bottomClosure6 != null && sc.bottomClosure6 < 60) {
+                return '6의 아래쪽 동그라미를 끝까지 닿도록 닫아주세요.';
+            }
             if (sc.bottomLoop6 != null && sc.bottomLoop6 < 60) {
                 return '6의 아래쪽 동그라미를 또렷하고 충분히 크게 그려주세요.';
             }
             return '6의 위쪽 갈고리를 충분히 길게 그려보세요.';
         }
-        if (num === 4) return '4를 너무 좁거나 넓지 않게 그려보세요.';
+        if (num === 4) {
+            if (sc.tallness4 != null && sc.tallness4 < 0.5) {
+                return '4의 세로선이 너무 길지 않게 그려보세요.';
+            }
+            return '4를 너무 좁거나 넓지 않게 그려보세요.';
+        }
         if (num === 7) return '7은 가로획과 사선의 길이 비율을 비슷하게 해보세요.';
         return num + '의 가로/세로 비율을 더 신경써 보세요.';
     }
