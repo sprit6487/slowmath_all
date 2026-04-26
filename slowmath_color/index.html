@@ -542,6 +542,14 @@ function speak(text) {
   u.lang = 'ko-KR'; u.rate = 0.9;
   setTimeout(() => speechSynthesis.speak(u), 50);
 }
+// 자주 쓰는 문구 프리워밍 — 첫 재생부터 즉시 응답
+if (window.SM_TTS && window.SM_TTS.prewarm) {
+  window.SM_TTS.prewarm([
+    '순서대로 골라보세요',
+    '이 색깔은 무엇인가요?',
+    '순서대로 맞춰보세요'
+  ]);
+}
 
 /* ══ 뷰 전환 ══ */
 const VIEWS = ['login-view','start-view','play-view','result-view'];

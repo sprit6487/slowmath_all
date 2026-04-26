@@ -1054,6 +1054,12 @@ function speak(text) {
   u.lang = 'ko-KR'; u.rate = 0.9;
   setTimeout(() => window.speechSynthesis.speak(u), 50);
 }
+// 자주 쓰는 문구 프리워밍 — 첫 재생부터 즉시 응답
+if (window.SM_TTS && window.SM_TTS.prewarm) {
+  window.SM_TTS.prewarm([
+    '빈칸에 들어갈 것은 무엇일까요?'
+  ]);
+}
 
 // ===== Feedback =====
 function showFeedback(emoji) {

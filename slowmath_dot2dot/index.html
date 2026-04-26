@@ -713,6 +713,12 @@ function speak(text) {
     u.lang = 'ko-KR'; u.rate = 0.9;
     setTimeout(function() { window.speechSynthesis.speak(u); }, 50);
 }
+// 자주 쓰는 문구 프리워밍 — 첫 재생부터 즉시 응답
+if (window.SM_TTS && window.SM_TTS.prewarm) {
+    window.SM_TTS.prewarm([
+        '점과 점 사이에 선을 그으세요'
+    ]);
+}
 // Init TTS toggle UI
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('tts-toggle').classList.toggle('on', ttsEnabled);

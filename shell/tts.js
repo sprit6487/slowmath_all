@@ -25,7 +25,12 @@
 
     var memCache = {};
     var currentAudio = null;
+    var currentAudioStart = 0;     // 재생 시작 시각 (Date.now), 경과 시간 추적용
     var audioUnlocked = false;
+    var pendingNext = null;        // 큐잉된 다음 speak (length 1)
+    var fetchToken = 0;            // race condition 방지: 새 호출 시마다 증가
+    var QUEUE_THRESHOLD_MS = 350;  // 진행 중 음성의 남은 시간이 이 값 미만이면 큐잉
+    var MIN_PROTECT_MS = 1500;     // 재생 시작 후 이 시간 이내엔 무조건 큐잉 (짧은 피드백 보호)
 
     function cacheKey(text) {
         try {
@@ -136,6 +141,8 @@
     }
 
     function cancel() {
+        pendingNext = null;
+        fetchToken++; // 진행 중 fetch 결과 무효화
         if (currentAudio) {
             try { currentAudio.pause(); currentAudio.src = ''; } catch (e) {}
             currentAudio = null;
@@ -159,13 +166,46 @@
 
     function speak(text, opts) {
         if (!text || typeof text !== 'string' || !text.trim()) return;
-        cancel();
+        // 진행 중 음성이 있으면 큐잉 여부 판단 — 짧은 피드백("정답이에요" 등)이 잘리지 않게 보호
+        if (currentAudio && !currentAudio.paused && !currentAudio.ended) {
+            var elapsed = Date.now() - currentAudioStart;
+            var dur = currentAudio.duration;
+            var remaining = (isFinite(dur) && dur > 0) ? (dur - currentAudio.currentTime) * 1000 : null;
+            // 큐잉 조건: (1) 재생 시작 후 1.5초 이내 또는 (2) 남은 시간 < 350ms
+            var shouldQueue = (elapsed < MIN_PROTECT_MS) ||
+                              (remaining !== null && remaining > 0 && remaining < QUEUE_THRESHOLD_MS);
+            if (shouldQueue) {
+                pendingNext = { text: text, opts: opts };
+                currentAudio.addEventListener('ended', _flushPending, { once: true });
+                return;
+            }
+        }
+        _doSpeak(text, opts);
+    }
+
+    function _flushPending() {
+        if (!pendingNext) return;
+        var p = pendingNext;
+        pendingNext = null;
+        _doSpeak(p.text, p.opts);
+    }
+
+    function _doSpeak(text, opts) {
+        // 진행 중 audio가 있으면 (아직 안 끝났음) cancel — 그러나 token만 무효화 (pendingNext는 그대로)
+        if (currentAudio) {
+            try { currentAudio.pause(); currentAudio.src = ''; } catch (e) {}
+            currentAudio = null;
+        }
+        if (global.speechSynthesis && _origCancel) {
+            try { _origCancel.call(global.speechSynthesis); } catch (e) {}
+        }
+        fetchToken++;
+        var myToken = fetchToken;
         var cached = readCache(text);
         if (cached) {
             playDataUrl(cached, opts);
             return;
         }
-        // 캐시 미스 — 일일 한도 체크
         if (rateLimitExceeded()) {
             if (global.console) console.warn('[SM_TTS] daily API limit (' + DAILY_API_CALL_LIMIT + ') reached, fallback');
             fallbackSpeak(text, opts);
@@ -173,11 +213,31 @@
         }
         bumpRateCount();
         fetchTTS(text).then(function (dataUrl) {
+            if (myToken !== fetchToken) return; // 더 새 호출이 있었으면 무시
             writeCache(text, dataUrl);
             playDataUrl(dataUrl, opts);
         }).catch(function (err) {
+            if (myToken !== fetchToken) return;
             if (global.console) console.warn('[SM_TTS] fallback:', err);
             fallbackSpeak(text, opts);
+        });
+    }
+
+    // 자주 쓰는 문구를 백그라운드로 미리 합성·캐시 → 첫 재생도 즉시
+    function prewarm(texts) {
+        if (!Array.isArray(texts)) return;
+        texts.forEach(function (text, i) {
+            if (!text || typeof text !== 'string' || !text.trim()) return;
+            if (readCache(text)) return; // 이미 캐시됨
+            // 200ms 간격으로 분산 (UI 첫 페인트 방해 안 하도록)
+            setTimeout(function () {
+                if (readCache(text)) return;
+                if (rateLimitExceeded()) return;
+                bumpRateCount();
+                fetchTTS(text).then(function (dataUrl) {
+                    writeCache(text, dataUrl);
+                }).catch(function () {});
+            }, 100 + i * 200);
         });
     }
 
@@ -186,6 +246,7 @@
             var audio = new Audio(dataUrl);
             audio.playbackRate = (opts && opts.rate) || 1.0;
             currentAudio = audio;
+            currentAudioStart = Date.now();
             var p = audio.play();
             if (p && p.catch) p.catch(function (err) {
                 if (global.console) console.warn('[SM_TTS] play failed:', err);
@@ -220,6 +281,13 @@
             speak(text, { rate: utterance.rate || 1.0, pitch: utterance.pitch || 1.0 });
         };
         global.speechSynthesis.cancel = function () {
+            // 짧은 피드백("정답이에요" 등) 보호 — 재생 시작 후 1.5초 이내면 cancel 무시
+            // (서브앱의 speak() 함수는 보통 cancel() 직후 새 speak()를 호출하는데,
+            // cancel을 즉시 실행하면 진행 중 음성이 잘림. 큐잉 로직이 처리하도록 위임)
+            if (currentAudio && !currentAudio.paused && !currentAudio.ended) {
+                var elapsed = Date.now() - currentAudioStart;
+                if (elapsed < MIN_PROTECT_MS) return;
+            }
             cancel();
         };
     }
@@ -227,6 +295,20 @@
     global.SM_TTS = {
         speak: speak,
         cancel: cancel,
+        prewarm: prewarm,
         unlock: unlockAudio
     };
+
+    // ── 모든 서브앱이 공통으로 쓰는 짧은 피드백 자동 prewarm ──
+    // 각 서브앱은 자기만의 질문/안내 문구만 별도 prewarm 호출하면 됨
+    prewarm([
+        // 정답 피드백
+        '정답', '정답!', '정답이에요', '정답이에요.', '정답이에요!', '정답입니다.',
+        // 오답 피드백
+        '다시 해봐요', '다시 해봐요.', '다시 해봐요!', '다시 골라보세요', '아니에요.',
+        // 칭찬/완료
+        '잘했어요!', '완벽해요!', '모두 풀었어요! 잘했어요!', '연습 완료! 잘했어요!',
+        // 패스
+        '패스합니다.'
+    ]);
 })(window);

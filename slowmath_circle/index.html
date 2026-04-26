@@ -1763,6 +1763,13 @@ _smGameCompleted=true;
         u.lang = 'ko-KR'; u.rate = 0.9;
         setTimeout(() => window.speechSynthesis.speak(u), 50);
     }
+    // 자주 쓰는 문구 프리워밍 — 첫 재생부터 즉시 응답
+    if (window.SM_TTS && window.SM_TTS.prewarm) {
+        window.SM_TTS.prewarm([
+            '천천히 생각하고 풀어보세요.',
+            '오답노트 연습을 시작해요.'
+        ]);
+    }
 
     // 채우기 색상 드래그 설정
     ['blue', 'orange'].forEach(color => {

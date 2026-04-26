@@ -752,6 +752,14 @@ function speak(text) {
   u.lang = 'ko-KR'; u.rate = 0.9;
   setTimeout(() => window.speechSynthesis.speak(u), 50);
 }
+// 자주 쓰는 문구 프리워밍 — 첫 재생부터 즉시 응답
+if (window.SM_TTS && window.SM_TTS.prewarm) {
+  window.SM_TTS.prewarm([
+    '천천히 생각하고 풀어보세요.',
+    '힌트를 보고 나머지를 채워봐요.',
+    '다 맞혔어요! 정말 잘했어요.'
+  ]);
+}
 
 // ── Settings persistence ─────────────────────
 function loadSettings() {

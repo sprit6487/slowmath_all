@@ -931,6 +931,13 @@ function speak(text) {
   u.lang = 'ko-KR'; u.rate = 0.9;
   setTimeout(() => window.speechSynthesis.speak(u), 50);
 }
+// 자주 쓰는 문구 프리워밍 — 첫 재생부터 즉시 응답
+if (window.SM_TTS && window.SM_TTS.prewarm) {
+  window.SM_TTS.prewarm([
+    '원본을 보고 똑같이 색칠해 보세요',
+    '다시 한번 살펴봐요'
+  ]);
+}
 
 // ===== Feedback =====
 function showFeedback(emoji) {
