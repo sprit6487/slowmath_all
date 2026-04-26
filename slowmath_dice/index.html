@@ -1438,6 +1438,11 @@ setTimeout(function() {
     u.rate = 0.9;
     setTimeout(function() { window.speechSynthesis.speak(u); }, 50);
   }
+  // 질문 텍스트 표시 + TTS 한 번에 처리
+  function setQuestion(html) {
+    questionEl.innerHTML = html;
+    speak(questionEl.textContent);
+  }
 
   // ---- Start View Setup ----
 
@@ -1728,7 +1733,7 @@ if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
     document.getElementById('matchDrop2').textContent = '?';
     document.getElementById('matchDrop2').className = 'match-drop';
     document.getElementById('matchEq').textContent = '';
-    questionEl.innerHTML = '각 주사위의 <span class="hl">숫자</span>를 맞춰보세요';
+    setQuestion('각 주사위의 <span class="hl">숫자</span>를 맞춰보세요');
 
     // Generate chips: always include both correct values + 2 unique distractors
     var arr = [v1, v2];
@@ -1843,7 +1848,7 @@ if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
   function checkMatchComplete() {
     if (matchDrops[0] !== null && matchDrops[1] !== null) {
       document.getElementById('matchEq').textContent = matchDrops[0] + ' + ' + matchDrops[1] + ' = ?';
-      questionEl.innerHTML = '두 주사위의 <span class="hl">합</span>은?';
+      setQuestion('두 주사위의 <span class="hl">합</span>은?');
       // Hide match chips, show answer choices
       document.getElementById('matchChips').style.display = 'none';
       setTimeout(function() { showInput(); }, 400);
@@ -2124,7 +2129,7 @@ _smGameCompleted=true;
       answer = fv;
       fingerImage.src = 'images/' + fv + '.png';
       fingerImage.alt = '손가락 ' + fv + '개';
-      questionEl.innerHTML = '손가락이 <span class="hl">몇 개</span>일까요?';
+      setQuestion('손가락이 <span class="hl">몇 개</span>일까요?');
       showInput();
     } else if (gameType === 'dice') {
       dice1Wrapper.style.display = 'block';
@@ -2135,14 +2140,14 @@ _smGameCompleted=true;
         matchVal1Cur = v1; matchVal2Cur = v2;
         plusSign.style.display = 'inline';
         dice2Wrapper.style.display = 'block';
-        if (!isMatchMode()) questionEl.innerHTML = '두 주사위의 <span class="hl">합</span>은?';
+        if (!isMatchMode()) setQuestion('두 주사위의 <span class="hl">합</span>은?');
         rollDice(dice1El, v1, onReady);
         rollDice(dice2El, v2, onReady);
       } else {
         var v1 = rand(1, 6);
         while (answerCount(v1) >= MAX_REPEAT) { v1 = rand(1, 6); }
         answer = v1;
-        questionEl.innerHTML = '주사위의 <span class="hl">숫자</span>는?';
+        setQuestion('주사위의 <span class="hl">숫자</span>는 몇일까요?');
         rollDice(dice1El, v1, onReady);
       }
     } else {
@@ -2154,7 +2159,7 @@ _smGameCompleted=true;
         answer = cv1 + cv2;
         plusSignCard.style.display = 'inline';
         card2Wrapper.style.display = 'block';
-        questionEl.innerHTML = '두 카드 모양의 <span class="hl">합</span>은?';
+        setQuestion('두 카드 모양의 <span class="hl">합</span>은?');
         flipCard(card1El, cv1, s1, onReady);
         flipCard(card2El, cv2, s2, onReady);
       } else {
@@ -2162,7 +2167,7 @@ _smGameCompleted=true;
         while (answerCount(cv1) >= 1) { cv1 = rand(1, 10); }
         s1 = rand(0, 3);
         answer = cv1;
-        questionEl.innerHTML = '카드의 <span class="hl">모양 수</span>는?';
+        setQuestion('카드의 <span class="hl">모양 수</span>는 몇 개일까요?');
         flipCard(card1El, cv1, s1, onReady);
       }
     }
@@ -2411,7 +2416,7 @@ _smGameCompleted=true;
       fingerWrapper.style.display = 'block';
       fingerImage.src = 'images/' + targetAnswer + '.png';
       fingerImage.alt = '손가락 ' + targetAnswer + '개';
-      questionEl.innerHTML = '손가락이 <span class="hl">몇 개</span>일까요?';
+      setQuestion('손가락이 <span class="hl">몇 개</span>일까요?');
       showInput();
     } else if (gameType === 'dice') {
       dice1Wrapper.style.display = 'block';
@@ -2424,11 +2429,11 @@ _smGameCompleted=true;
         wnMatchV1 = v1; wnMatchV2 = v2;
         plusSign.style.display = 'inline';
         dice2Wrapper.style.display = 'block';
-        if (!isMatchMode()) questionEl.innerHTML = '두 주사위의 <span class="hl">합</span>은?';
+        if (!isMatchMode()) setQuestion('두 주사위의 <span class="hl">합</span>은?');
         rollDice(dice1El, v1, onReady);
         rollDice(dice2El, v2, onReady);
       } else {
-        questionEl.innerHTML = '주사위의 <span class="hl">숫자</span>는?';
+        setQuestion('주사위의 <span class="hl">숫자</span>는 몇일까요?');
         rollDice(dice1El, targetAnswer, onReady);
       }
     } else {
@@ -2441,12 +2446,12 @@ _smGameCompleted=true;
         var s1 = rand(0, 3), s2 = rand(0, 3);
         plusSignCard.style.display = 'inline';
         card2Wrapper.style.display = 'block';
-        questionEl.innerHTML = '두 카드 모양의 <span class="hl">합</span>은?';
+        setQuestion('두 카드 모양의 <span class="hl">합</span>은?');
         flipCard(card1El, cv1, s1, onReady);
         flipCard(card2El, cv2, s2, onReady);
       } else {
         var s1 = rand(0, 3);
-        questionEl.innerHTML = '카드의 <span class="hl">모양 수</span>는?';
+        setQuestion('카드의 <span class="hl">모양 수</span>는 몇 개일까요?');
         flipCard(card1El, targetAnswer, s1, onReady);
       }
     }
