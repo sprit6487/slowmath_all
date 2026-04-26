@@ -1371,7 +1371,49 @@ function nextTurn() {
    쓰기 평가 (4축: 모양 / 크기 / 부드러움 / 비례) + 숫자별 특화 검증
    ════════════════════════════════════════════════════════════ */
 // 숫자별 (가로/세로) 비율 권장값
-const IDEAL_AR = { 0:0.7, 1:0.22, 2:0.65, 3:0.62, 4:0.72, 5:0.65, 6:0.65, 7:0.65, 8:0.6, 9:0.62 };
+const IDEAL_AR = { 0:0.85, 1:0.22, 2:0.65, 3:0.62, 4:0.72, 5:0.65, 6:0.65, 7:0.65, 8:0.6, 9:0.62 };
+
+// 평가 임계값 — 한 곳에 모아 두어 튜닝하기 쉽게
+const TH = {
+    // 점수 변환
+    SHAPE_DIST_MULT: 250,    // 100 - dist * 250 (333 → 250 완화)
+    SMOOTH_RATIO_MULT: 600,
+    PROP_DIFF_MULT: 110,
+    // 워스트 선정
+    SIZE_CRIT: 60, SHAPE_CRIT: 60, PROP_CRIT: 60, AVG_LOW: 72,
+    // 베스트 선정
+    BEST_AVG_MIN: 75, BEST_AXIS_MIN: 60,
+    // 디짓 팁
+    SIZE_PRIORITY: 60,
+    // 폐곡선 — 자기-근접 거리 / bbox 대각선 비율
+    CLOSURE_RATIO: 0.20,
+    // self-approach 인덱스 gap 비율 (6, 9에서 통일)
+    LOOP_IDX_GAP: 0.35,
+    // 디짓별 검사 임계값
+    DIGIT: {
+        // 6 hook 위치 (정규화 x좌표) — 0.5 미만이면 hook 없음
+        N6_HOOK_X_LOW: 0.5,
+        N6_HOOK_X_HIGH: 0.65,
+        // 6 위/아래 균형 (위 1/3 점 비율)
+        N6_BAND_LOW: 0.18,
+        N6_BAND_HIGH: 0.40,
+        N6_BAND_PENALTY_RANGE: 0.30,
+        // 9 윗 동그라미 크기 ratio
+        N9_LOOP_RATIO_LOW: 0.20,
+        N9_LOOP_RATIO_RANGE: 0.30,
+        N9_LOOP_FIND_DIST: 0.18,  // diag 대비 — loop 검출 거리 한도
+        // 5 상단 가로획
+        N5_TOPBAR_LOW: 0.30,
+        N5_TOPBAR_HIGH: 0.55,
+        // 3 위·아래 폭 임계
+        N3_WIDTH_FULL: 0.7,
+        // 4 세로 너무 김 (가로/세로 비율 < )
+        N4_TOO_TALL: 0.5,
+        // 1 직선성 허용 폭 (xspread/h)
+        N1_TOLERANT: 0.10,
+        N1_BREAK_AT: 0.50,
+    },
+};
 
 function _bbox(pts) {
     let minX=Infinity, maxX=-Infinity, minY=Infinity, maxY=-Infinity;
@@ -1412,6 +1454,30 @@ function _resample(pts, n) {
     return out;
 }
 
+// 폐곡선/loop 검출 — 인덱스로 idxGapRatio 이상 떨어진 점쌍의 최소 공간거리
+// opts.yFilterMin: 이 y 이상의 점들만 비교 (영역 한정)
+// 반환: { d, i, j } 또는 null (검출 실패)
+function _selfApproach(pts, idxGapRatio, opts) {
+    opts = opts || {};
+    if (!pts || pts.length < 4) return null;
+    const minIdxGap = Math.max(2, Math.floor(pts.length * idxGapRatio));
+    let bestI = -1, bestJ = -1, bestD = Infinity;
+    for (let i = 0; i < pts.length; i++) {
+        if (opts.yFilterMin != null && pts[i].y < opts.yFilterMin) continue;
+        for (let j = i + minIdxGap; j < pts.length; j++) {
+            if (opts.yFilterMin != null && pts[j].y < opts.yFilterMin) continue;
+            const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
+            if (d < bestD) { bestD = d; bestI = i; bestJ = j; }
+        }
+    }
+    return bestI < 0 ? null : { d: bestD, i: bestI, j: bestJ };
+}
+
+// 폐곡선 점수 (0~1) — 거리가 normValue * closureRatio 이내면 닫힘으로 봄
+function _closureScore(d, normValue, closureRatio) {
+    return Math.max(0, 1 - (d / Math.max(normValue, 1)) / closureRatio);
+}
+
 // 두 stroke 평균 점거리 (정/역 방향 중 작은 값 — DTW 단순화 버전)
 function _strokeDist(a, b, n) {
     n = n || 28;
@@ -1425,39 +1491,42 @@ function _strokeDist(a, b, n) {
 }
 
 // 모양 점수 (0~100): 사용자 stroke ↔ NUM_STROKES 평균 거리 → 점수
-// (1) 전체 경로 직접 비교 + (2) 획별 매칭 — 둘 중 더 좋은 거리 사용
-// → 단일획으로 흘려쓴 8/9 등이 부당하게 페널티 받지 않도록
+// (1) 전체 경로 비교 + (2) 획별 매칭, 정/역 stroke 순서 둘 다 시도해 더 좋은 거리 사용
+// → 단일획/다획, 다른 stroke 순서로 그린 8/9 등도 부당하게 페널티 받지 않도록
 function scoreShape(num, userStrokes) {
     const ref = NUM_STROKES[num];
     if (!ref || !userStrokes || userStrokes.length === 0) return 0;
     const userN = _normStrokes(userStrokes);
-
-    // (1) 전체 경로 비교
-    const userFull = userN.flat();
-    const refFull = ref.flat();
-    const fullDist = _strokeDist(userFull, refFull, 60);
-
-    // (2) 획별 그리디 매칭
-    const used = new Set();
-    let total = 0, matched = 0;
-    ref.forEach((rs) => {
-        let best = -1, bestD = Infinity;
-        for (let ui=0; ui<userN.length; ui++) {
-            if (used.has(ui)) continue;
-            const d = _strokeDist(userN[ui], rs);
-            if (d < bestD) { bestD = d; best = ui; }
-        }
-        if (best >= 0) { used.add(best); total += bestD; matched++; }
-    });
-    const perStrokeAvg = matched > 0 ? total / matched : Infinity;
-
-    // 더 좋은 (작은) 거리 사용
-    let bestDist = Math.min(fullDist, perStrokeAvg);
-
+    // 정답 stroke 순서를 정/역 둘 다 시도
+    const refOrders = ref.length > 1 ? [ref, ref.slice().reverse()] : [ref];
+    let bestDist = Infinity;
+    for (const r of refOrders) {
+        // (1) 전체 경로 비교
+        const userFull = userN.flat();
+        const refFull = r.flat();
+        const fullDist = _strokeDist(userFull, refFull, 60);
+        // (2) 획별 그리디 매칭
+        const used = new Set();
+        let total = 0, matched = 0;
+        r.forEach((rs) => {
+            let best = -1, bestD = Infinity;
+            for (let ui=0; ui<userN.length; ui++) {
+                if (used.has(ui)) continue;
+                const d = _strokeDist(userN[ui], rs);
+                if (d < bestD) { bestD = d; best = ui; }
+            }
+            if (best >= 0) { used.add(best); total += bestD; matched++; }
+        });
+        const perStrokeAvg = matched > 0 ? total / matched : Infinity;
+        const d = Math.min(fullDist, perStrokeAvg);
+        if (d < bestDist) bestDist = d;
+    }
     // 획 수 차이 페널티는 약하게만 (±1까지 관대)
-    const cntDiff = Math.max(0, Math.abs(ref.length - userStrokes.length) - 1);
+    // 단일획/이중획 모두 자연스러운 8·9는 페널티 면제
+    const ALT_STROKE_OK = num === 8 || num === 9;
+    const cntDiff = ALT_STROKE_OK ? 0 : Math.max(0, Math.abs(ref.length - userStrokes.length) - 1);
     const penalty = cntDiff * 0.04;
-    return Math.max(0, Math.min(100, Math.round(100 - (bestDist + penalty) * 333)));
+    return Math.max(0, Math.min(100, Math.round(100 - (bestDist + penalty) * TH.SHAPE_DIST_MULT)));
 }
 
 // 크기 점수 (0~100): 캔버스의 50~85% 사용을 이상적으로
@@ -1474,233 +1543,205 @@ function scoreSize(strokes, canvasW, canvasH) {
     return 88;
 }
 
-// 부드러움 점수 (0~100): 떨림 역수 — 캔버스 크기에 정규화
+// 부드러움 점수 (0~100): 떨림을 경로 길이 대비로 정규화 (점 밀도 무관)
 function scoreSmooth(strokes, canvasW) {
-    let total = 0, count = 0;
+    let totalDev = 0, totalLen = 0, totalPts = 0;
     strokes.forEach(pts => {
+        totalPts += pts.length;
         if (pts.length < 3) return;
         for (let i=1; i<pts.length-1; i++) {
             const ex = (pts[i-1].x + pts[i+1].x) / 2;
             const ey = (pts[i-1].y + pts[i+1].y) / 2;
-            total += Math.hypot(pts[i].x - ex, pts[i].y - ey);
-            count++;
+            totalDev += Math.hypot(pts[i].x - ex, pts[i].y - ey);
+            totalLen += Math.hypot(pts[i+1].x - pts[i-1].x, pts[i+1].y - pts[i-1].y);
         }
     });
-    if (count === 0) return 70;
-    const avg = total / count;
-    const ratio = avg / Math.max(canvasW, 1);  // 캔버스 폭 대비
-    // ratio 0 → 100, 0.025+ → 30 부근
-    return Math.max(15, Math.min(100, Math.round(100 - ratio * 3200)));
+    // 너무 짧은 stroke (< 8 점)은 fallback 50 (관대 70 → 보수)
+    if (totalPts < 8 || totalLen === 0) return 50;
+    const ratio = totalDev / totalLen;
+    return Math.max(15, Math.min(100, Math.round(100 - ratio * TH.SMOOTH_RATIO_MULT)));
 }
 
-// 비례 점수 (0~100): 가로/세로 비율 + 숫자별 특화 검증
+// 비례 점수 + sub-score (0~100): 가로/세로 비율 + 숫자별 특화 검증
+// 반환: { score, sub: { ...digit-specific sub-scores... } }
 function scoreProportion(num, strokes) {
     const all = strokes.flat();
-    if (all.length === 0) return 0;
+    const sub = {};
+    if (all.length === 0) return { score: 0, sub: sub };
     const bb = _bbox(all);
+    const diag = Math.max(bb.w, bb.h, 1);
     const ar = bb.w / Math.max(bb.h, 1);
     const target = IDEAL_AR[num] || 0.65;
     const diff = Math.abs(ar - target) / target;
-    // 페널티 완화 (180 → 110) — 정상 손글씨 비율 변동을 너무 가혹하게 깎지 않도록
-    let s = Math.max(0, 100 - diff * 110);
+    let s = Math.max(0, 100 - diff * TH.PROP_DIFF_MULT);
+    const D = TH.DIGIT;
 
-    // 숫자별 특화
     if (num === 8) {
-        // 위·아래 고리 크기 균형 — 단일획이든 다획이든 y 중간으로 분할해 비교
+        // 위·아래 고리 크기 균형 — 단일획이든 다획이든 y 중간으로 분할
         let topBB, botBB;
         if (strokes.length >= 2) {
-            topBB = _bbox(strokes[0]);
-            botBB = _bbox(strokes[1]);
+            topBB = _bbox(strokes[0]); botBB = _bbox(strokes[1]);
         } else if (all.length >= 6) {
             const midY = bb.minY + bb.h / 2;
             const topPts = all.filter(p => p.y < midY);
             const botPts = all.filter(p => p.y >= midY);
             if (topPts.length >= 3 && botPts.length >= 3) {
-                topBB = _bbox(topPts);
-                botBB = _bbox(botPts);
+                topBB = _bbox(topPts); botBB = _bbox(botPts);
             }
         }
         if (topBB && botBB) {
-            const tArea = topBB.w * topBB.h;
-            const bArea = botBB.w * botBB.h;
+            const tArea = topBB.w * topBB.h, bArea = botBB.w * botBB.h;
             const ratio = Math.min(tArea, bArea) / Math.max(tArea, bArea, 1);
             s = (s + ratio * 100) / 2;
         }
     } else if (num === 1) {
-        // 1은 좁고 곧을수록 좋음 — aspect는 무시하고 직선성만으로 평가
+        // 1은 직선성 위주, 약간의 흔들림은 관용 (xspread/h가 N1_TOLERANT 이내면 만점)
         const pts = strokes.flat();
         if (pts.length >= 2) {
             const xs = pts.map(p => p.x);
             const xspread = (Math.max(...xs) - Math.min(...xs));
-            // 가로 진폭이 세로 진폭의 30% 이하면 직선에 가까움 (1.0 만점)
-            const verticality = Math.max(0, 1 - xspread / Math.max(bb.h, 1) / 0.3);
-            s = verticality * 100;
+            const ratio = xspread / Math.max(bb.h, 1);
+            let v;
+            if (ratio < D.N1_TOLERANT) v = 1;
+            else if (ratio < D.N1_BREAK_AT) v = 1 - (ratio - D.N1_TOLERANT) / (D.N1_BREAK_AT - D.N1_TOLERANT);
+            else v = 0;
+            s = v * 100;
         }
     } else if (num === 0) {
-        // 0: 폐곡선 닫힘 정도 (시작-끝 점이 가까운지)
-        if (strokes[0] && strokes[0].length > 1) {
+        // 폐곡선 — diag 기준 통일
+        const r = _selfApproach(all, TH.LOOP_IDX_GAP);
+        if (r) {
+            const closure = _closureScore(r.d, diag, TH.CLOSURE_RATIO);
+            s = s * 0.5 + closure * 100 * 0.5;
+        } else if (strokes[0] && strokes[0].length > 1) {
             const s0 = strokes[0];
             const startEnd = Math.hypot(s0[0].x - s0[s0.length-1].x, s0[0].y - s0[s0.length-1].y);
-            const closure = Math.max(0, 1 - startEnd / Math.max(bb.h, 1) / 0.4);
+            const closure = _closureScore(startEnd, diag, TH.CLOSURE_RATIO);
             s = s * 0.5 + closure * 100 * 0.5;
         }
-    }
-    // 9: 폐곡선(완화) + 윗 동그라미 크기 검사
-    else if (num === 9) {
-        const pts = strokes.flat();
-        if (pts.length >= 12) {
-            const diag = Math.max(bb.w, bb.h, 1);
-            // 1) 폐곡선 — 20% 이내면 닫힘으로 봄
-            const minIdxGap = Math.floor(pts.length * 0.3);
-            let minD = Infinity;
-            for (let i = 0; i < pts.length; i++) {
-                for (let j = i + minIdxGap; j < pts.length; j++) {
-                    const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
-                    if (d < minD) minD = d;
-                }
-            }
-            const closure = Math.max(0, 1 - (minD / diag) / 0.20);
-
-            // 2) 윗 동그라미 크기 — 시작점 근처로 돌아오는 첫 시점까지의 y 범위
-            //    윗 고리의 세로 크기가 전체 bbox.h의 충분한 비율이어야 정상
-            let loopSize = 1;  // 기본값(검사 못 하면 영향 없음)
-            const start = pts[0];
-            const gap = Math.floor(pts.length * 0.2);
-            for (let i = gap; i < pts.length; i++) {
-                const d = Math.hypot(pts[i].x - start.x, pts[i].y - start.y);
-                if (d < diag * 0.20) {
-                    const loopYs = pts.slice(0, i + 1).map(p => p.y);
-                    const loopH = Math.max(...loopYs) - Math.min(...loopYs);
-                    const ratio = loopH / Math.max(bb.h, 1);
-                    // 정상 9: ratio ~ 0.5+. 0.2 이하 → 매우 빈약
-                    loopSize = Math.max(0, Math.min(1, (ratio - 0.2) / 0.3));
-                    break;
-                }
+    } else if (num === 9) {
+        // 폐곡선 + 윗 동그라미 크기
+        const closeR = _selfApproach(all, TH.LOOP_IDX_GAP);
+        if (closeR) {
+            const closure = _closureScore(closeR.d, diag, TH.CLOSURE_RATIO);
+            // loop 검출 (더 짧은 gap으로 최단 자기-근접 쌍)
+            let loopSize = 1;
+            const loopR = _selfApproach(all, 0.15);
+            if (loopR && loopR.d < diag * D.N9_LOOP_FIND_DIST) {
+                const loopYs = all.slice(loopR.i, loopR.j + 1).map(p => p.y);
+                const loopH = Math.max(...loopYs) - Math.min(...loopYs);
+                const ratio = loopH / Math.max(bb.h, 1);
+                loopSize = Math.max(0, Math.min(1, (ratio - D.N9_LOOP_RATIO_LOW) / D.N9_LOOP_RATIO_RANGE));
+                sub.topLoop9 = Math.round(loopSize * 100);
+            } else {
+                sub.topLoop9 = 100;
             }
             s = s * 0.5 + closure * 100 * 0.2 + loopSize * 100 * 0.3;
         }
     } else if (num === 4 && strokes.length >= 2) {
-        // 두 획이 교차해야 자연스러움 — 두 stroke의 bbox 겹침
         const a = _bbox(strokes[0]), b = _bbox(strokes[1]);
         const overlapX = Math.max(0, Math.min(a.maxX, b.maxX) - Math.max(a.minX, b.minX));
         const overlapY = Math.max(0, Math.min(a.maxY, b.maxY) - Math.max(a.minY, b.minY));
         const cross = (overlapX > 0 && overlapY > 0) ? 100 : 50;
         s = (s + cross) / 2;
     } else if (num === 6) {
-        // 6 검사 — (a) 갈고리 우측 위치 + (b) 위/아래 균형 + (c) 아래 동그라미 폐곡선
         if (all.length > 5) {
             const top = all.reduce((a, p) => p.y < a.y ? p : a);
             const topNorX = (top.x - bb.minX) / Math.max(bb.w, 1);
-            const hookScore = Math.max(0, Math.min(1, (topNorX - 0.4) / 0.25));
+            const hookScore = Math.max(0, Math.min(1, (topNorX - D.N6_HOOK_X_LOW) / (D.N6_HOOK_X_HIGH - D.N6_HOOK_X_LOW)));
             const upperY = bb.minY + bb.h / 3;
             const upperPts = all.filter(p => p.y < upperY).length;
             const upperRatio = upperPts / all.length;
             let balanceScore;
-            if (upperRatio < 0.18) balanceScore = upperRatio / 0.18;
-            else if (upperRatio > 0.40) balanceScore = Math.max(0, 1 - (upperRatio - 0.40) / 0.30);
+            if (upperRatio < D.N6_BAND_LOW) balanceScore = upperRatio / D.N6_BAND_LOW;
+            else if (upperRatio > D.N6_BAND_HIGH) balanceScore = Math.max(0, 1 - (upperRatio - D.N6_BAND_HIGH) / D.N6_BAND_PENALTY_RANGE);
             else balanceScore = 1;
-            // 폐곡선: 경로 안에서 인덱스 40% 이상 떨어진 점쌍의 최소 공간거리
+            // 폐곡선 (헬퍼로 통일)
             let closure6 = 1;
-            if (all.length >= 12) {
-                const minIdxGap = Math.floor(all.length * 0.4);
-                let minD = Infinity;
-                for (let i = 0; i < all.length; i++) {
-                    for (let j = i + minIdxGap; j < all.length; j++) {
-                        const d = Math.hypot(all[i].x - all[j].x, all[i].y - all[j].y);
-                        if (d < minD) minD = d;
-                    }
-                }
-                const diag = Math.max(bb.w, bb.h, 1);
-                closure6 = Math.max(0, 1 - (minD / diag) / 0.20);
+            const cR = _selfApproach(all, TH.LOOP_IDX_GAP);
+            if (cR) closure6 = _closureScore(cR.d, diag, TH.CLOSURE_RATIO);
+            // 50% base + (hook/balance/closure) 합쳐 50% — 다른 디지트와 가중치 통일
+            s = s * 0.5 + (hookScore * 16.67) + (balanceScore * 16.67) + (closure6 * 16.66);
+            // sub-scores
+            sub.bottomLoop6 = upperRatio > D.N6_BAND_HIGH
+                ? Math.max(0, Math.round(100 - (upperRatio - D.N6_BAND_HIGH) * 250))
+                : 100;
+            sub.bottomClosure6 = Math.round(closure6 * 100);
+        }
+    } else if (num === 3) {
+        if (all.length >= 6) {
+            const midY = bb.minY + bb.h / 2;
+            const top = all.filter(p => p.y < midY);
+            const bot = all.filter(p => p.y >= midY);
+            if (top.length >= 3 && bot.length >= 3) {
+                const tBB = _bbox(top), bBB = _bbox(bot);
+                const tWR = tBB.w / Math.max(bb.w, 1);
+                const bWR = bBB.w / Math.max(bb.w, 1);
+                const widthScore = Math.min(1, Math.min(tWR, bWR) / D.N3_WIDTH_FULL);
+                const symScore = Math.min(tBB.w, bBB.w) / Math.max(tBB.w, bBB.w, 1);
+                const score3 = (widthScore + symScore) / 2;
+                s = (s + score3 * 100) / 2;
             }
-            s = s * 0.4 + (hookScore * 20) + (balanceScore * 20) + (closure6 * 20);
+        }
+    } else if (num === 5) {
+        if (all.length >= 6) {
+            const upperY = bb.minY + bb.h * 0.25;
+            const upperPts = all.filter(p => p.y <= upperY);
+            let topBarScore = 0;
+            if (upperPts.length >= 2) {
+                const xs = upperPts.map(p => p.x);
+                const xspread = (Math.max(...xs) - Math.min(...xs));
+                const ratio = xspread / Math.max(bb.w, 1);
+                topBarScore = Math.max(0, Math.min(1, (ratio - D.N5_TOPBAR_LOW) / (D.N5_TOPBAR_HIGH - D.N5_TOPBAR_LOW)));
+            }
+            // 하단 60% 영역 폐곡선
+            const lowerStartY = bb.minY + bb.h * 0.4;
+            const loopR = _selfApproach(all, TH.LOOP_IDX_GAP, { yFilterMin: lowerStartY });
+            const bottomLoop5 = loopR ? _closureScore(loopR.d, bb.h, TH.CLOSURE_RATIO) : 1;
+            s = s * 0.5 + topBarScore * 25 + bottomLoop5 * 25;
         }
     } else if (num === 7) {
-        // 가로 부분과 사선 부분의 길이 비율 — 첫 stroke의 가로 진폭 vs 세로 진폭
-        // 한 획이면 시작에서 가로 → 사선 패턴
-        // 단순화: 가로/세로 진폭이 비슷하면 좋음
-        const allPts = strokes.flat();
-        const xs = allPts.map(p => p.x), ys = allPts.map(p => p.y);
+        // 상단 가로획(top bar) 존재 + 가로/세로 비율
+        let topBarScore = 0;
+        if (all.length >= 4) {
+            const upperY = bb.minY + bb.h * 0.20;
+            const upperPts = all.filter(p => p.y <= upperY);
+            if (upperPts.length >= 2) {
+                const xs = upperPts.map(p => p.x);
+                const xspread = Math.max(...xs) - Math.min(...xs);
+                const ratio = xspread / Math.max(bb.w, 1);
+                topBarScore = Math.max(0, Math.min(1, (ratio - 0.30) / 0.30));  // 30%~60% spread
+            }
+        }
+        let balance = 0.5;
+        const xs = all.map(p => p.x), ys = all.map(p => p.y);
         const wsp = Math.max(...xs) - Math.min(...xs);
         const hsp = Math.max(...ys) - Math.min(...ys);
         if (hsp > 0) {
             const r = wsp / hsp;
-            const balance = Math.max(0, 1 - Math.abs(r - 0.7) / 0.7);
-            s = (s + balance * 100) / 2;
+            balance = Math.max(0, 1 - Math.abs(r - 0.7) / 0.7);
         }
+        s = s * 0.5 + topBarScore * 25 + balance * 25;
     }
-    return Math.max(0, Math.min(100, Math.round(s)));
+
+    // 4 sub-score
+    if (num === 4 && all.length >= 3) sub.tallness4 = ar;
+
+    return { score: Math.max(0, Math.min(100, Math.round(s))), sub: sub };
 }
 
 function evaluateTurn(item, canvasW, canvasH) {
     const strokes = item.strokes || [];
+    const propResult = scoreProportion(item.num, strokes);
     const r = {
         num: item.num,
         shape: scoreShape(item.num, strokes),
         size: scoreSize(strokes, canvasW, canvasH),
         smooth: scoreSmooth(strokes, canvasW),
-        prop: scoreProportion(item.num, strokes),
+        prop: propResult.score,
+        ...propResult.sub,
     };
-    // 4 sub-score: 세로선이 너무 긴지 (가로/세로 비율)
-    if (item.num === 4 && strokes.length > 0) {
-        const all = strokes.flat();
-        if (all.length >= 3) {
-            const bb = _bbox(all);
-            const ar = bb.w / Math.max(bb.h, 1);
-            r.tallness4 = ar;  // 정상 ~0.72, < 0.5면 세로가 너무 긺
-        }
-    }
-    // 9 sub-score: 윗 동그라미 크기 — 작으면 "동그라미를 크게, 꼬리 짧게" 메시지
-    if (item.num === 9 && strokes.length > 0) {
-        const all = strokes.flat();
-        if (all.length >= 8) {
-            const bb = _bbox(all);
-            const diag = Math.max(bb.w, bb.h, 1);
-            const start = all[0];
-            const gap = Math.floor(all.length * 0.2);
-            let topLoop = 100;  // 기본값
-            for (let i = gap; i < all.length; i++) {
-                const d = Math.hypot(all[i].x - start.x, all[i].y - start.y);
-                if (d < diag * 0.20) {
-                    const loopYs = all.slice(0, i + 1).map(p => p.y);
-                    const loopH = Math.max(...loopYs) - Math.min(...loopYs);
-                    const ratio = loopH / Math.max(bb.h, 1);
-                    topLoop = Math.round(Math.max(0, Math.min(1, (ratio - 0.2) / 0.3)) * 100);
-                    break;
-                }
-            }
-            r.topLoop9 = topLoop;
-        }
-    }
-    // 6 sub-score: 아래쪽 동그라미 충실도 + 폐곡선
-    if (item.num === 6 && strokes.length > 0) {
-        const all = strokes.flat();
-        if (all.length >= 5) {
-            const bb = _bbox(all);
-            const upperY = bb.minY + bb.h / 3;
-            const upperPts = all.filter(p => p.y < upperY).length;
-            const upperRatio = upperPts / all.length;
-            r.bottomLoop6 = upperRatio > 0.40
-                ? Math.max(0, Math.round(100 - (upperRatio - 0.40) * 250))
-                : 100;
-            // 폐곡선
-            if (all.length >= 12) {
-                const minIdxGap = Math.floor(all.length * 0.4);
-                let minD = Infinity;
-                for (let i = 0; i < all.length; i++) {
-                    for (let j = i + minIdxGap; j < all.length; j++) {
-                        const d = Math.hypot(all[i].x - all[j].x, all[i].y - all[j].y);
-                        if (d < minD) minD = d;
-                    }
-                }
-                const diag = Math.max(bb.w, bb.h, 1);
-                r.bottomClosure6 = Math.round(Math.max(0, Math.min(1, 1 - (minD / diag) / 0.20)) * 100);
-            } else {
-                r.bottomClosure6 = 100;
-            }
-        }
-    }
-    // 2 sub-score: 아래쪽 가로 받침 충실도 (메시지 분리용)
+    // 2 sub-score (scoreProportion에 안 넣은 메시지 전용 검사) — 아래쪽 가로 받침 충실도
     if (item.num === 2 && strokes.length > 0) {
         const all = strokes.flat();
         if (all.length >= 3) {
@@ -1711,7 +1752,6 @@ function evaluateTurn(item, canvasW, canvasH) {
                 const xs = lowerPts.map(p => p.x);
                 const xspread = Math.max(...xs) - Math.min(...xs);
                 const ratio = xspread / Math.max(bb.w, 1);
-                // 받침 폭이 전체 폭의 30% 이하 → 약함, 70%+ → 충실함
                 r.bottom2 = Math.round(Math.max(0, Math.min(1, (ratio - 0.3) / 0.4)) * 100);
             } else {
                 r.bottom2 = 0;
@@ -1721,10 +1761,21 @@ function evaluateTurn(item, canvasW, canvasH) {
     return r;
 }
 
+// 6 전용 분기 (shape/prop 양쪽에서 동일하게 사용)
+function _tip6(sc) {
+    if (sc.bottomClosure6 != null && sc.bottomClosure6 < 60) {
+        return '6의 아래쪽 동그라미를 끝까지 닿도록 닫아주세요.';
+    }
+    if (sc.bottomLoop6 != null && sc.bottomLoop6 < 60) {
+        return '6의 아래쪽 동그라미를 또렷하고 충분히 크게 그려주세요.';
+    }
+    return '6의 위쪽 갈고리를 충분히 길게 그려보세요.';
+}
+
 // 숫자별 특화 코멘트 — 가장 약한 축 1개를 골라 한 줄로
-// 단, 크기가 60 미만이면 항상 크기를 우선 (어린이에게 가장 행동 가능한 피드백)
+// 단, 크기가 TH.SIZE_PRIORITY 미만이면 항상 크기를 우선
 function digitTip(num, sc) {
-    if (sc.size < 60) {
+    if (sc.size < TH.SIZE_PRIORITY) {
         return num + '을 더 크게, 칸을 시원하게 써보세요.';
     }
     const weakest = ['shape','prop','smooth','size']
@@ -1738,36 +1789,23 @@ function digitTip(num, sc) {
             }
             return '2의 위쪽을 동그랗게 굴려주세요.';
         }
-        // 6: 폐곡선 미달 → 닫기 / 아래 빈약 → 크기 / 그 외 → 갈고리
-        if (num === 6) {
-            if (sc.bottomClosure6 != null && sc.bottomClosure6 < 60) {
-                return '6의 아래쪽 동그라미를 끝까지 닿도록 닫아주세요.';
-            }
-            if (sc.bottomLoop6 != null && sc.bottomLoop6 < 60) {
-                return '6의 아래쪽 동그라미를 또렷하고 충분히 크게 그려주세요.';
-            }
-            return '6의 위쪽 갈고리를 충분히 길게 그려보세요.';
-        }
-        // 9: 윗 동그라미가 너무 작으면 크기 메시지, 아니면 일반적인 모양 메시지
+        // 6: 헬퍼 호출 (prop과 공유)
+        if (num === 6) return _tip6(sc);
+        // 9: 윗 동그라미가 너무 작으면 크기 메시지, 아니면 닫기 메시지
         if (num === 9) {
             if (sc.topLoop9 != null && sc.topLoop9 < 60) {
                 return '9의 위쪽 동그라미를 더 크게 그리고 아래 꼬리를 짧게 내려보세요.';
             }
-            return '9는 위쪽 동그라미를 둥글게 그리고 매끄럽게 아래로 꼬리를 내려보세요.';
+            return '9의 위쪽 동그라미를 둥글게 닫아주세요.';
         }
-        // 4: 세로가 너무 길면 길이 메시지, 아니면 가로선 메시지
-        if (num === 4) {
-            if (sc.tallness4 != null && sc.tallness4 < 0.5) {
-                return '4의 세로선이 너무 길지 않게 그려보세요.';
-            }
-            return '4의 가로선이 가운데를 가로지르도록 그려보세요.';
-        }
+        // 4: shape는 가로선 메시지만 (세로 길이는 prop 분기로 일원화)
+        if (num === 4) return '4의 가로선이 가운데를 가로지르도록 그려보세요.';
         const map = {
             0:'0은 위에서 시작해 한 번에 동그랗게 그려보세요.',
             1:'1은 위에서 아래로 곧게 한 번에 그어보세요.',
             3:'3은 위·아래 둥근 부분을 매끄럽게 굴려서 그려보세요.',
-            5:'5는 위 가로선을 먼저 긋고 아래로 내려와 곡선을 만들어요.',
-            7:'7은 가로 한 번, 사선 한 번으로 또렷하게 써보세요.',
+            5:'5는 위 가로선을 긋고 아래에 곡선을 그려보세요.',
+            7:'7은 가로 한 번, 비스듬한 선 한 번으로 또렷하게 써보세요.',
             8:'8은 위·아래 동그라미를 또렷하게 두 개로 그려보세요.',
         };
         return map[num];
@@ -1776,28 +1814,29 @@ function digitTip(num, sc) {
         if (num === 8) return '8은 위 동그라미와 아래 동그라미 크기를 비슷하게 해보세요.';
         if (num === 1) return '1은 옆으로 흔들리지 않게 곧게 세워서 써보세요.';
         if (num === 0) return '0의 동그라미가 끝까지 닿도록 닫아주세요.';
+        // 2: 받침이 약하면 shape와 동일한 받침 메시지, 아니면 비례 fallback
+        if (num === 2) {
+            if (sc.bottom2 != null && sc.bottom2 < 60) {
+                return '2의 아래쪽을 가로로 길게 받쳐주세요.';
+            }
+            return '2를 너무 좁거나 넓지 않게 그려보세요.';
+        }
+        if (num === 3) return '3의 위·아래가 똑같이 동그랗게 보이도록 그려보세요.';
+        if (num === 5) return '5의 위쪽 가로획이 또렷하게 보이도록 그려보세요.';
         if (num === 9) {
             if (sc.topLoop9 != null && sc.topLoop9 < 60) {
                 return '9의 위쪽 동그라미를 더 크게 그리고 아래 꼬리를 짧게 내려보세요.';
             }
-            return '9의 윗 동그라미가 끝까지 닿도록 닫아주세요.';
+            return '9의 위쪽 동그라미를 둥글게 닫아주세요.';
         }
-        if (num === 6) {
-            if (sc.bottomClosure6 != null && sc.bottomClosure6 < 60) {
-                return '6의 아래쪽 동그라미를 끝까지 닿도록 닫아주세요.';
-            }
-            if (sc.bottomLoop6 != null && sc.bottomLoop6 < 60) {
-                return '6의 아래쪽 동그라미를 또렷하고 충분히 크게 그려주세요.';
-            }
-            return '6의 위쪽 갈고리를 충분히 길게 그려보세요.';
-        }
+        if (num === 6) return _tip6(sc);
         if (num === 4) {
             if (sc.tallness4 != null && sc.tallness4 < 0.5) {
                 return '4의 세로선이 너무 길지 않게 그려보세요.';
             }
             return '4를 너무 좁거나 넓지 않게 그려보세요.';
         }
-        if (num === 7) return '7은 가로획과 사선의 길이 비율을 비슷하게 해보세요.';
+        if (num === 7) return '7은 가로획과 비스듬한 선의 길이 비율을 비슷하게 해보세요.';
         return num + '의 가로/세로 비율을 더 신경써 보세요.';
     }
     if (weakest.k === 'smooth') return num + '을 쓸 때 손에 힘을 빼고 천천히 그어보세요.';
@@ -1865,6 +1904,7 @@ _smGameCompleted=true;
             '</div>'
         ).join('');
 
+
     // ── 요약 팁: 가장 잘 쓴 / 연습 필요 / 한 줄 코멘트 ──
     const overalls = evals.map(e => ({
         num: e.num,
@@ -1872,15 +1912,20 @@ _smGameCompleted=true;
         e
     }));
     const best = overalls.slice().sort((a,b) => b.v - a.v).slice(0, 2);
-    // 더 연습해요: 크기 critical(<55) | 모양 critical(<55) | 평균 < 72 인 숫자들을 모아 최대 3개까지
+    // 더 연습해요: 단일 composite criticality
+    // 각 축의 임계값 미달 정도에 가중치를 곱해 최댓값 사용 — 한 축이라도 심하게 약하면 우선
     const _uniq = arr => Array.from(new Set(arr));
-    const tooSmall   = overalls.filter(o => o.e.size  < 55);
-    const weakShape  = overalls.filter(o => o.e.shape < 60 && !tooSmall.includes(o));
-    const lowAvg     = overalls.filter(o => o.v < 72 && !tooSmall.includes(o) && !weakShape.includes(o));
-    tooSmall.sort((a,b) => a.e.size - b.e.size);
-    weakShape.sort((a,b) => a.e.shape - b.e.shape);
-    lowAvg.sort((a,b) => a.v - b.v);
-    const worsts = tooSmall.concat(weakShape, lowAvg).slice(0, 3);
+    const _crit = (o) => Math.max(
+        Math.max(0, TH.SIZE_CRIT  - o.e.size)  * 1.5,   // size 가중 (어린이에게 가장 행동 가능)
+        Math.max(0, TH.SHAPE_CRIT - o.e.shape) * 1.0,
+        Math.max(0, TH.PROP_CRIT  - o.e.prop)  * 0.8,
+        Math.max(0, TH.AVG_LOW    - o.v)       * 0.6,
+    );
+    const worsts = overalls
+        .filter(o => _crit(o) > 0)
+        .slice()
+        .sort((a, b) => _crit(b) - _crit(a))
+        .slice(0, 3);
     const bestNums = _uniq(best.map(o => o.num)).slice(0, 2);
     const worstNums = _uniq(worsts.map(o => o.num));
     // 표시 순서는 숫자 오름차순으로 통일
@@ -1908,11 +1953,12 @@ _smGameCompleted=true;
 
     const tipsEl = document.getElementById('summary-tips');
     let html = '';
-    const goodBest = best.filter(o => {
-        if (o.v < 75) return false;
-        const minAxis = Math.min(o.e.shape, o.e.size, o.e.smooth, o.e.prop);
-        return minAxis >= 60;  // 한 축이라도 심하게 약하면 "잘 쓴"에서 제외
-    }).map(o => o.num);
+    // 잘 쓴 = 워스트에 안 잡힌 숫자 중 평균 상위 2개 (sanity floor: avg ≥ 65)
+    const _worstSet = new Set(worsts.map(o => o.num));
+    const goodBest = overalls
+        .filter(o => !_worstSet.has(o.num) && o.v >= 65)
+        .sort((a, b) => b.v - a.v)
+        .map(o => o.num);
     const goodBestUniq = _uniq(goodBest).slice(0, 2).sort((a, b) => a - b);
     const worstNumsSorted = worstNums.slice().sort((a, b) => a - b);
     if (goodBestUniq.length > 0) {
@@ -1920,13 +1966,14 @@ _smGameCompleted=true;
     }
     if (worstNumsSorted.length > 0) {
         html += '<div class="tip-row"><span class="tip-label">더 연습해요</span>' + worstNumsSorted.join(', ') + '</div>';
-    }
-    if (perTips.length > 0) {
-        perTips.forEach(t => {
-            html += '<div class="tip-row"><span class="tip-label">팁</span>' + t + '</div>';
-        });
-    } else if (avg[weakestAxis] < 80) {
-        html += '<div class="tip-row"><span class="tip-label">팁</span>' + generalTips[weakestAxis] + '</div>';
+        // 팁은 "더 연습해요" 숫자가 있을 때만 출력
+        if (perTips.length > 0) {
+            perTips.forEach(t => {
+                html += '<div class="tip-row"><span class="tip-label">팁</span>' + t + '</div>';
+            });
+        } else if (avg[weakestAxis] < 80) {
+            html += '<div class="tip-row"><span class="tip-label">팁</span>' + generalTips[weakestAxis] + '</div>';
+        }
     }
     if (!html) {
         html = '<div class="tip-empty">균형 잡힌 글씨예요! 자세와 힘 조절 모두 잘 하고 있어요.</div>';
