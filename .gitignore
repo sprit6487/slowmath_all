@@ -3,3 +3,11 @@ node_modules/
 .env.local
 .env
 *.log
+
+# TTS voice 비교용 임시 자료 (재생성 가능)
+voice_listen*.html
+voice_samples*.py
+voice_test_*.py
+voice_samples/
+voice_samples_ko/
+voice_samples_gcloud/
