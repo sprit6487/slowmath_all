@@ -587,6 +587,16 @@
     transform: translate(-50%, -50%);
     box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   }
+  /* 가르기 도식 — 카운트 원 (모으기와 동일 스타일) */
+  .split-total-row { display: flex; justify-content: center; margin: 2px 0 0; }
+  .drag-counts-row { display: flex; justify-content: space-around; gap: 8px; width: 100%; margin: 2px 0 0; }
+  .count-circle { width: 36px; height: 36px; border: 2px solid var(--warm-400); border-radius: 50%; background: #fff; font-size: 1.15rem; font-weight: 800; color: var(--warm-700); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .count-circle.orange-c { border-color: var(--app-orange); color: var(--app-orange); }
+  .count-circle.green-c { border-color: var(--app-green); color: var(--app-green); }
+  .count-circle.blue-c { border-color: var(--app-blue); color: var(--app-blue); background: var(--app-blue-soft); }
+  .split-v-svg { width: 100%; height: 20px; display: block; margin: 0; }
+  .split-game-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; margin: 8px 0 12px; }
+
   .split-counts {
     display: flex; justify-content: center; gap: 40px;
     margin-top: 8px;
@@ -1973,7 +1983,6 @@ function renderCircleFillNumQuestion() {
 function renderSplitQuestion() {
   const q = questions[questionNum - 1];
   const gc = document.getElementById('game-container');
-  const triangleHTML = renderTriangle(q.total, q.left, q.right, 'none', false);
 
   let circlesHTML = '';
   for (let i = 0; i < q.total; i++) {
@@ -1981,35 +1990,34 @@ function renderSplitQuestion() {
   }
 
   gc.innerHTML = `
-    <div class="question-label">동그라미를 알맞게 나누세요</div>
-    ${triangleHTML}
-    <div class="split-instruction">동그라미를 끌어서 왼쪽/오른쪽에 놓으세요</div>
-    <div class="split-source" id="split-source">${circlesHTML}</div>
-    <div class="split-buckets">
-      <div class="split-bucket left-bucket" id="bucket-left">
-        <div class="split-bucket-label">왼쪽</div>
-        <div class="bucket-inner" id="bucket-left-inner"></div>
+    <div class="question-label">${q.total}개를 왼쪽 ${q.left}개와 오른쪽 ${q.right}개로 나누어요</div>
+    <div class="split-game-wrap">
+      <div class="split-source" id="split-source">${circlesHTML}</div>
+      <div class="split-total-row">
+        <div class="count-circle blue-c">${q.total}</div>
       </div>
-      <div class="split-bucket right-bucket" id="bucket-right">
-        <div class="split-bucket-label">오른쪽</div>
-        <div class="bucket-inner" id="bucket-right-inner"></div>
+      <svg class="split-v-svg" viewBox="0 0 200 28" preserveAspectRatio="none">
+        <line x1="100" y1="2" x2="50" y2="26" stroke="#C8C0B4" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="100" y1="2" x2="150" y2="26" stroke="#C8C0B4" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <div class="drag-counts-row">
+        <div class="count-circle orange-c">${q.left}</div>
+        <div class="count-circle green-c">${q.right}</div>
       </div>
-    </div>
-    <div class="split-counts" id="split-counts">
-      <div class="split-count-item">
-        <div class="split-count-num orange" id="left-count">0</div>
-        <div class="split-count-label">왼쪽</div>
-      </div>
-      <div class="split-count-item">
-        <div class="split-count-num green" id="right-count">0</div>
-        <div class="split-count-label">오른쪽</div>
+      <div class="split-buckets">
+        <div class="split-bucket left-bucket" id="bucket-left">
+          <div class="bucket-inner" id="bucket-left-inner"></div>
+        </div>
+        <div class="split-bucket right-bucket" id="bucket-right">
+          <div class="bucket-inner" id="bucket-right-inner"></div>
+        </div>
       </div>
     </div>
     <button class="split-check-btn" id="split-check-btn" disabled>확인하기</button>
     <div class="split-result-msg" id="split-result-msg"></div>
   `;
 
-  speak(`${q.total}개의 동그라미를 ${q.left}개와 ${q.right}개로 나누세요.`);
+  speak(`${q.total}개를 ${q.left}개와 ${q.right}개로 나누어요`);
   window._splitQ = q;
   initDragAndDrop();
 }
@@ -2029,8 +2037,6 @@ function initDragAndDrop() {
   function updateCounts() {
     const leftCount = bucketLeft.querySelectorAll('.drag-circle').length;
     const rightCount = bucketRight.querySelectorAll('.drag-circle').length;
-    document.getElementById('left-count').textContent = leftCount;
-    document.getElementById('right-count').textContent = rightCount;
     const total = leftCount + rightCount;
     checkBtn.disabled = (total !== q.total);
   }
