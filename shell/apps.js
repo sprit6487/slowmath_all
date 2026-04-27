@@ -13,7 +13,7 @@
     { id: 'number',     name: '숫자 익히기',      icon: '🔢',  category: '수 개념' },
     { id: 'numberdraw', name: '숫자 쓰기',        icon: '5️⃣',  category: '수 개념' },
     { id: 'dice',       name: '세기',             icon: '🎲',  category: '수 개념' },
-    { id: 'counting',   name: '우리말 세기',      icon: '🇰🇷',  category: '수 개념' },
+    { id: 'counting',   name: '우리말 세기',      icon: '🗣️',  category: '수 개념' },
     { id: 'matching',   name: '숫자 매칭',        icon: '🎯',  category: '수 개념' },
 
     { id: 'comparing',  name: '비교하기 기초',    icon: '⚖️',  category: '수 관계' },
@@ -53,7 +53,7 @@
   };
 
   // 서브앱 index.html은 쉘의 ?v=N과 별개로 캐시되므로 iframe URL에도 버전 파라미터를 붙임
-  var SUBAPP_VERSION = '76';
+  var SUBAPP_VERSION = '77';
   function path(id) {
     return './slowmath_' + id + '/?embedded=1&sv=' + SUBAPP_VERSION;
   }
