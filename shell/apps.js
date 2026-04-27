@@ -36,10 +36,12 @@
     { id: 'minusthree', name: '빼기 3',           icon: '3️⃣',  category: '뺄셈' },
     { id: 'verticalsub',name: '세로 뺄셈',        icon: '🧮',  category: '뺄셈' },
 
-    { id: 'timestables',name: '구구단 연습',      icon: '✖️',  category: '곱셈' }
+    { id: 'timestables',name: '구구단 연습',      icon: '✖️',  category: '곱셈' },
+
+    { id: 'payment_demo', name: '결제 플로우',     icon: '💳',  category: '데모' }
   ];
 
-  var CATEGORY_ORDER = ['기초 인지', '수 개념', '수 관계', '덧셈 전 개념', '덧셈', '뺄셈', '곱셈'];
+  var CATEGORY_ORDER = ['기초 인지', '수 개념', '수 관계', '덧셈 전 개념', '덧셈', '뺄셈', '곱셈', '데모'];
 
   // 카테고리별 부제 — slowkids.net(everydaysummer)과 동일
   var CATEGORY_DESCRIPTIONS = {
@@ -49,11 +51,12 @@
     '덧셈 전 개념': '모으고 가르며 수를 만져보는 경험',
     '덧셈':        '작은 걸음부터 쌓아올리는 계산',
     '뺄셈':        '한 걸음씩 덜어내는 계산',
-    '곱셈':        '개념을 이해하는 수의 규칙'
+    '곱셈':        '개념을 이해하는 수의 규칙',
+    '데모':        '시연·검토용 플로우 (학습 콘텐츠 아님)'
   };
 
   // 서브앱 index.html은 쉘의 ?v=N과 별개로 캐시되므로 iframe URL에도 버전 파라미터를 붙임
-  var SUBAPP_VERSION = '77';
+  var SUBAPP_VERSION = '80';
   function path(id) {
     return './slowmath_' + id + '/?embedded=1&sv=' + SUBAPP_VERSION;
   }

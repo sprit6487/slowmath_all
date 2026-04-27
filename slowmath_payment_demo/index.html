@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>슬로매스 결제·접근권 플로우 데모</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --warm-50: #FDFCFA; --warm-100: #FAF7F2; --warm-200: #F3EDE4;
+    --warm-300: #E0D5C5; --warm-400: #B8AD9E; --warm-500: #8C7E6A;
+    --warm-600: #6B5F50; --warm-700: #4A4035; --warm-800: #2E261D;
+    --border: #E8E2DA; --border-light: #F0ECE6;
+    --app-blue: #6BADE8; --app-blue-light: #D9EDFC; --app-blue-soft: #EEF6FD;
+    --app-orange: #F0A050; --app-orange-light: #FDE8C8; --app-orange-soft: #FFF6EB;
+    --app-green: #5BC886; --app-green-light: #D4F5E0;
+    --app-red: #F07070; --app-red-light: #FDE8E8;
+    --bg: #F5F1EB;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; justify-content: center; align-items: flex-start;
+    color: var(--warm-700);
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .hidden { display: none !important; }
+
+  .app {
+    width: 100%; max-width: 480px;
+    min-height: 100dvh;
+    background: #fff;
+    display: flex; flex-direction: column;
+    position: relative;
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+    overflow: hidden;
+  }
+
+  /* ── Header / Trace bar ── */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--warm-100);
+    border-bottom: 1px solid var(--border-light);
+    min-height: 56px;
+  }
+  .topbar .back {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.875rem; font-weight: 600;
+    color: var(--warm-600);
+    background: transparent; border: none;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 8px;
+  }
+  .topbar .back:active { background: var(--warm-200); }
+  .topbar .title {
+    font-size: 0.95rem; font-weight: 700; color: var(--warm-800);
+  }
+  .topbar .restart {
+    font-size: 0.75rem;
+    color: var(--app-blue);
+    background: var(--app-blue-soft);
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .trace {
+    background: var(--warm-50);
+    padding: 8px 18px;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.74rem;
+    color: var(--warm-500);
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+    min-height: 32px;
+  }
+  .trace .badge {
+    background: var(--warm-200);
+    color: var(--warm-700);
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.7rem;
+  }
+  .trace .badge.priority-1 { background: var(--app-green-light); color: #2D7A47; }
+  .trace .badge.priority-2 { background: var(--app-blue-light); color: #2D6B9F; }
+  .trace .badge.priority-3 { background: var(--app-orange-light); color: #8C5A1C; }
+  .trace .badge.priority-4 { background: var(--app-red-light); color: #9F2D2D; }
+
+  .scenario-tag {
+    background: #fff;
+    border: 1px solid var(--border);
+    color: var(--warm-600);
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  /* ── Screen container ── */
+  .screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  /* ── Scenario picker ── */
+  .scenario-list {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-top: 8px;
+  }
+  .scenario-card {
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    background: #fff;
+    cursor: pointer;
+    transition: transform 0.1s, border-color 0.15s, background 0.15s;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .scenario-card:active { transform: scale(0.98); }
+  .scenario-card.selected {
+    border-color: var(--app-blue);
+    background: var(--app-blue-soft);
+  }
+  .scenario-card .num {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--warm-200);
+    color: var(--warm-700);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.95rem;
+  }
+  .scenario-card.selected .num {
+    background: var(--app-blue);
+    color: #fff;
+  }
+  .scenario-card .body {
+    flex: 1; min-width: 0;
+  }
+  .scenario-card .body .label {
+    font-size: 0.95rem; font-weight: 700;
+    color: var(--warm-800);
+    margin-bottom: 2px;
+  }
+  .scenario-card .body .desc {
+    font-size: 0.78rem; color: var(--warm-500);
+    line-height: 1.4;
+  }
+
+  .payment-result-picker {
+    margin-top: 16px;
+    padding: 14px;
+    background: var(--warm-50);
+    border: 1px dashed var(--warm-300);
+    border-radius: 12px;
+  }
+  .payment-result-picker.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .payment-result-picker > .title {
+    font-size: 0.82rem; font-weight: 700;
+    color: var(--warm-700);
+    margin-bottom: 10px;
+  }
+  .payment-result-picker .options {
+    display: flex; gap: 8px;
+  }
+  .payment-result-picker .hint {
+    font-size: 0.75rem;
+    color: var(--warm-500);
+    margin-top: 8px;
+  }
+  .payment-result-picker label {
+    flex: 1;
+    text-align: center;
+    padding: 8px 6px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--warm-600);
+    background: #fff;
+    cursor: pointer;
+  }
+  .payment-result-picker input[type="radio"] { display: none; }
+  .payment-result-picker input[type="radio"]:checked + span {
+    /* nothing — handled at label level */
+  }
+  .payment-result-picker label:has(input:checked) {
+    border-color: var(--app-orange);
+    background: var(--app-orange-soft);
+    color: var(--warm-800);
+  }
+
+  /* ── Generic ── */
+  h1.screen-title {
+    font-size: 1.35rem; font-weight: 800;
+    color: var(--warm-800);
+    margin-bottom: 6px;
+  }
+  p.screen-desc {
+    font-size: 0.88rem; color: var(--warm-500);
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+
+  .primary-btn {
+    width: 100%;
+    padding: 14px 20px;
+    background: var(--app-blue);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.15s;
+  }
+  .primary-btn:active { transform: scale(0.98); }
+  .primary-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .secondary-btn {
+    width: 100%;
+    padding: 14px 20px;
+    background: #fff;
+    color: var(--warm-700);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .secondary-btn:active { background: var(--warm-100); }
+
+  .ghost-btn {
+    background: transparent;
+    border: none;
+    color: var(--warm-500);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px;
+    font-family: inherit;
+  }
+
+  .footer-fixed {
+    margin-top: auto;
+    padding-top: 14px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+
+  /* ── Series / Practice tab ── */
+  .practice-card {
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    background: #fff;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 14px;
+    transition: transform 0.1s;
+  }
+  .practice-card:active { transform: scale(0.98); }
+  .practice-card .icon {
+    flex-shrink: 0;
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: var(--app-blue-soft);
+    color: var(--app-blue);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; font-weight: 800;
+  }
+  .practice-card .body { flex: 1; }
+  .practice-card .body .name {
+    font-size: 1rem; font-weight: 700;
+    color: var(--warm-800);
+    margin-bottom: 2px;
+  }
+  .practice-card .body .meta {
+    font-size: 0.78rem; color: var(--warm-500);
+  }
+  .practice-card .chevron {
+    color: var(--warm-400);
+    font-size: 1.2rem;
+  }
+
+  .practice-detail {
+    display: flex; flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 24px;
+  }
+  .practice-detail .big-icon {
+    width: 96px; height: 96px;
+    border-radius: 24px;
+    background: var(--app-blue-soft);
+    color: var(--app-blue);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.4rem; font-weight: 800;
+    margin-bottom: 18px;
+  }
+  .practice-detail h2 {
+    font-size: 1.4rem; font-weight: 800;
+    color: var(--warm-800);
+    margin-bottom: 8px;
+  }
+  .practice-detail .desc {
+    font-size: 0.9rem; color: var(--warm-500);
+    line-height: 1.55;
+    margin-bottom: 24px;
+    max-width: 320px;
+  }
+  .practice-detail .info-row {
+    display: flex; gap: 12px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .practice-detail .pill {
+    background: var(--warm-100);
+    color: var(--warm-600);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  /* ── Login ── */
+  .pd-login-view {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .pd-login-view .logo {
+    width: 84px; height: 84px;
+    background: var(--app-blue);
+    color: #fff;
+    border-radius: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 2.1rem;
+    margin-bottom: 20px;
+  }
+  .pd-login-view h1 {
+    font-size: 1.5rem; font-weight: 900;
+    color: var(--warm-800);
+    margin-bottom: 6px;
+  }
+  .pd-login-view .sub {
+    color: var(--warm-500);
+    font-size: 0.9rem;
+    margin-bottom: 36px;
+  }
+  .login-buttons {
+    width: 100%;
+    max-width: 300px;
+    display: flex; flex-direction: column;
+    gap: 10px;
+  }
+  .login-btn {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: inherit;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .login-btn:active { transform: scale(0.97); }
+  .login-btn.kakao { background: #FEE500; color: #191919; }
+  .login-btn.google { background: #fff; color: #444; border: 1.5px solid #DADCE0; }
+  .login-btn.guest { background: var(--app-blue); color: #fff; }
+
+  /* ── Loading / spinner ── */
+  .loading-view {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 18px;
+    padding: 24px;
+    text-align: center;
+  }
+  .spinner {
+    width: 44px; height: 44px;
+    border: 3.5px solid var(--warm-200);
+    border-top-color: var(--app-blue);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-view .label {
+    font-size: 0.95rem; font-weight: 600;
+    color: var(--warm-700);
+  }
+  .loading-view .sub-label {
+    font-size: 0.8rem; color: var(--warm-500);
+  }
+
+  /* ── Bottom sheet ── */
+  .sheet-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(46, 38, 29, 0.45);
+    z-index: 50;
+    display: flex; align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .sheet {
+    width: 100%;
+    max-width: 480px;
+    background: #fff;
+    border-top-left-radius: 22px;
+    border-top-right-radius: 22px;
+    padding: 22px 22px max(28px, env(safe-area-inset-bottom));
+    animation: slideUp 0.28s cubic-bezier(.2,.7,.3,1);
+    max-height: 85%;
+    overflow-y: auto;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .sheet .grip {
+    width: 40px; height: 4px;
+    background: var(--warm-300);
+    border-radius: 999px;
+    margin: 0 auto 16px;
+  }
+  .sheet h3 {
+    font-size: 1.15rem; font-weight: 800;
+    color: var(--warm-800);
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .sheet .sheet-desc {
+    font-size: 0.86rem; color: var(--warm-500);
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+  .sheet-buttons {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-top: 6px;
+  }
+  .fail-icon-wrap { display: flex; justify-content: center; margin: 6px 0 18px; }
+
+  /* ── Plan options ── */
+  .plan-list {
+    display: flex; flex-direction: column;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .plan-option {
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    background: #fff;
+  }
+  .plan-option.selected {
+    border-color: var(--app-orange);
+    background: var(--app-orange-soft);
+  }
+  .plan-option .left { display: flex; align-items: center; gap: 12px; }
+  .plan-icon { flex-shrink: 0; width: 64px; height: 36px; display: flex; align-items: center; justify-content: center; }
+  .plan-icon svg { width: 100%; height: 100%; display: block; }
+  .plan-option .left .name {
+    font-size: 0.95rem; font-weight: 700; color: var(--warm-800);
+  }
+  .plan-option .left .meta {
+    font-size: 0.76rem; color: var(--warm-500);
+    margin-top: 2px;
+  }
+  .plan-option .price {
+    font-size: 1rem; font-weight: 800; color: var(--warm-800);
+  }
+  .plan-option.selected .price { color: var(--app-orange); }
+
+  /* ── Coupon banner ── */
+  .coupon-banner {
+    background: var(--app-green-light);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 12px;
+  }
+  .coupon-banner .icon {
+    flex-shrink: 0;
+    width: 64px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .coupon-banner .icon svg { width: 100%; height: 100%; display: block; }
+  .coupon-banner .text {
+    flex: 1;
+    font-size: 0.85rem;
+    color: #2D7A47;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  /* ── Play screen ── */
+  .play-view {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 24px;
+    background: linear-gradient(180deg, var(--app-blue-soft) 0%, #fff 100%);
+  }
+  .play-view .badge-success {
+    background: var(--app-green);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+  }
+  .play-view .play-icon {
+    width: 110px; height: 110px;
+    border-radius: 28px;
+    background: #fff;
+    color: var(--app-blue);
+    box-shadow: 0 10px 30px rgba(107, 173, 232, 0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem;
+    margin-bottom: 24px;
+  }
+  .play-view h2 {
+    font-size: 1.6rem; font-weight: 900;
+    color: var(--warm-800);
+    margin-bottom: 8px;
+  }
+  .play-view .sub {
+    font-size: 0.9rem; color: var(--warm-500);
+    margin-bottom: 30px;
+  }
+  .play-view .placeholder {
+    width: 100%; max-width: 320px;
+    background: rgba(255,255,255,0.6);
+    border: 1.5px dashed var(--warm-300);
+    border-radius: 16px;
+    padding: 18px;
+    color: var(--warm-500);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+
+  /* ── Fail / cancel toast ── */
+  .toast {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--warm-800);
+    color: #fff;
+    padding: 11px 18px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    z-index: 200;
+    animation: toastIn 0.25s ease-out;
+    max-width: 90%;
+    text-align: center;
+  }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translate(-50%, -8px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+
+  /* ── Practice tab nav (fake) ── */
+  .tab-nav {
+    display: flex;
+    border-bottom: 1px solid var(--border-light);
+    background: #fff;
+  }
+  .tab-nav .tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--warm-400);
+    border-bottom: 2px solid transparent;
+  }
+  .tab-nav .tab.active {
+    color: var(--app-blue);
+    border-bottom-color: var(--app-blue);
+  }
+
+  /* small helpers */
+  .gap-12 { gap: 12px; }
+  .mt-12 { margin-top: 12px; }
+  .mt-16 { margin-top: 16px; }
+  .mt-24 { margin-top: 24px; }
+  .center { text-align: center; }
+
+  .info-box {
+    background: var(--warm-50);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 0.8rem;
+    color: var(--warm-600);
+    line-height: 1.5;
+  }
+  .info-box b { color: var(--warm-800); }
+
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ── Top bar (visible after scenario selected) ── -->
+  <div class="topbar hidden" id="topbar">
+    <button class="back" id="backBtn" aria-label="뒤로">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      <span>뒤로</span>
+    </button>
+    <div class="title" id="topbarTitle">슬로매스</div>
+    <button class="restart" id="restartBtn">시나리오 다시</button>
+  </div>
+
+  <!-- ── Trace bar ── -->
+  <div class="trace hidden" id="traceBar">
+    <span class="scenario-tag" id="traceScenario">시나리오 —</span>
+    <span class="badge" id="traceBadge">진행 중</span>
+  </div>
+
+  <!-- ── Screens ── -->
+
+  <!-- Step 0: Scenario picker -->
+  <div class="screen" id="screen-scenario">
+    <h1 class="screen-title">시나리오 선택</h1>
+    <p class="screen-desc">결제·접근권 플로우 데모입니다. 어떤 케이스를 시연할지 선택하세요.</p>
+
+    <div class="scenario-list" id="scenarioList">
+      <!-- filled by JS -->
+    </div>
+
+    <div class="footer-fixed">
+      <button class="primary-btn" id="startScenarioBtn" disabled>시작</button>
+      <div class="info-box">
+        <b>데모 안내</b><br>
+        실제 결제/인증은 발생하지 않습니다. 모든 단계는 모킹된 지연(0.6~1초)과 함께 화면 전환만 보여줍니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 1: Series (가짜) -->
+  <div class="screen hidden" id="screen-series">
+    <h1 class="screen-title">시리즈</h1>
+    <p class="screen-desc">아래 연습을 누르면 흐름이 시작됩니다.</p>
+
+    <div class="practice-card" id="seriesPracticeCard">
+      <div class="icon">+</div>
+      <div class="body">
+        <div class="name">한 자리 덧셈</div>
+        <div class="meta">슬로매스 시리즈 · 기초 연산</div>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+  </div>
+
+  <!-- Step 2: Practice tab (연습 탭) -->
+  <div class="screen hidden" id="screen-practiceTab" style="padding: 0;">
+    <div class="tab-nav">
+      <div class="tab">소개</div>
+      <div class="tab active">연습</div>
+      <div class="tab">기록</div>
+    </div>
+    <div style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
+      <div class="practice-detail">
+        <div class="big-icon">+</div>
+        <h2>한 자리 덧셈</h2>
+        <div class="desc">한 자리 수끼리 더하는 연습이에요. 천천히, 정확하게.</div>
+        <div class="info-row">
+          <span class="pill">기초 연산</span>
+          <span class="pill">5분 권장</span>
+          <span class="pill">난이도 ★</span>
+        </div>
+      </div>
+      <div class="footer-fixed">
+        <button class="primary-btn" id="practiceStartBtn">시작하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Login -->
+  <div class="screen hidden" id="screen-login" style="padding: 0;">
+    <div class="pd-login-view">
+      <div class="logo">슬</div>
+      <h1>슬로매스 로그인</h1>
+      <div class="sub">계속하려면 로그인이 필요해요</div>
+      <div class="login-buttons">
+        <button class="login-btn kakao" id="loginKakaoBtn">카카오로 시작</button>
+        <button class="login-btn google" id="loginGoogleBtn">Google로 시작</button>
+        <button class="login-btn guest" id="loginGuestBtn">데모용 빠른 로그인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Loading (entitlement check) -->
+  <div class="screen hidden" id="screen-loading">
+    <div class="loading-view">
+      <div class="spinner"></div>
+      <div class="label" id="loadingLabel">이용권 확인 중…</div>
+      <div class="sub-label" id="loadingSubLabel">잠시만 기다려 주세요</div>
+    </div>
+  </div>
+
+  <!-- Step 5: Play (성공) -->
+  <div class="screen hidden" id="screen-play" style="padding: 0;">
+    <div class="play-view">
+      <div class="badge-success" id="playBadge">접근 허용됨</div>
+      <div class="play-icon">+</div>
+      <h2 id="playTitle">한 자리 덧셈 시작!</h2>
+      <div class="sub" id="playSub">play 화면 (실제 게임은 데모에서 생략)</div>
+      <div class="placeholder">
+        여기는 <b>play 화면</b>의 자리예요.<br>
+        실제 통합앱에서는 서브앱 iframe이 로드됩니다.
+      </div>
+      <button class="secondary-btn" id="playBackBtn">시나리오 처음으로</button>
+    </div>
+  </div>
+
+  <!-- Sheet container (rendered on demand) -->
+  <div id="sheetContainer"></div>
+
+  <!-- Toast container -->
+  <div id="toastContainer"></div>
+
+</div>
+
+<script>
+'use strict';
+
+// ─────────────────────────────────────────────────────────────────
+// 시나리오 정의
+// ─────────────────────────────────────────────────────────────────
+const SCENARIOS = {
+  '1': {
+    id: '1', label: '① 회원가입 24시간 이내',
+    desc: '로그인 Y, 가입 직후 — 1순위 통과 → play',
+    loginStatus: true,
+    entitlements: { recentSignup: true, plan: false, coupon: false },
+    expectedBranch: '1순위 — 가입 24h 이내'
+  },
+  '2': {
+    id: '2', label: '② plan 보유',
+    desc: '로그인 Y, 해당 practice plan 보유 — 2순위 통과 → play',
+    loginStatus: true,
+    entitlements: { recentSignup: false, plan: true, coupon: false },
+    expectedBranch: '2순위 — 유효한 plan'
+  },
+  '3': {
+    id: '3', label: '③ 무료 쿠폰 보유',
+    desc: '로그인 Y, 무료 쿠폰 1장 — 3순위 → 쿠폰 사용 다이얼로그',
+    loginStatus: true,
+    entitlements: { recentSignup: false, plan: false, coupon: true },
+    expectedBranch: '3순위 — 무료 쿠폰'
+  },
+  '4': {
+    id: '4', label: '④ 무자격',
+    desc: '로그인 Y, 모든 자격 X — 4순위 → 결제 의사 확인',
+    loginStatus: true,
+    entitlements: { recentSignup: false, plan: false, coupon: false },
+    expectedBranch: '4순위 — 결제 의사 확인'
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────
+// In-memory state
+// ─────────────────────────────────────────────────────────────────
+const state = {
+  scenario: null,         // SCENARIOS key
+  loginStatus: false,
+  entitlements: { recentSignup: false, plan: false, coupon: false },
+  paymentResult: 'success', // 'success' | 'fail' | 'reject'
+  currentScreen: 'scenario',
+  // history of screens for back nav
+  history: [],
+  // current branch info for trace
+  branchInfo: '시나리오 선택'
+};
+
+const PRACTICE = {
+  name: '한 자리 덧셈',
+  icon: '+',
+};
+
+// ─────────────────────────────────────────────────────────────────
+// Screen helpers
+// ─────────────────────────────────────────────────────────────────
+const SCREENS = ['scenario', 'series', 'practiceTab', 'login', 'loading', 'play'];
+
+function showScreen(name, opts = {}) {
+  SCREENS.forEach(s => {
+    const el = document.getElementById('screen-' + s);
+    if (el) el.classList.toggle('hidden', s !== name);
+  });
+  state.currentScreen = name;
+
+  // topbar/trace visibility
+  const topbar = document.getElementById('topbar');
+  const traceBar = document.getElementById('traceBar');
+  if (name === 'scenario') {
+    topbar.classList.add('hidden');
+    traceBar.classList.add('hidden');
+  } else {
+    topbar.classList.remove('hidden');
+    traceBar.classList.remove('hidden');
+    updateTrace();
+  }
+  // back button visibility — hide on play & loading
+  const backBtn = document.getElementById('backBtn');
+  backBtn.style.visibility = (name === 'loading' || name === 'play') ? 'hidden' : 'visible';
+
+  // update topbar title
+  const titleEl = document.getElementById('topbarTitle');
+  const titles = {
+    series: '시리즈',
+    practiceTab: '한 자리 덧셈',
+    login: '로그인',
+    loading: '확인 중',
+    play: 'play'
+  };
+  titleEl.textContent = titles[name] || '슬로매스';
+}
+
+function updateTrace(branchOverride) {
+  const sc = SCENARIOS[state.scenario];
+  const tagEl = document.getElementById('traceScenario');
+  const badgeEl = document.getElementById('traceBadge');
+  if (sc) tagEl.textContent = sc.label;
+  const branch = branchOverride || state.branchInfo;
+  badgeEl.textContent = '현재 단계: ' + branch;
+  // priority color
+  badgeEl.classList.remove('priority-1','priority-2','priority-3','priority-4');
+  if (branch.startsWith('1순위')) badgeEl.classList.add('priority-1');
+  else if (branch.startsWith('2순위')) badgeEl.classList.add('priority-2');
+  else if (branch.startsWith('3순위')) badgeEl.classList.add('priority-3');
+  else if (branch.startsWith('4순위')) badgeEl.classList.add('priority-4');
+}
+
+function setBranch(text) {
+  state.branchInfo = text;
+  updateTrace(text);
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function showToast(msg, ms = 1800) {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => { el.remove(); }, ms);
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Sheet (modal) helpers
+// ─────────────────────────────────────────────────────────────────
+function openSheet({ title, desc, body = '', buttons = [] }) {
+  closeSheet();
+  const container = document.getElementById('sheetContainer');
+  const backdrop = document.createElement('div');
+  backdrop.className = 'sheet-backdrop';
+  backdrop.id = 'sheetBackdrop';
+  backdrop.innerHTML = `
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="grip"></div>
+      <h3>${title}</h3>
+      ${desc ? `<div class="sheet-desc">${desc}</div>` : ''}
+      <div class="sheet-body">${body}</div>
+      <div class="sheet-buttons" id="sheetButtons"></div>
+    </div>
+  `;
+  container.appendChild(backdrop);
+
+  const btnHost = backdrop.querySelector('#sheetButtons');
+  buttons.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = b.kind === 'primary' ? 'primary-btn' : (b.kind === 'ghost' ? 'ghost-btn' : 'secondary-btn');
+    btn.textContent = b.label;
+    btn.addEventListener('click', () => {
+      try { b.onClick && b.onClick(); }
+      finally { /* caller decides whether to close */ }
+    });
+    btnHost.appendChild(btn);
+  });
+
+  // Backdrop click closes only when allowed
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop) {
+      // mimic 거절 if it's the payment sheet — but to keep semantics explicit,
+      // we do not auto-resolve. User must press a button.
+    }
+  });
+}
+
+function closeSheet() {
+  const existing = document.getElementById('sheetBackdrop');
+  if (existing) existing.remove();
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Flow logic
+// ─────────────────────────────────────────────────────────────────
+
+// 진입: 시리즈에서 practice 클릭
+async function onSeriesPracticeClick() {
+  setBranch('Login 확인 중');
+  // Login 확인은 즉시 (state.loginStatus 참조)
+  // 플로우차트: [Login 확인] → [연습 탭으로 이동]
+  // (실제 통합앱에서는 비로그인이어도 연습 탭은 보이지만, 데모는 플로우차트 그대로)
+  await delay(500);
+  showScreen('practiceTab');
+  setBranch('연습 탭 진입');
+}
+
+// 연습 탭 "시작하기" 클릭
+async function onPracticeStartClick() {
+  if (!state.loginStatus) {
+    setBranch('로그인 필요');
+    showScreen('login');
+    return;
+  }
+  await runEntitlementCheck();
+}
+
+// 로그인 성공 후 연결
+async function onLoginSuccess() {
+  state.loginStatus = true;
+  showToast('로그인 성공');
+  await runEntitlementCheck();
+}
+
+// play 화면 이동 가능 확인 — 우선순위 1→4 순서대로 체크
+async function runEntitlementCheck() {
+  setBranch('이용권 확인 중');
+  showScreen('loading');
+  document.getElementById('loadingLabel').textContent = '이용권 확인 중…';
+  document.getElementById('loadingSubLabel').textContent = '잠시만 기다려 주세요';
+
+  await delay(900);
+
+  // 우선순위 1: 회원가입 24시간 이내
+  if (state.entitlements.recentSignup) {
+    setBranch('1순위 — 가입 24h 이내');
+    document.getElementById('loadingLabel').textContent = '가입 직후 체험 적용';
+    await delay(500);
+    goToPlay({ reason: '가입 24시간 이내 무료 체험' });
+    return;
+  }
+
+  // 우선순위 2: practice plan 보유
+  if (state.entitlements.plan) {
+    setBranch('2순위 — 유효한 plan');
+    document.getElementById('loadingLabel').textContent = 'plan 확인됨';
+    await delay(500);
+    goToPlay({ reason: '구독중인 plan으로 접근' });
+    return;
+  }
+
+  // 우선순위 3: 무료 쿠폰 보유
+  if (state.entitlements.coupon) {
+    setBranch('3순위 — 무료 쿠폰');
+    await delay(300);
+    promptCouponConversion();
+    return;
+  }
+
+  // 우선순위 4: 결제 의사 확인
+  setBranch('4순위 — 결제 의사 확인');
+  await delay(300);
+  promptPayment();
+}
+
+// 우선순위 3 — 쿠폰 사용 다이얼로그
+function promptCouponConversion() {
+  // 화면을 연습 탭으로 되돌리고 그 위에 시트
+  showScreen('practiceTab');
+  setBranch('3순위 — 쿠폰 사용 확인');
+
+  openSheet({
+    title: '무료 쿠폰을 사용할까요?',
+    desc: `무료 쿠폰으로 <b>${PRACTICE.name}</b>을 즉시 이용할 수 있어요`,
+    body: `
+      <div class="coupon-banner">
+        <div class="icon" aria-label="쿠폰">
+          <svg viewBox="0 0 80 44" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6,0 H74 a6,6 0 0 1 6,6 V18 a4,4 0 0 0 0,8 V38 a6,6 0 0 1 -6,6 H6 a6,6 0 0 1 -6,-6 V26 a4,4 0 0 0 0,-8 V6 a6,6 0 0 1 6,-6 Z" fill="#2A3DAA"/>
+            <text x="40" y="28" text-anchor="middle" fill="white" font-size="11" font-weight="900" font-family="Arial,sans-serif" letter-spacing="0.5">COUPON</text>
+          </svg>
+        </div>
+        <div class="text">무료 쿠폰 2장 보유</div>
+      </div>
+    `,
+    buttons: [
+      {
+        label: '사용할게요',
+        kind: 'primary',
+        onClick: async () => {
+          closeSheet();
+          // 쿠폰을 plan으로 전환
+          state.entitlements.coupon = false;
+          state.entitlements.plan = true;
+          setBranch('3순위 — 쿠폰을 plan으로 전환');
+          showScreen('loading');
+          document.getElementById('loadingLabel').textContent = '쿠폰 사용 처리 중…';
+          await delay(800);
+          goToPlay({ reason: '무료 쿠폰을 plan으로 전환' });
+        }
+      },
+      {
+        label: '사용하지 않을래요',
+        kind: 'secondary',
+        onClick: () => {
+          closeSheet();
+          setBranch('3순위 — 쿠폰 거부 → 연습 탭');
+          showToast('연습 탭으로 돌아갑니다');
+          // practice (이전 화면)으로
+          showScreen('practiceTab');
+        }
+      }
+    ]
+  });
+}
+
+// 우선순위 4 — 결제 의사 모달
+function promptPayment() {
+  showScreen('practiceTab');
+  setBranch('4순위 — 결제 의사 확인');
+
+  const selectedPlan = 'monthly';
+
+  openSheet({
+    title: '이용권을 구매해주세요',
+    desc: `<b>${PRACTICE.name}</b>을 즉시 이용할 수 있어요`,
+    body: `
+      <div class="plan-list" id="planList">
+        <div class="plan-option selected" data-plan="monthly">
+          <div class="left">
+            <div class="plan-icon" aria-label="30일 이용권">
+              <svg viewBox="0 0 80 44" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6,0 H74 a6,6 0 0 1 6,6 V18 a4,4 0 0 0 0,8 V38 a6,6 0 0 1 -6,6 H6 a6,6 0 0 1 -6,-6 V26 a4,4 0 0 0 0,-8 V6 a6,6 0 0 1 6,-6 Z" fill="#D97706"/>
+                <text x="40" y="28" text-anchor="middle" fill="white" font-size="11" font-weight="900" font-family="Arial,sans-serif" letter-spacing="0.5">30 DAYS</text>
+              </svg>
+            </div>
+            <div class="name">30일 이용권</div>
+          </div>
+          <div class="price">₩2,200</div>
+        </div>
+      </div>
+    `,
+    buttons: [
+      {
+        label: '결제하기',
+        kind: 'primary',
+        onClick: async () => {
+          closeSheet();
+          await processPayment(selectedPlan, 'success');
+        }
+      },
+      {
+        label: '결제 실패 (시연)',
+        kind: 'secondary',
+        onClick: async () => {
+          closeSheet();
+          await processPayment(selectedPlan, 'fail');
+        }
+      },
+      {
+        label: '다음에 할게요',
+        kind: 'secondary',
+        onClick: () => {
+          closeSheet();
+          // 결제 거절 — 연습 탭(이전 화면)으로
+          setBranch('4순위 — 결제 거절 → 연습 탭');
+          showToast('연습 탭으로 돌아갑니다');
+          showScreen('practiceTab');
+        }
+      }
+    ]
+  });
+}
+
+async function processPayment(planKey, result) {
+  setBranch('4순위 — 결제 처리 중');
+  showScreen('loading');
+  document.getElementById('loadingLabel').textContent = '결제 처리 중…';
+  document.getElementById('loadingSubLabel').textContent = '30일 이용권 · ₩2,200';
+
+  await delay(1100);
+
+  // 결제 결과는 모달 버튼 클릭으로 결정됨
+  if (result === 'success') {
+    state.entitlements.plan = true;
+    setBranch('4순위 — 결제 완료');
+    goToPlay({ reason: '결제 완료 (30일 이용권)' });
+  } else if (result === 'fail') {
+    setBranch('4순위 — 결제 실패');
+    showScreen('practiceTab');
+    openSheet({
+      title: '결제에 실패했어요',
+      desc: '결제가 정상적으로 처리되지 않았어요<br>잠시 후 다시 시도해주세요',
+      body: `
+        <div class="fail-icon-wrap">
+          <svg width="76" height="76" viewBox="0 0 76 76" xmlns="http://www.w3.org/2000/svg" aria-label="결제 실패">
+            <circle cx="38" cy="38" r="36" fill="#FDE8E8"/>
+            <circle cx="38" cy="38" r="26" fill="#F07070"/>
+            <path d="M31 31 L45 45 M45 31 L31 45" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      `,
+      buttons: [
+        {
+          label: '확인',
+          kind: 'primary',
+          onClick: () => {
+            closeSheet();
+            setBranch('4순위 — 결제 실패 → 연습 탭');
+          }
+        }
+      ]
+    });
+  } else {
+    // reject (모달 외에서 사실상 도달 안 함, 안전장치)
+    setBranch('4순위 — 결제 거절 → 연습 탭');
+    showToast('연습 탭으로 돌아갑니다');
+    await delay(200);
+    showScreen('practiceTab');
+  }
+}
+
+function goToPlay({ reason }) {
+  showScreen('play');
+  document.getElementById('playBadge').textContent = '접근 허용 — ' + (reason || 'OK');
+  document.getElementById('playTitle').textContent = PRACTICE.name + ' 시작!';
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Scenario picker logic
+// ─────────────────────────────────────────────────────────────────
+function renderScenarioList() {
+  const host = document.getElementById('scenarioList');
+  host.innerHTML = '';
+  Object.values(SCENARIOS).forEach(sc => {
+    const card = document.createElement('div');
+    card.className = 'scenario-card';
+    card.dataset.scenario = sc.id;
+    card.innerHTML = `
+      <div class="num">${sc.id}</div>
+      <div class="body">
+        <div class="label">${sc.label}</div>
+        <div class="desc">${sc.desc}</div>
+      </div>
+    `;
+    card.addEventListener('click', () => selectScenario(sc.id));
+    host.appendChild(card);
+  });
+}
+
+function selectScenario(id) {
+  state.scenario = id;
+  document.querySelectorAll('.scenario-card').forEach(el => {
+    el.classList.toggle('selected', el.dataset.scenario === id);
+  });
+  document.getElementById('startScenarioBtn').disabled = false;
+}
+
+function readPaymentResult() {
+  // (deprecated) 모달 버튼 기반으로 결정 — 안전장치로 success 반환
+  return 'success';
+}
+
+function startScenario() {
+  const sc = SCENARIOS[state.scenario];
+  if (!sc) return;
+  // load state from scenario
+  state.loginStatus = sc.loginStatus;
+  state.entitlements = { ...sc.entitlements };
+  state.history = [];
+
+  setBranch('시리즈 진입');
+  showScreen('series');
+}
+
+function resetToScenarioPicker() {
+  closeSheet();
+  state.scenario = null;
+  state.loginStatus = false;
+  state.entitlements = { recentSignup: false, plan: false, coupon: false };
+  state.branchInfo = '시나리오 선택';
+
+  document.querySelectorAll('.scenario-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById('startScenarioBtn').disabled = true;
+
+  showScreen('scenario');
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Back button — coarse step-back
+// ─────────────────────────────────────────────────────────────────
+function onBack() {
+  closeSheet();
+  switch (state.currentScreen) {
+    case 'series':
+      resetToScenarioPicker();
+      break;
+    case 'practiceTab':
+      setBranch('시리즈로 복귀');
+      showScreen('series');
+      break;
+    case 'login':
+      setBranch('연습 탭으로 복귀');
+      showScreen('practiceTab');
+      break;
+    default:
+      resetToScenarioPicker();
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Bind events
+// ─────────────────────────────────────────────────────────────────
+function bindEvents() {
+  // scenario picker
+  renderScenarioList();
+  document.getElementById('startScenarioBtn').addEventListener('click', startScenario);
+
+  // top bar
+  document.getElementById('backBtn').addEventListener('click', onBack);
+  document.getElementById('restartBtn').addEventListener('click', resetToScenarioPicker);
+
+  // series → practice tab
+  document.getElementById('seriesPracticeCard').addEventListener('click', onSeriesPracticeClick);
+
+  // practice tab → start
+  document.getElementById('practiceStartBtn').addEventListener('click', onPracticeStartClick);
+
+  // login buttons (모두 동일하게 모킹)
+  ['loginKakaoBtn','loginGoogleBtn','loginGuestBtn'].forEach(id => {
+    document.getElementById(id).addEventListener('click', async () => {
+      setBranch('로그인 처리 중');
+      showScreen('loading');
+      document.getElementById('loadingLabel').textContent = '로그인 중…';
+      document.getElementById('loadingSubLabel').textContent = '인증을 진행하고 있어요';
+      await delay(800);
+      await onLoginSuccess();
+    });
+  });
+
+  // play → restart
+  document.getElementById('playBackBtn').addEventListener('click', resetToScenarioPicker);
+}
+
+// init
+document.addEventListener('DOMContentLoaded', bindEvents);
+</script>
+</body>
+</html>

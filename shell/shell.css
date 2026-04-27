@@ -340,6 +340,17 @@ body.game-active .home-iframe-wrap { bottom: 0 !important; }
   padding: 2px 6px;
   font-weight: 700;
 }
+.sm-sb-active {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-size: 0.58rem;
+  background: #5BC886;
+  color: #fff;
+  border-radius: 99px;
+  padding: 2px 6px;
+  font-weight: 700;
+}
 
 /* ---------- 기록 탭 ---------- */
 .records-header {

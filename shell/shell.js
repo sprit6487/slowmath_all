@@ -210,6 +210,9 @@
   }
 
   // ---------------- 시리즈 탭 렌더 (카테고리별 그룹 + .sm-si 카드) ----------------
+  // 데모용 활성 plan 목록 — 실제 결제 시스템 연결 시 동적으로 채움
+  var ACTIVE_PLAN_IDS = ['color', 'easy', 'combining', 'verticaladd', 'minusone'];
+
   function renderSeries() {
     var host = $('#sm-series-sections');
     if (!host) return;
@@ -232,6 +235,7 @@
       grid.className = 'sm-sg';
       group.apps.forEach(function (app) {
         var cur = app.id === state.currentApp;
+        var active = ACTIVE_PLAN_IDS.indexOf(app.id) >= 0;
         var card = document.createElement('button');
         card.type = 'button';
         card.className = 'sm-si' + (cur ? ' smc' : '');
@@ -239,6 +243,7 @@
         card.innerHTML =
           '<span class="sm-se">' + app.icon + '</span>' +
           '<span class="sm-sn">' + app.name + '</span>' +
+          (active ? '<span class="sm-sb-active">이용중</span>' : '') +
           (cur ? '<span class="sm-sb">현재</span>' : '');
         card.addEventListener('click', function () { selectApp(app.id); });
         grid.appendChild(card);
