@@ -274,6 +274,7 @@
   .hint-dot { width: 12px; height: 12px; border-radius: 50%; opacity: 0.7; }
   .hint-dot.orange { background: var(--app-orange); }
   .hint-dot.green { background: var(--app-green); }
+  .hint-dot.blue { background: var(--app-blue); }
 
   /* ===== Circle Combine Mode ===== */
   .circle-box {
@@ -1400,6 +1401,7 @@ function renderNumCombineQuestion() {
 
   const leftHint  = showHint ? renderHintDots(q.left,  'orange') : '';
   const rightHint = showHint ? renderHintDots(q.right, 'green')  : '';
+  const totalHint = showHint ? renderHintDots(answer,  'blue')   : '';
 
   const gc = document.getElementById('game-container');
   gc.innerHTML = `
@@ -1418,6 +1420,7 @@ function renderNumCombineQuestion() {
       <div class="tri-arrows">${combineArrowsSVG()}</div>
       <div class="tri-top-section">
         <div class="tri-box top blank" id="tri-top">?</div>
+        ${totalHint}
       </div>
     </div>
     <div class="choices-grid" id="choices-grid">

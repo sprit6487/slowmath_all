@@ -1474,8 +1474,9 @@ function renderTriangle(total, left, right, blankSide, showHint) {
 
   let leftDots = '', rightDots = '';
   if (showHint) {
-    if (blankSide !== 'left') leftDots = renderHintDots(left, 'orange');
-    if (blankSide !== 'right') rightDots = renderHintDots(right, 'green');
+    // ? 박스 쪽도 hint dots 표시 — 정답 개수를 시각 단서로 제공
+    leftDots = renderHintDots(left, 'orange');
+    rightDots = renderHintDots(right, 'green');
   }
 
   return `
