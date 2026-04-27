@@ -346,6 +346,19 @@
   .tray-slot { background: transparent; }
   .tray-slot.blue { background: #6BADE8; animation: popIn 0.2s ease; }
 
+  /* 가르기·모으기 도식 — 카운트 원 */
+  .drag-counts-row { display: flex; justify-content: space-around; gap: 8px; width: 100%; margin: 2px 0 0; }
+  .count-circle { width: 36px; height: 36px; border: 2px solid var(--warm-400); border-radius: 50%; background: #fff; font-size: 1.15rem; font-weight: 800; color: var(--warm-700); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .count-circle.orange-c { border-color: var(--app-orange); color: var(--app-orange); }
+  .count-circle.green-c { border-color: var(--app-green); color: var(--app-green); }
+  .count-circle.blue-c { border-color: var(--app-blue); color: var(--app-blue); background: var(--app-blue-soft); margin: 0 auto; }
+  .count-circle.blank { color: var(--warm-400); border-color: var(--warm-300); background: #fff; }
+  .count-circle.correct-fill { animation: popIn 0.25s ease; }
+  .combine-v-svg { width: 100%; height: 20px; display: block; }
+  /* 비활성 그룹 — 색깔은 유지하면서 흐리게 (있다는 건 보이되 지금 차례 아님을 표시) */
+  .drag-circle-box.disabled { opacity: 0.5; pointer-events: none; }
+  .drag-circle-box.active { box-shadow: 0 0 0 3px rgba(107,173,232,0.18); }
+
   /* Reveal button */
   .reveal-btn-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 5; }
   .reveal-btn{display:block;width:100%;max-width:320px;margin:0 auto 12px;padding:14px 0;border-radius:14px;border:2px solid #C4AA82;background:#FAF5EE;color:#7B6545;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;}
@@ -1196,27 +1209,26 @@ function renderDragCombineQuestion() {
   let rightDotsHTML = '';
   for (let i = 0; i < q.right; i++) rightDotsHTML += `<div class="cdot green"></div>`;
 
-  const slotsHTML = Array.from({length: 20}, () => `<div class="tray-slot"></div>`).join('');
+  const totalDots = q.left + q.right;
+  const slotsHTML = Array.from({length: totalDots}, () => `<div class="tray-slot"></div>`).join('');
 
   const gc = document.getElementById('game-container');
   gc.innerHTML = `
-    <div class="question-label">작은 원을 파란 공간에 모두 모아보아요!</div>
+    <div class="question-label">왼쪽을 먼저 모으고, 오른쪽도 모아보아요!</div>
     <div class="drag-game-wrap">
       <div class="drag-sources-row">
-        <div class="drag-circle-box orange-src" data-count="${q.left}" data-color="orange">${leftDotsHTML}</div>
-        <div class="drag-circle-box green-src" data-count="${q.right}" data-color="green">${rightDotsHTML}</div>
+        <div class="drag-circle-box orange-src active" data-count="${q.left}" data-color="orange" data-side="left">${leftDotsHTML}</div>
+        <div class="drag-circle-box green-src disabled" data-count="${q.right}" data-color="green" data-side="right">${rightDotsHTML}</div>
       </div>
-      <div class="drag-arrow-wrap">
-        <svg width="100%" viewBox="0 0 200 22" fill="none" style="display:block;overflow:visible;">
-          <defs>
-            <marker id="ah" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto">
-              <polyline points="1,1 6,3.5 1,6" fill="none" stroke="#C8C0B4" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-            </marker>
-          </defs>
-          <line x1="42" y1="3" x2="88" y2="19" stroke="#C8C0B4" stroke-width="1.8" stroke-linecap="round" marker-end="url(#ah)"/>
-          <line x1="158" y1="3" x2="112" y2="19" stroke="#C8C0B4" stroke-width="1.8" stroke-linecap="round" marker-end="url(#ah)"/>
-        </svg>
+      <div class="drag-counts-row">
+        <div class="count-circle orange-c">${q.left}</div>
+        <div class="count-circle green-c">${q.right}</div>
       </div>
+      <svg class="combine-v-svg" viewBox="0 0 200 28" preserveAspectRatio="none">
+        <line x1="50" y1="2" x2="100" y2="26" stroke="#C8C0B4" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="150" y1="2" x2="100" y2="26" stroke="#C8C0B4" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <div class="count-circle blue-c blank" id="combine-total">?</div>
       <div class="drag-tray" id="drag-tray">
         ${slotsHTML}
         <span class="drag-hint-txt" id="drag-hint">여기에 모아요</span>
@@ -1227,7 +1239,7 @@ function renderDragCombineQuestion() {
     </div>
     <div class="impulse-msg" id="impulse-msg"></div>`;
 
-  // 소스 dot 크기를 측정해 트레이 grid에 적용
+  // 소스 dot 크기를 측정해 트레이 grid에 적용 — 행 수는 totalDots에 맞게 동적 계산
   requestAnimationFrame(() => {
     const sampleDot = document.querySelector('.drag-circle-box .cdot');
     const tray = document.getElementById('drag-tray');
@@ -1235,12 +1247,14 @@ function renderDragCombineQuestion() {
       const sz = sampleDot.offsetWidth;
       const gap = parseInt(getComputedStyle(tray).gap) || 6;
       const pad = parseInt(getComputedStyle(tray).padding) || 12;
-      tray.style.gridTemplateColumns = `repeat(5, ${sz}px)`;
-      tray.style.gridTemplateRows = `repeat(4, ${sz}px)`;
-      tray.style.height = (4 * sz + 3 * gap + 2 * pad) + 'px';
+      const cols = Math.min(5, totalDots);
+      const rows = Math.max(1, Math.ceil(totalDots / 5));
+      tray.style.gridTemplateColumns = `repeat(${cols}, ${sz}px)`;
+      tray.style.gridTemplateRows = `repeat(${rows}, ${sz}px)`;
+      tray.style.height = (rows * sz + (rows - 1) * gap + 2 * pad) + 'px';
     }
   });
-  speak(`작은 원을 파란 공간에 모두 모아보아요!`);
+  speak(`왼쪽에 ${q.left}개, 오른쪽에 ${q.right}개가 있어요. 모두 모아볼까요?`);
   setupDragCombine(q, answer, choices);
 }
 
@@ -1261,6 +1275,13 @@ function setupDragCombine(q, answer) {
           btn.classList.add('correct');
           combo++; correctCount++;
           showFeedback('🎉'); speak('정답이에요!');
+          // 합 원에 답 채우기 (도식 완성)
+          const totalEl = document.getElementById('combine-total');
+          if (totalEl) {
+            totalEl.textContent = answer;
+            totalEl.classList.remove('blank');
+            totalEl.classList.add('correct-fill');
+          }
           if (isWrongNotesPractice) removeWrongNote(`${q.left}-${q.right}-${q.total}`);
           updateScoreUI();
           document.getElementById('next-q-btn').style.display='';
@@ -1276,7 +1297,10 @@ function setupDragCombine(q, answer) {
 
   const total = q.left + q.right;
   let droppedCount = 0;
+  let leftDropped = 0, rightDropped = 0;
   let filledSlots = 0;
+  const orangeBox = document.querySelector('.drag-circle-box.orange-src');
+  const greenBox  = document.querySelector('.drag-circle-box.green-src');
 
   document.querySelectorAll('.drag-circle-box .cdot').forEach(dot => {
     let ghost = null;
@@ -1318,6 +1342,18 @@ function setupDragCombine(q, answer) {
           filledSlots++;
         }
         droppedCount++;
+        // 그룹별 카운트 + 한 쪽 다 끝나면 다음 그룹 활성화
+        if (dot.classList.contains('orange')) {
+          leftDropped++;
+          if (leftDropped >= q.left && orangeBox && greenBox) {
+            orangeBox.classList.remove('active');
+            orangeBox.classList.add('disabled');
+            greenBox.classList.remove('disabled');
+            greenBox.classList.add('active');
+          }
+        } else {
+          rightDropped++;
+        }
         if (droppedCount >= total) setTimeout(onAllDropped, 200);
       } else {
         dot.style.opacity = '1';
