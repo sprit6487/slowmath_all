@@ -222,6 +222,12 @@
       title.className = 'cat-title';
       title.textContent = group.category;
       section.appendChild(title);
+      if (group.description) {
+        var desc = document.createElement('div');
+        desc.className = 'cat-desc';
+        desc.textContent = group.description;
+        section.appendChild(desc);
+      }
       var grid = document.createElement('div');
       grid.className = 'sm-sg';
       group.apps.forEach(function (app) {
