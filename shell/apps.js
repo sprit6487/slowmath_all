@@ -29,6 +29,7 @@
     { id: 'plusthree',  name: '더하기 3',         icon: '3️⃣',  category: '덧셈' },
     { id: 'easy',       name: '한 자리 덧셈',     icon: '➕',  category: '덧셈' },
     { id: 'circle',     name: '한 자리 덧셈 연습',icon: '➕',  category: '덧셈' },
+    { id: 'verticaladd',name: '세로 덧셈',        icon: '🧮',  category: '덧셈' },
 
     { id: 'minusone',   name: '빼기 1',           icon: '1️⃣',  category: '뺄셈' },
     { id: 'minustwo',   name: '빼기 2',           icon: '2️⃣',  category: '뺄셈' },
@@ -51,7 +52,7 @@
   };
 
   // 서브앱 index.html은 쉘의 ?v=N과 별개로 캐시되므로 iframe URL에도 버전 파라미터를 붙임
-  var SUBAPP_VERSION = '73';
+  var SUBAPP_VERSION = '74';
   function path(id) {
     return './slowmath_' + id + '/?embedded=1&sv=' + SUBAPP_VERSION;
   }
