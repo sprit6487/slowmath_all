@@ -734,7 +734,7 @@ body.game-active .home-iframe-wrap { bottom: 0 !important; }
   color: #4A4035;
 }
 .sm-my-wrap {
-  padding: 0 16px;
+  padding: 0 20px;
 }
 .sm-my-sec {
   width: 100%;
@@ -746,7 +746,25 @@ body.game-active .home-iframe-wrap { bottom: 0 !important; }
   color: #B8AD9E;
   letter-spacing: 0.06em;
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+/* 시연용 교체 버튼 (이용권 있음/없음 토글) */
+.sm-my-demo-toggle {
+  margin-left: auto;
+  background: #ECE5DA;
+  border: none;
+  font-family: inherit;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: #8C7E6A;
+  padding: 3px 9px;
+  border-radius: 99px;
+  cursor: pointer;
+}
+.sm-my-demo-toggle:active { background: #DCD3C5; }
 .sm-my-card {
   background: #F5F1EB;
   border-radius: 16px;
@@ -765,6 +783,22 @@ body.game-active .home-iframe-wrap { bottom: 0 !important; }
 .sm-my-row:last-child { border-bottom: none; }
 .sm-my-lbl { color: #8C8070; font-weight: 500; flex-shrink: 0; }
 .sm-my-val { color: #4A4035; font-weight: 700; text-align: right; }
+/* 로그인 방식 칩 — 공식 색상 + 심볼 */
+.sm-provider-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-weight: 700;
+  color: #4A4035;
+}
+.sm-provider-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.sm-provider-icon.kakao { background: #FEE500; }
+.sm-provider-icon.google { background: #fff; border: 1px solid #DADCE0; }
+.sm-provider-icon svg { display: block; }
+
 .sm-my-tag {
   display: inline-block;
   background: #5BC886;
@@ -1071,6 +1105,374 @@ body.game-active .home-iframe-wrap { bottom: 0 !important; }
   text-align: left;
   gap: 8px;
 }
+/* ── 쿠폰 카드 — 강조형 디자인 ── */
+.sm-my-coupon-card { padding: 0; background: transparent; border: none; }
+.sm-my-coupon-balance {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, #FFF8EC 0%, #FFEDD0 100%);
+  border-radius: 18px;
+  padding: 22px 24px;
+  box-shadow: 0 2px 10px rgba(240, 160, 80, 0.08);
+}
+.sm-my-coupon-balance .lbl {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.sm-my-coupon-balance .lbl .title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #8C5A1C;
+  letter-spacing: 0.01em;
+}
+.sm-my-coupon-balance .lbl .sub {
+  font-size: 0.72rem;
+  color: #B4854D;
+  font-weight: 500;
+}
+.sm-my-coupon-balance .count { display: flex; align-items: baseline; gap: 2px; }
+.sm-my-coupon-balance .count .num {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #C76E20;
+  line-height: 1;
+}
+.sm-my-coupon-balance .count .unit {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #C76E20;
+}
+
+/* 공유 CTA — 클릭 시 실제 공유 함수 실행 */
+.sm-my-share-cta {
+  display: block;
+  width: 100%;
+  background: linear-gradient(135deg, #FFEFD3 0%, #FFD49A 100%);
+  border: none;
+  border-radius: 16px;
+  padding: 16px 24px;
+  margin-top: 10px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 3px 12px rgba(240, 160, 80, 0.18);
+}
+.sm-my-share-cta:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 6px rgba(240, 160, 80, 0.18);
+}
+.sm-my-share-cta .head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.sm-my-share-cta .head .title {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #6E3F0F;
+}
+.sm-my-share-cta .head .arrow {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #C76E20;
+  line-height: 1;
+}
+.sm-my-share-cta .meta {
+  font-size: 0.74rem;
+  color: #8C5A1C;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.sm-my-share-cta .meta b { color: #C76E20; font-weight: 800; }
+.sm-my-share-cta .progress {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.sm-my-share-cta .progress > div {
+  height: 100%;
+  background: #C76E20;
+  border-radius: 99px;
+  transition: width 0.3s;
+}
+
+.sm-my-history {
+  padding: 8px 0 6px;
+}
+.sm-my-history-tit {
+  font-size: 0.72rem;
+  color: #8C8070;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.sm-my-history-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0;
+  font-size: 0.8rem;
+  border-bottom: 1px dashed #E0DAD2;
+}
+.sm-my-history-row:last-child { border-bottom: none; }
+.sm-my-history-row .date { color: #8C8070; }
+.sm-my-history-row .src { color: #4A4035; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+.sm-my-history-row .src .qty {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.sm-my-history-row .src .qty.plus { background: #D4F5E0; color: #2D7A47; }
+.sm-my-history-row .src .qty.minus { background: #FDE8C8; color: #8C5A1C; }
+.sm-my-history-row .src.grant .lbl { color: #4A4035; }
+.sm-my-history-row .src.admin .lbl { color: #6BADE8; }
+.sm-my-history-row .src.use .lbl { color: #4A4035; }
+.sm-my-empty {
+  padding: 14px 0;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--sm-mute2);
+}
+
+/* ── 이용권 카드 — 사용 중 강조형 ── */
+.sm-my-ticket-card { padding: 0; background: transparent; border: none; }
+.sm-my-ticket-row {
+  display: flex; flex-direction: column;
+  gap: 4px;
+  background: linear-gradient(135deg, #F4F8FB 0%, #DCEBF8 100%);
+  border-radius: 18px;
+  padding: 18px 22px;
+  box-shadow: 0 2px 10px rgba(107, 173, 232, 0.08);
+  margin-bottom: 8px;
+}
+.sm-my-ticket-row + .sm-my-ticket-row { margin-top: 8px; }
+.sm-my-ticket-line1 {
+  display: flex; align-items: center; gap: 6px;
+}
+.sm-my-ticket-name {
+  color: #1F4F7A;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.sm-my-ticket-period {
+  font-size: 0.75rem;
+  color: #4A8AC0;
+  font-weight: 600;
+}
+/* (유료/무료/만료 칩은 사용하지 않음 — 영역 구분으로 대체) */
+.sm-my-ticket-kind { display: none; }
+
+/* 풀스크린 오버레이 안 만료 이용권 — 회색 톤 */
+.sm-history-body .sm-my-ticket-row {
+  background: #F5F1EB;
+  box-shadow: none;
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.sm-history-body .sm-my-ticket-row .sm-my-ticket-name { color: #4A4035; font-size: 0.95rem; }
+.sm-history-body .sm-my-ticket-row .sm-my-ticket-period { color: #8C8070; }
+
+/* 이용권 빈 상태 — 미니멀 outline + 차분한 톤 */
+.sm-my-ticket-empty {
+  background: transparent;
+  border: 1.5px dashed #DCD3C5;
+  border-radius: 16px;
+  padding: 24px 22px;
+  text-align: center;
+}
+.sm-my-ticket-empty .ic {
+  width: 28px;
+  height: 28px;
+  margin: 0 auto 8px;
+  color: #C9BFB0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sm-my-ticket-empty .ic svg { width: 100%; height: 100%; display: block; }
+.sm-my-ticket-empty .title {
+  font-size: 0.84rem;
+  color: #8C7E6A;
+  font-weight: 500;
+}
+
+/* "이용 내역 보기" / "지난 이용권 보기" 진입 링크 — 별도 카드 형태 */
+.sm-my-link-history {
+  background: #fff;
+  border: 1.5px solid #F0ECE6;
+  border-radius: 14px;
+  margin-top: 10px;
+  padding: 14px 18px;
+}
+.sm-my-link-history:active { background: #FAF7F2; }
+.sm-my-link.sm-my-link-history .sm-my-history-count {
+  display: inline-block;
+  margin-left: 6px;
+  background: #ECE5DA;
+  color: #8C8070;
+  border-radius: 99px;
+  padding: 1px 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* 풀스크린 이용 내역 오버레이 본문 */
+.sm-history-body {
+  padding: 16px;
+}
+
+/* ── 상단 요약 chip ── */
+.sm-history-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.sm-history-summary.three { grid-template-columns: 1fr 1fr 1fr; }
+.sm-history-summary .summary-chip {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px;
+  padding: 14px 8px;
+  border-radius: 14px;
+}
+/* SVG 아이콘 영역 — 모든 chip의 아이콘을 같은 사이즈로 통일 */
+.sm-history-summary .summary-chip .ic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+.sm-history-summary .summary-chip .ic svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+.sm-history-summary .summary-chip .num { font-size: 1.3rem; font-weight: 900; line-height: 1; }
+.sm-history-summary .summary-chip .lbl { font-size: 0.72rem; font-weight: 700; }
+.sm-history-summary .summary-chip.plus  { background: #F0F9F4; color: #2D7A47; }
+.sm-history-summary .summary-chip.minus { background: #FCF6EE; color: #C76E20; }
+.sm-history-summary .summary-chip.ticket-paid   { background: #FAF7F2; color: #6B5F50; }
+.sm-history-summary .summary-chip.ticket-coupon { background: #F0F9F4; color: #2D7A47; }
+.sm-history-summary .summary-chip.ticket-signup { background: #F4F8FB; color: #2D6B9F; }
+
+/* ── 타임라인 (쿠폰 사용 기록) ── */
+.sm-timeline { position: relative; }
+.sm-timeline-item {
+  display: flex; gap: 12px;
+  position: relative;
+  padding-bottom: 10px;
+}
+.sm-timeline-item:last-child { padding-bottom: 0; }
+.sm-timeline-item .dot {
+  flex-shrink: 0;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  margin-top: 16px;
+  z-index: 1;
+}
+.sm-timeline-item.grant .dot { background: #5BC886; box-shadow: 0 0 0 4px #F0F9F4; }
+.sm-timeline-item.use .dot { background: #F0A050; box-shadow: 0 0 0 4px #FCF6EE; }
+/* 도트 사이 연결선 */
+.sm-timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 30px;
+  bottom: -2px;
+  width: 2px;
+  background: #E8E2DA;
+}
+.sm-timeline-item .row-card {
+  flex: 1;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.sm-timeline-item.grant .row-card { background: linear-gradient(135deg, #F0F9F4 0%, #DEF2E6 100%); }
+.sm-timeline-item.use .row-card { background: linear-gradient(135deg, #FCF6EE 0%, #F8E8D2 100%); }
+.sm-timeline-item .row-card .head {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 4px;
+}
+.sm-timeline-item .row-card .head .qty {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.sm-timeline-item .row-card .head .qty.plus { background: #5BC886; color: #fff; }
+.sm-timeline-item .row-card .head .qty.minus { background: #F0A050; color: #fff; }
+.sm-timeline-item .row-card .head .lbl {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #4A4035;
+  line-height: 1.4;
+}
+.sm-timeline-item .row-card .date {
+  font-size: 0.74rem;
+  color: #8C7E6A;
+  font-weight: 500;
+}
+
+/* ── 만료된 이용권 row (출처별 색조) ── */
+.sm-ticket-history-row {
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 8px;
+}
+.sm-ticket-history-row.paid   { background: linear-gradient(135deg, #FAF7F2 0%, #F0ECE6 100%); }
+.sm-ticket-history-row.coupon { background: linear-gradient(135deg, #F0F9F4 0%, #DEF2E6 100%); }
+.sm-ticket-history-row.signup { background: linear-gradient(135deg, #F4F8FB 0%, #E8F1FA 100%); }
+.sm-ticket-history-row .name {
+  font-size: 0.95rem; font-weight: 800;
+  color: #4A4035; margin-bottom: 4px;
+}
+.sm-ticket-history-row .source {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.74rem; font-weight: 700;
+  margin-bottom: 6px;
+}
+.sm-ticket-history-row .source svg { width: 14px; height: 14px; display: block; }
+.sm-ticket-history-row.paid   .source { color: #6B5F50; }
+.sm-ticket-history-row.coupon .source { color: #2D7A47; }
+.sm-ticket-history-row.signup .source { color: #2D6B9F; }
+.sm-ticket-history-row .period {
+  font-size: 0.78rem; color: #8C7E6A;
+}
+
+/* 헤더 카운트 — 제목 옆 작은 배지 */
+.sm-history-title-count {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 9px;
+  border-radius: 99px;
+  background: #ECE5DA;
+  color: #8C7E6A;
+  font-size: 0.78rem;
+  font-weight: 700;
+  vertical-align: 1px;
+}
+/* 쿠폰 이용 내역 row — 날짜·수량·라벨을 고정 컬럼으로 정렬 */
+.sm-history-body .sm-my-history-row {
+  display: grid;
+  grid-template-columns: 110px 36px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+.sm-history-body .sm-my-history-row .date {
+  white-space: nowrap;
+}
+/* .src 안의 자식(qty, lbl)을 부모 grid 아이템으로 승격 → 모든 row 정렬 일치 */
+.sm-history-body .sm-my-history-row .src {
+  display: contents;
+}
+.sm-history-body .sm-my-history-row .src .qty {
+  text-align: center;
+  width: 36px;
+}
+
 .sm-my-card .sm-my-link + .sm-my-link,
 .sm-my-card .sm-my-link + .sm-my-row,
 .sm-my-card .sm-my-row + .sm-my-link {

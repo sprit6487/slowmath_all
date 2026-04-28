@@ -1003,6 +1003,10 @@
         openLegalDoc(el.getAttribute('data-doc'));
       });
     });
+
+    // 이용권/쿠폰 이용 내역 오버레이 닫기 (공용)
+    var historyBack = document.getElementById('sm-history-back');
+    if (historyBack) historyBack.addEventListener('click', closeHistoryOverlay);
   }
 
   function wireModals() {
@@ -1512,6 +1516,34 @@
   // ---------------- 마이 (서브앱과 동일 포맷) ----------------
   var PROVIDER_KR = { kakao: '카카오', google: '구글', naver: '네이버', facebook: '페이스북' };
 
+  // 로그인 방식 표시 — 공식 로고 칩
+  function providerTagHTML(provider) {
+    if (provider === 'kakao') {
+      return '<span class="sm-provider-tag">' +
+        '<span class="sm-provider-icon kakao">' +
+          '<svg width="14" height="14" viewBox="0 0 20 20" aria-hidden="true">' +
+            '<path d="M10 1C4.477 1 0 4.477 0 8.667c0 2.7 1.753 5.072 4.393 6.413-.192.717-.694 2.6-.794 3.004-.124.497.182.49.383.356.158-.105 2.51-1.708 3.525-2.398.8.118 1.628.18 2.493.18 5.523 0 10-3.477 10-7.555C20 4.477 15.523 1 10 1z" fill="#191919"/>' +
+          '</svg>' +
+        '</span>' +
+        '<span>카카오</span>' +
+        '</span>';
+    }
+    if (provider === 'google') {
+      return '<span class="sm-provider-tag">' +
+        '<span class="sm-provider-icon google">' +
+          '<svg width="14" height="14" viewBox="0 0 48 48" aria-hidden="true">' +
+            '<path d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" fill="#FFC107"/>' +
+            '<path d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" fill="#FF3D00"/>' +
+            '<path d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" fill="#4CAF50"/>' +
+            '<path d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 01-4.087 5.571l.001-.001 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" fill="#1976D2"/>' +
+          '</svg>' +
+        '</span>' +
+        '<span>Google</span>' +
+        '</span>';
+    }
+    return PROVIDER_KR[provider] || provider;
+  }
+
   function renderMy() {
     var user = lsGet(LS.user, null);
     var em = $('#sm-my-em');
@@ -1519,8 +1551,319 @@
     if (em) em.textContent = (user && user.email) || 'sprit6487@gmail.com';
     if (pv) {
       var p = (user && user.provider) || 'kakao';
-      pv.textContent = PROVIDER_KR[p] || p;
+      pv.innerHTML = providerTagHTML(p);
     }
+    renderCoupons();
+    renderTickets();
+  }
+
+  // ── 더미 데이터 ── (실제 시스템 연결 시 교체)
+  // 정책 (2026-04-28 기준)
+  // - 이용권: { target(연습 id 또는 'ALL') + durationDays(1 또는 30) }
+  //   · 회원가입 시 ALL × 1일 자동 부여
+  //   · 인앱결제: N번 연습 × 30일
+  //   · 쿠폰 교환: N번 연습 × 1일 (ALL은 교환 불가)
+  // - 쿠폰: 공유/CS로 지급, N번 연습 × 1일 이용권으로 교환
+  var COUPON_GRANT_LIMIT = 10; // 누적 부여 가능 최대 개수
+
+  var DEMO_COUPONS = {
+    // 시간순(최신 → 과거) history. event = 'grant' | 'use'
+    history: [
+      { event: 'grant', source: 'share',  at: '2026-04-28' },
+      { event: 'use',   target: 'easy',    at: '2026-04-26' }, // 한 자리 덧셈 1일권 교환
+      { event: 'grant', source: 'admin',   at: '2026-04-25', note: 'CS 지급' },
+      { event: 'grant', source: 'share',   at: '2026-04-20' },
+      { event: 'use',   target: 'plusone', at: '2026-04-12' }, // 더하기 1 1일권 교환
+      { event: 'grant', source: 'share',   at: '2026-04-10' }
+    ]
+  };
+
+  function appNameById(id) {
+    if (id === 'ALL') return '모든 연습';
+    var app = window.SM_FIND_APP && window.SM_FIND_APP(id);
+    return app ? app.name : id;
+  }
+
+  // 이용권 더미 — 각 항목에 durationDays 명시 (1 또는 30)
+  // 시연 토글: localStorage 'sm_demo_empty_tickets' === '1' 이면 current 비움
+  // 콘솔에서 토글:
+  //   localStorage.setItem('sm_demo_empty_tickets', '1'); location.reload();   // 빈 상태
+  //   localStorage.removeItem('sm_demo_empty_tickets'); location.reload();      // 원래대로
+  var _DEMO_TICKETS_BASE = {
+    current: [
+      { kind: 'paid', target: 'easy', durationDays: 30, from: '2026-04-15', to: '2026-05-14' }
+    ],
+    past: [
+      { kind: 'free', target: 'easy',    durationDays: 1,  from: '2026-04-26', to: '2026-04-26', source: 'coupon' },
+      { kind: 'paid', target: 'plusone', durationDays: 30, from: '2026-03-12', to: '2026-04-10' },
+      { kind: 'free', target: 'ALL',     durationDays: 1,  from: '2026-04-10', to: '2026-04-10', source: 'signup' }
+    ]
+  };
+  function getDemoTickets() {
+    var emptyMode = false;
+    try { emptyMode = localStorage.getItem('sm_demo_empty_tickets') === '1'; } catch (e) {}
+    if (emptyMode) return { current: [], past: _DEMO_TICKETS_BASE.past };
+    return _DEMO_TICKETS_BASE;
+  }
+  // legacy alias (다른 곳에서 참조 가능)
+  var DEMO_TICKETS = _DEMO_TICKETS_BASE;
+
+  function fmtDate(s) { return (s || '').replace(/-/g, '.'); }
+  function fmtKDate(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+    if (!m) return s;
+    return m[1] + '년 ' + parseInt(m[2], 10) + '월 ' + parseInt(m[3], 10) + '일';
+  }
+  // 이용권 표시 이름: "한 자리 덧셈 30일 이용권" / "모든 연습 1일 이용권"
+  function ticketLabel(t) {
+    return appNameById(t.target) + ' ' + t.durationDays + '일 이용권';
+  }
+
+  function renderCoupons() {
+    var card = $('#sm-my-coupon-card');
+    if (!card) return;
+    card.classList.add('sm-my-coupon-card');
+    var data = DEMO_COUPONS;
+    var grants = data.history.filter(function (h) { return h.event === 'grant'; });
+    var uses = data.history.filter(function (h) { return h.event === 'use'; });
+    var totalGranted = grants.length;
+    var available = totalGranted - uses.length;
+
+    var html = '';
+    // 보유 강조 박스
+    html += '<div class="sm-my-coupon-balance">';
+    html += '<div class="lbl">';
+    html += '<span class="title">🎟️ 내 쿠폰</span>';
+    html += '<span class="sub">공유하고 받은 쿠폰이에요</span>';
+    html += '</div>';
+    html += '<div class="count"><span class="num">' + available + '</span><span class="unit">장</span></div>';
+    html += '</div>';
+
+    // 누적 10개 미만이면 공유 CTA — 클릭 시 실제 공유 함수 실행
+    if (totalGranted < COUPON_GRANT_LIMIT) {
+      var remain = COUPON_GRANT_LIMIT - totalGranted;
+      var pct = Math.round((totalGranted / COUPON_GRANT_LIMIT) * 100);
+      html += '<button class="sm-my-share-cta" id="sm-my-share-cta" type="button">';
+      html += '<div class="head"><span class="title">🎁 친구에게 알려주기</span><span class="arrow">›</span></div>';
+      html += '<div class="meta">공유하면 쿠폰 1장을 받을 수 있어요. (' + totalGranted + '/' + COUPON_GRANT_LIMIT + ')</div>';
+      html += '<div class="progress"><div style="width:' + pct + '%"></div></div>';
+      html += '</button>';
+    }
+
+    // 이용 내역 진입 링크 (한 뎁스 들어가야 보임)
+    if (data.history.length > 0) {
+      html += '<button class="sm-my-link sm-my-link-history" type="button" id="sm-my-coupon-history-link">' +
+        '<span class="sm-my-link-lbl">쿠폰 사용 기록 <span class="sm-my-history-count">' + data.history.length + '</span></span>' +
+        '<span class="sm-my-link-arrow">›</span>' +
+        '</button>';
+    }
+
+    card.innerHTML = html;
+
+    var couponLink = document.getElementById('sm-my-coupon-history-link');
+    if (couponLink) couponLink.addEventListener('click', openCouponHistory);
+    var shareCta = document.getElementById('sm-my-share-cta');
+    if (shareCta) shareCta.addEventListener('click', shellShare);
+  }
+
+  function ticketRowHTML(t, isPast) {
+    return '<div class="sm-my-ticket-row' + (isPast ? ' expired' : '') + '">' +
+      '<div class="sm-my-ticket-line1">' +
+      '<span class="sm-my-ticket-name">' + ticketLabel(t) + '</span>' +
+      '</div>' +
+      '<div class="sm-my-ticket-period">' + fmtDate(t.from) + ' ~ ' + fmtDate(t.to) + '</div>' +
+      '</div>';
+  }
+
+  // 출처별 SVG 아이콘 — 모든 SVG에 동일한 invisible bbox rect (3,5,18,14)를 두어
+  // 브라우저가 인식하는 vertical bounding을 강제 통일 → 시각 하단 라인 일치
+  var _BBOX_RECT = '<rect x="3" y="5" width="18" height="14" fill="none" stroke="none"/>';
+  var SVG_ICON = {
+    card: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      _BBOX_RECT +
+      '<rect x="3" y="5" width="18" height="14" rx="2"/>' +
+      '<line x1="3" y1="10" x2="21" y2="10"/>' +
+      '<line x1="6" y1="15" x2="10" y2="15"/>' +
+      '</svg>',
+    ticket: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      _BBOX_RECT +
+      '<path d="M3 9 V7 a2 2 0 0 1 2 -2 h14 a2 2 0 0 1 2 2 v2 a2 2 0 0 0 0 6 v2 a2 2 0 0 1 -2 2 h-14 a2 2 0 0 1 -2 -2 v-2 a2 2 0 0 0 0 -6 z"/>' +
+      '<line x1="9" y1="11" x2="9" y2="13"/>' +
+      '<line x1="15" y1="11" x2="15" y2="13"/>' +
+      '</svg>',
+    gift: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      _BBOX_RECT +
+      '<polyline points="21 11 21 19 3 19 3 11"/>' +
+      '<rect x="3" y="9" width="18" height="2"/>' +
+      '<line x1="12" y1="19" x2="12" y2="9"/>' +
+      '<path d="M12 9 H8 a1.7 1.7 0 0 1 0 -4 C11 5 12 9 12 9 Z"/>' +
+      '<path d="M12 9 h4 a1.7 1.7 0 0 0 0 -4 C13 5 12 9 12 9 Z"/>' +
+      '</svg>'
+  };
+
+  // 마이 탭용 작은 거북이 SVG (빈 상태 등에 사용)
+  var SM_MINI_TURTLE_SVG =
+    '<svg class="turtle" viewBox="0 0 80 60" width="72" height="54" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+    '<ellipse cx="20" cy="44" rx="7" ry="4" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="1.6" transform="rotate(-15 20 44)"/>' +
+    '<ellipse cx="56" cy="46" rx="7" ry="4" fill="#F2DC8C" stroke="#3A9B6A" stroke-width="1.6" transform="rotate(12 56 46)"/>' +
+    '<ellipse cx="38" cy="38" rx="22" ry="13" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="1.8"/>' +
+    '<ellipse cx="36" cy="28" rx="20" ry="17" fill="#7EDCAA" stroke="#3A9B6A" stroke-width="2"/>' +
+    '<ellipse cx="62" cy="26" rx="11" ry="9" fill="#F5E6C8" stroke="#3A9B6A" stroke-width="2"/>' +
+    '<circle cx="67" cy="22" r="2.4" fill="white" stroke="#3A9B6A" stroke-width="1"/>' +
+    '<circle cx="67.8" cy="21.6" r="1.4" fill="#3A9B6A"/>' +
+    '<path d="M62 30 Q66 33 70 30" fill="none" stroke="#3A9B6A" stroke-width="1.2" stroke-linecap="round"/>' +
+    '</svg>';
+
+  function renderTickets() {
+    var card = $('#sm-my-ticket-card');
+    if (!card) return;
+    card.classList.add('sm-my-ticket-card');
+    var data = getDemoTickets();
+
+    var html = '';
+    if (data.current.length > 0) {
+      // 파란 강조 박스 자체가 "사용 중" 의미를 전달 — 별도 라벨 없음
+      data.current.forEach(function (t) { html += ticketRowHTML(t, false); });
+    } else {
+      // 빈 상태 — 미니멀 티켓 outline + 차분한 메시지
+      html += '<div class="sm-my-ticket-empty">';
+      html += '<div class="ic">' + SVG_ICON.ticket + '</div>';
+      html += '<div class="title">아직 이용권이 없어요</div>';
+      html += '</div>';
+    }
+    // 만료된 이용권 진입 링크
+    if (data.past.length > 0) {
+      html += '<button class="sm-my-link sm-my-link-history" type="button" id="sm-my-history-link" style="margin-top:6px;">' +
+        '<span class="sm-my-link-lbl">만료된 이용권 <span class="sm-my-history-count">' + data.past.length + '</span></span>' +
+        '<span class="sm-my-link-arrow">›</span>' +
+        '</button>';
+    }
+    card.innerHTML = html;
+
+    var link = document.getElementById('sm-my-history-link');
+    if (link) link.addEventListener('click', openTicketHistory);
+  }
+
+  function toggleDemoEmptyTickets() {
+    var current = false;
+    try { current = localStorage.getItem('sm_demo_empty_tickets') === '1'; } catch (e) {}
+    try {
+      if (current) localStorage.removeItem('sm_demo_empty_tickets');
+      else localStorage.setItem('sm_demo_empty_tickets', '1');
+    } catch (e) {}
+    renderTickets();
+  }
+
+  function openHistoryOverlay(title, bodyHtml) {
+    var overlay = document.getElementById('sm-history-overlay');
+    var body = document.getElementById('sm-history-body');
+    var titleEl = document.getElementById('sm-history-title');
+    if (!overlay || !body || !titleEl) return;
+    titleEl.innerHTML = title; // HTML 허용 (카운트 배지 등)
+    body.innerHTML = bodyHtml;
+    overlay.hidden = false;
+    body.scrollTop = 0;
+  }
+  function closeHistoryOverlay() {
+    var overlay = document.getElementById('sm-history-overlay');
+    if (overlay) overlay.hidden = true;
+  }
+  function ticketHistoryRowHTML(t) {
+    var sourceCls, sourceLabel, sourceIcon;
+    if (t.kind === 'paid') {
+      sourceCls = 'paid'; sourceLabel = '결제'; sourceIcon = SVG_ICON.card;
+    } else if (t.source === 'coupon') {
+      sourceCls = 'coupon'; sourceLabel = '쿠폰 교환'; sourceIcon = SVG_ICON.ticket;
+    } else if (t.source === 'signup') {
+      sourceCls = 'signup'; sourceLabel = '가입 선물'; sourceIcon = SVG_ICON.gift;
+    } else {
+      sourceCls = 'paid'; sourceLabel = ''; sourceIcon = '';
+    }
+    var period = (t.from === t.to)
+      ? fmtDate(t.from) + ' (하루 이용)'
+      : fmtDate(t.from) + ' ~ ' + fmtDate(t.to);
+    return '<div class="sm-ticket-history-row ' + sourceCls + '">' +
+      '<div class="name">' + ticketLabel(t) + '</div>' +
+      '<div class="source">' + sourceIcon + '<span>' + sourceLabel + '</span></div>' +
+      '<div class="period">' + period + '</div>' +
+      '</div>';
+  }
+
+  function openTicketHistory() {
+    var data = getDemoTickets();
+    var html = '';
+    if (!data.past.length) {
+      html = '<div class="sm-my-empty">' + SM_MINI_TURTLE_SVG +
+        '<div class="title" style="margin-top:8px;font-weight:800;color:#4A4035;">만료된 이용권이 없어요</div></div>';
+    } else {
+      // P2 — 상단 요약 (출처별 카운트)
+      var paidCount = 0, couponCount = 0, signupCount = 0;
+      data.past.forEach(function (t) {
+        if (t.kind === 'paid') paidCount++;
+        else if (t.source === 'coupon') couponCount++;
+        else if (t.source === 'signup') signupCount++;
+      });
+      var chips = [];
+      if (paidCount)   chips.push('<div class="summary-chip ticket-paid"><span class="ic">' + SVG_ICON.card + '</span><span class="num">' + paidCount + '</span><span class="lbl">결제</span></div>');
+      if (couponCount) chips.push('<div class="summary-chip ticket-coupon"><span class="ic">' + SVG_ICON.ticket + '</span><span class="num">' + couponCount + '</span><span class="lbl">쿠폰</span></div>');
+      if (signupCount) chips.push('<div class="summary-chip ticket-signup"><span class="ic">' + SVG_ICON.gift + '</span><span class="num">' + signupCount + '</span><span class="lbl">가입</span></div>');
+      if (chips.length > 0) {
+        var gridCls = chips.length === 3 ? 'three' : '';
+        html += '<div class="sm-history-summary ' + gridCls + '">' + chips.join('') + '</div>';
+      }
+      // P1 — 출처별 색조 row
+      data.past.forEach(function (t) { html += ticketHistoryRowHTML(t); });
+    }
+    // P3 — 헤더 카운트
+    var title = '만료된 이용권' +
+      (data.past.length ? '<span class="sm-history-title-count">' + data.past.length + '</span>' : '');
+    openHistoryOverlay(title, html);
+  }
+  function timelineItemHTML(h) {
+    var qty, qtyCls, lbl, eventCls;
+    if (h.event === 'grant') {
+      qty = '+1'; qtyCls = 'plus'; eventCls = 'grant';
+      lbl = h.source === 'admin' ? '관리자 지급' : '공유 보상';
+    } else {
+      qty = '−1'; qtyCls = 'minus'; eventCls = 'use';
+      lbl = appNameById(h.target) + ' 1일 이용권 교환';
+    }
+    return '<div class="sm-timeline-item ' + eventCls + '">' +
+      '<div class="dot"></div>' +
+      '<div class="row-card">' +
+        '<div class="head">' +
+          '<span class="qty ' + qtyCls + '">' + qty + '</span>' +
+          '<span class="lbl">' + lbl + '</span>' +
+        '</div>' +
+        '<div class="date">' + fmtKDate(h.at) + '</div>' +
+      '</div>' +
+      '</div>';
+  }
+
+  function openCouponHistory() {
+    var data = DEMO_COUPONS;
+    var grants = data.history.filter(function (h) { return h.event === 'grant'; });
+    var uses   = data.history.filter(function (h) { return h.event === 'use'; });
+
+    var html = '';
+    if (!data.history.length) {
+      html = '<div class="sm-my-empty">' + SM_MINI_TURTLE_SVG +
+        '<div class="title" style="margin-top:8px;font-weight:800;color:#4A4035;">쿠폰 사용 기록이 없어요</div></div>';
+    } else {
+      // P1 — 상단 요약
+      html += '<div class="sm-history-summary">' +
+        '<div class="summary-chip plus"><span class="ic">' + SVG_ICON.gift + '</span><span class="num">+' + grants.length + '</span><span class="lbl">받은 쿠폰</span></div>' +
+        '<div class="summary-chip minus"><span class="ic">' + SVG_ICON.ticket + '</span><span class="num">−' + uses.length + '</span><span class="lbl">사용한 쿠폰</span></div>' +
+        '</div>';
+      // P2 — 타임라인
+      html += '<div class="sm-timeline">';
+      data.history.forEach(function (h) { html += timelineItemHTML(h); });
+      html += '</div>';
+    }
+    // P3 — 헤더 카운트
+    var title = '쿠폰 사용 기록' +
+      (data.history.length ? '<span class="sm-history-title-count">' + data.history.length + '</span>' : '');
+    openHistoryOverlay(title, html);
   }
 
   function doLogout() {
@@ -1655,6 +1998,9 @@
     if (shareBtn) shareBtn.addEventListener('click', shellShare);
     var logoutBtn = $('#sm-my-logout');
     if (logoutBtn) logoutBtn.addEventListener('click', doLogout);
+    // 시연용: 이용권 있음/없음 토글
+    var ticketsToggle = $('#sm-my-tickets-toggle');
+    if (ticketsToggle) ticketsToggle.addEventListener('click', toggleDemoEmptyTickets);
     // 회원 탈퇴
     var withdrawLink = $('#sm-my-withdraw');
     if (withdrawLink) withdrawLink.addEventListener('click', showWithdrawModal);

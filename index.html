@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#ffffff">
   <title>느린아이 시리즈</title>
-  <link rel="stylesheet" href="./shell/shell.css?v=46">
+  <link rel="stylesheet" href="./shell/shell.css?v=60">
 </head>
 <body class="splash-active tab-series">
 
@@ -62,27 +62,28 @@
       <div class="sm-panel" data-tab="my">
         <div class="my-header"><h2>마이</h2></div>
         <div class="sm-my-wrap">
+          <!-- 쿠폰 정보 (상단) -->
+          <div class="sm-my-sec">
+            <div class="sm-my-tit">쿠폰</div>
+            <div class="sm-my-card" id="sm-my-coupon-card">
+              <!-- JS가 채움 (renderCoupons) -->
+            </div>
+          </div>
+          <!-- 이용권 정보 -->
+          <div class="sm-my-sec">
+            <div class="sm-my-tit">
+              <span>이용권</span>
+              <button class="sm-my-demo-toggle" type="button" id="sm-my-tickets-toggle" title="시연용: 이용권 있음/없음 전환">교체</button>
+            </div>
+            <div class="sm-my-card" id="sm-my-ticket-card">
+              <!-- JS가 채움 (renderTickets) -->
+            </div>
+          </div>
           <div class="sm-my-sec">
             <div class="sm-my-tit">계정 정보</div>
             <div class="sm-my-card">
               <div class="sm-my-row"><span class="sm-my-lbl">이메일</span><span class="sm-my-val" id="sm-my-em">-</span></div>
               <div class="sm-my-row"><span class="sm-my-lbl">로그인 방식</span><span class="sm-my-val" id="sm-my-pv">-</span></div>
-            </div>
-          </div>
-          <div class="sm-my-sec">
-            <div class="sm-my-tit">이용권 정보</div>
-            <div class="sm-my-card">
-              <div class="sm-my-row"><span class="sm-my-lbl">이용권 종류</span><span class="sm-my-val"><span class="sm-my-tag">유료 이용권</span></span></div>
-              <div class="sm-my-row"><span class="sm-my-lbl">이용 가능 기간</span><span class="sm-my-val">~2026년 5월 15일</span></div>
-              <div class="sm-my-row"><span class="sm-my-lbl">남은 기간</span><span class="sm-my-val">29일</span></div>
-            </div>
-          </div>
-          <div class="sm-my-sec">
-            <div class="sm-my-tit">결제 정보</div>
-            <div class="sm-my-card">
-              <div class="sm-my-row"><span class="sm-my-lbl">최근 결제일</span><span class="sm-my-val">2026년 4월 15일</span></div>
-              <div class="sm-my-row"><span class="sm-my-lbl">결제 금액</span><span class="sm-my-val">4,900원 / 월</span></div>
-              <div class="sm-my-row"><span class="sm-my-lbl">다음 결제일</span><span class="sm-my-val">2026년 5월 15일</span></div>
             </div>
           </div>
           <div class="sm-my-sec">
@@ -105,7 +106,7 @@
             </div>
           </div>
           <button class="sm-lg-btn" id="sm-my-logout" type="button">로그아웃</button>
-          <button class="sm-withdraw-link" id="sm-my-withdraw" type="button">회원 탈퇴</button>
+          <button class="sm-withdraw-link" id="sm-my-withdraw" type="button">계정 삭제</button>
         </div>
       </div>
 
@@ -176,9 +177,13 @@
   <!-- 회원 탈퇴 확인 모달 -->
   <div id="sm-modal-withdraw" class="sm-modal-mask">
     <div class="sm-modal">
-      <h3>정말 탈퇴하시겠어요?</h3>
-      <p>회원 탈퇴 시 남은 이용권과 학습 기록이<br>모두 삭제되며, 복구할 수 없습니다.</p>
+      <h3>정말 계정을 삭제하시겠어요?</h3>
+      <p>계정 삭제 시 남은 이용권과 학습 기록이<br>모두 삭제되며, 복구할 수 없습니다.</p>
       <div class="sm-withdraw-info">
+        <div class="sm-withdraw-row">
+          <span class="lbl">남은 쿠폰</span>
+          <span class="val" id="sm-withdraw-coupon">2장</span>
+        </div>
         <div class="sm-withdraw-row">
           <span class="lbl">남은 이용권</span>
           <span class="val" id="sm-withdraw-ticket">30일 이용권 · 29일 남음</span>
@@ -190,13 +195,26 @@
       </div>
       <div class="btns">
         <button id="sm-withdraw-cancel" type="button" class="secondary">취소</button>
-        <button id="sm-withdraw-ok" type="button" class="danger">탈퇴하기</button>
+        <button id="sm-withdraw-ok" type="button" class="danger">삭제하기</button>
       </div>
     </div>
   </div>
 
   <!-- 공유 토스트 (시리즈 탭의 공유 버튼이 성공 시 표시) -->
   <div id="sm-share-toast" class="share-toast"></div>
+
+  <!-- 이용권/쿠폰 이용 내역 풀스크린 오버레이 -->
+  <div id="sm-history-overlay" class="sm-legal-overlay" hidden>
+    <div class="sm-legal-header">
+      <div id="sm-history-title" class="sm-legal-title">지난 이용권</div>
+      <button id="sm-history-back" type="button" class="sm-legal-back" aria-label="닫기">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6L6 18 M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div id="sm-history-body" class="sm-legal-body sm-history-body"></div>
+  </div>
 
   <!-- 약관/처리방침 풀스크린 오버레이 -->
   <div id="sm-legal-overlay" class="sm-legal-overlay" hidden>
@@ -211,7 +229,7 @@
     <div id="sm-legal-body" class="sm-legal-body"></div>
   </div>
 
-  <script src="./shell/apps.js?v=46"></script>
-  <script src="./shell/shell.js?v=46"></script>
+  <script src="./shell/apps.js?v=60"></script>
+  <script src="./shell/shell.js?v=60"></script>
 </body>
 </html>
