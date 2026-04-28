@@ -1063,6 +1063,7 @@ setTimeout(function() {
     function newQuestion() {
         document.getElementById('next-q-btn').style.display='none';
         if (impulseTimer) { clearInterval(impulseTimer); impulseTimer = null; }
+        clearAnswerDotsTimers();  // 이전 문제의 동그라미 채우기 애니메이션 cancel
         const oldReveal = document.getElementById('revealBtn');
         if (oldReveal) oldReveal.remove();
         busy = false; tries = 0;
@@ -1086,8 +1087,26 @@ setTimeout(function() {
         makeDots('dots1', n1, '#6BADE8');
         makeDots('dots2', n2, '#F0A050');
 
+        // 보기 생성 — 정답 ±1~3 범위에서 우선 채우고, 부족하면 ±4~5로 확장
         const opts = new Set([ans]);
-        while (opts.size < 4) opts.add(Math.floor(Math.random() * (maxNum * 2)) + 1);
+        const upperBound = maxNum * 2;
+        const lowerBound = 1;
+        const nearby = [];
+        for (var off = 1; off <= 3; off++) {
+            if (ans + off <= upperBound) nearby.push(ans + off);
+            if (ans - off >= lowerBound) nearby.push(ans - off);
+        }
+        nearby.sort(function () { return Math.random() - 0.5; });
+        for (var i = 0; i < nearby.length && opts.size < 4; i++) opts.add(nearby[i]);
+        for (var off2 = 4; off2 <= 5 && opts.size < 4; off2++) {
+            if (ans + off2 <= upperBound) opts.add(ans + off2);
+            if (opts.size >= 4) break;
+            if (ans - off2 >= lowerBound) opts.add(ans - off2);
+        }
+        while (opts.size < 4) {
+            var rand = ans + Math.floor(Math.random() * 11) - 5;
+            if (rand >= lowerBound && rand <= upperBound && rand !== ans) opts.add(rand);
+        }
 
         const el = document.getElementById('options');
         el.innerHTML = '';
@@ -1137,17 +1156,25 @@ setTimeout(function() {
         }
     }
 
+    // 동그라미 채우기 애니메이션 timer 추적 — 새 문제 진입 시 모두 cancel
+    let answerDotsTimers = [];
+    function clearAnswerDotsTimers() {
+        answerDotsTimers.forEach(id => clearTimeout(id));
+        answerDotsTimers = [];
+    }
     function showAnswerDots(count) {
+        clearAnswerDotsTimers();
         const container = document.getElementById('answer-dots');
         container.innerHTML = '';
         const delay = 500;
         for (let i = 0; i < count; i++) {
-            setTimeout(() => {
+            const t = setTimeout(() => {
                 const d = document.createElement('span');
                 d.className = 'answer-dot';
                 d.style.background = '#5BC886';
                 container.appendChild(d);
             }, i * delay);
+            answerDotsTimers.push(t);
         }
     }
 
@@ -1176,7 +1203,7 @@ setTimeout(function() {
             fb.textContent = '정답이에요! 🎉';
             fb.style.color = '#5BC886';
             fb.className = 'text-center h-8 text-base font-bold';
-            speak('정답이에요 ' + ans);
+            speak('정답이에요. ' + ans);
             showAnswerDots(ans);
             const totalQ = questionList.length;
             nextQBtn_action = () => { if (qNum < questionList.length) { qNum++; newQuestion(); } else showResult(); };
@@ -1193,6 +1220,7 @@ setTimeout(function() {
     // ── 쌓기 모드 ──
     function newDragQuestion() {
         document.getElementById('dnext-q-btn').style.display='none';
+        clearAnswerDotsTimers();
         busy = false; tries = 0;
         blueCount = 0; orangeCount = 0;
         [n1, n2] = questionList[qNum - 1];
@@ -1224,8 +1252,26 @@ setTimeout(function() {
     }
 
     function buildAnswerOptions() {
+        // 보기 생성 — 정답 ±1~3 범위에서 우선 채우고, 부족하면 ±4~5로 확장
         const opts = new Set([ans]);
-        while (opts.size < 4) opts.add(Math.floor(Math.random() * (maxNum * 2)) + 1);
+        const upperBound = maxNum * 2;
+        const lowerBound = 1;
+        const nearby = [];
+        for (var off = 1; off <= 3; off++) {
+            if (ans + off <= upperBound) nearby.push(ans + off);
+            if (ans - off >= lowerBound) nearby.push(ans - off);
+        }
+        nearby.sort(function () { return Math.random() - 0.5; });
+        for (var i = 0; i < nearby.length && opts.size < 4; i++) opts.add(nearby[i]);
+        for (var off2 = 4; off2 <= 5 && opts.size < 4; off2++) {
+            if (ans + off2 <= upperBound) opts.add(ans + off2);
+            if (opts.size >= 4) break;
+            if (ans - off2 >= lowerBound) opts.add(ans - off2);
+        }
+        while (opts.size < 4) {
+            var rand = ans + Math.floor(Math.random() * 11) - 5;
+            if (rand >= lowerBound && rand <= upperBound && rand !== ans) opts.add(rand);
+        }
 
         const el = document.getElementById('answer-opts');
         el.innerHTML = '';
@@ -1458,6 +1504,7 @@ setTimeout(function() {
     // ── 채우기 모드 ──
     function newFillQuestion() {
         document.getElementById('fnext-q-btn').style.display='none';
+        clearAnswerDotsTimers();
         busy = false; tries = 0;
         fillPhase = 'fill';
         activeColor = null;
@@ -1607,7 +1654,7 @@ setTimeout(function() {
             fb.textContent = '정답이에요! 🎉';
             fb.style.color = '#5BC886';
             fb.className = 'text-center h-8 text-base font-bold';
-            speak('정답이에요 ' + ans);
+            speak('정답이에요. ' + ans);
             nextQBtn_action = () => { if (qNum < 10) { qNum++; newFillQuestion(); } else showResult(); };
             document.getElementById('fnext-q-btn').style.display = '';
         } else {

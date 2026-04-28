@@ -1114,7 +1114,7 @@ function checkFillAnswer() {
         fb.textContent = '정답! ' + target + '개를 정확히 채웠어요';
         fb.className = 'feedback correct';
         document.getElementById('fill-score-label').textContent = score + '점';
-        speak('정답이에요 ' + target + '개');
+        speak('정답이에요. ' + target + '개');
     } else {
         fb.textContent = placedCount + '개를 놓았어요. 정답은 ' + target + '개예요';
         fb.className = 'feedback wrong';
@@ -1246,7 +1246,7 @@ function pickCountAnswer(btn, picked, target) {
         }
         fb.textContent = '정답! ' + target + '개';
         fb.className = 'feedback correct';
-        speak('정답이에요 ' + target + '개');
+        speak('정답이에요. ' + target + '개');
 
         currentQ++;
         setTimeout(loadCountQuestion, 1500);

@@ -1958,7 +1958,7 @@ if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
       feedbackEl.className = 'feedback success';
       vis.forEach(function(e) { e.classList.add('correct'); });
       if (btnEl) btnEl.classList.add('correct-choice');
-      speak('정답이에요 ' + answer);
+      speak('정답이에요. ' + answer);
 
       document.getElementById('correctCount').textContent = correctCount;
       document.getElementById('wrongCount').textContent = wrongCount;

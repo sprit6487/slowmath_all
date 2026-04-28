@@ -1144,7 +1144,7 @@ function selectCard(idx) {
     score++;
     fb.textContent = '정답!';
     fb.className = 'feedback correct';
-    if (ttsOn) speak('정답이에요 ' + formatTimeKorean(curQ.h, curQ.m));
+    if (ttsOn) speak('정답이에요. ' + formatTimeKorean(curQ.h, curQ.m));
     document.getElementById('play-score').textContent = `${score}점`;
     document.getElementById('next-q-btn').classList.remove('hidden');
   } else {
