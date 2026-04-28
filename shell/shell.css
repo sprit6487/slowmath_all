@@ -789,6 +789,49 @@ body.game-active .home-iframe-wrap { bottom: 0 !important; }
 }
 .sm-lg-btn:active { background: #F5F1EB; }
 
+/* 회원 탈퇴 — 로그아웃 버튼 아래 작은 텍스트 링크 (버튼 형태 X) */
+.sm-withdraw-link {
+  display: block;
+  width: 100%;
+  margin-top: 32px;
+  padding: 8px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.68rem;
+  color: var(--sm-mute2);
+  cursor: pointer;
+  text-align: center;
+}
+.sm-withdraw-link:active { color: var(--sm-muted); }
+
+/* 회원 탈퇴 모달 — 이용권/기록 정보 박스 */
+.sm-withdraw-info {
+  background: var(--sm-card);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 4px 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sm-withdraw-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+.sm-withdraw-row .lbl { color: var(--sm-muted); }
+.sm-withdraw-row .val { color: var(--sm-dark); font-weight: 700; }
+
+/* 탈퇴하기 위험 버튼 (모달 안) */
+.sm-modal .btns .danger {
+  background: #F07070;
+  color: #fff;
+  border: none;
+}
+.sm-modal .btns .danger:active { background: #D55858; }
+
 /* ---------- 하단 탭바 (서브앱과 동일 스타일) ---------- */
 .sm-tabbar {
   position: absolute;
@@ -919,6 +962,25 @@ body.game-active .home-iframe-wrap { bottom: 0 !important; }
   flex-direction: column;
   gap: 12px;
 }
+.sm-login-agree {
+  margin-top: 18px;
+  max-width: 320px;
+  font-size: 0.62rem;
+  color: var(--sm-mute2);
+  text-align: center;
+  line-height: 1.7;
+  padding: 0 12px;
+}
+.sm-login-doc-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.sm-login-doc-link:active { opacity: 0.7; }
 .sm-login-btn {
   display: flex;
   align-items: center;
@@ -961,7 +1023,11 @@ body.game-active .home-iframe-wrap { bottom: 0 !important; }
 .sm-modal h3 {
   font-size: 1.15rem;
   margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+.sm-modal h3 svg { flex-shrink: 0; }
 .sm-modal p {
   color: var(--sm-muted);
   font-size: 0.9rem;
@@ -982,3 +1048,206 @@ body.game-active .home-iframe-wrap { bottom: 0 !important; }
 }
 .sm-modal button.primary { background: var(--sm-blue); color: #fff; }
 .sm-modal button.secondary { background: #eee; color: var(--sm-dark); }
+.sm-modal button.primary:disabled,
+.sm-modal button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---------- 마이 탭 — 정보 섹션 링크 행 ---------- */
+.sm-my-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 0;
+  border-bottom: 1px solid #E0DAD2;
+  font-size: 0.85rem;
+  background: transparent;
+  border-left: 0; border-right: 0; border-top: 0;
+  font-family: inherit;
+  color: var(--sm-dark);
+  cursor: pointer;
+  text-align: left;
+  gap: 8px;
+}
+.sm-my-card .sm-my-link + .sm-my-link,
+.sm-my-card .sm-my-link + .sm-my-row,
+.sm-my-card .sm-my-row + .sm-my-link {
+  /* keep border-bottom logic consistent */
+}
+.sm-my-link:active { background: #ECE5DA; }
+.sm-my-link-lbl {
+  color: #4A4035;
+  font-weight: 600;
+}
+.sm-my-link-arrow {
+  color: var(--sm-mute2);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* ---------- 약관 동의 박스 (로그인 모달) ---------- */
+.sm-agree-box {
+  border: 1.5px solid var(--sm-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 4px 0 16px;
+  background: #FBF9F5;
+}
+.sm-agree-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 2px;
+  font-size: 0.9rem;
+  color: var(--sm-dark);
+  cursor: pointer;
+  line-height: 1.4;
+}
+.sm-agree-row > span {
+  flex: 1;
+  min-width: 0;
+}
+.sm-agree-row input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--sm-blue);
+  cursor: pointer;
+}
+.sm-agree-required {
+  color: #E05050;
+  font-style: normal;
+  font-weight: 600;
+  margin-left: 2px;
+}
+.sm-agree-view {
+  flex-shrink: 0;
+  background: #fff;
+  border: 1.5px solid var(--sm-blue);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--sm-blue);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.sm-agree-view:active {
+  background: #EEF6FD;
+}
+.sm-agree-divider {
+  border: 0;
+  border-top: 1px solid var(--sm-border);
+  margin: 4px 0;
+}
+.sm-agree-row.sm-agree-single {
+  margin: 4px 0 16px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--sm-border);
+  border-radius: 12px;
+  background: #FBF9F5;
+}
+
+/* ---------- 약관 풀스크린 오버레이 ---------- */
+.sm-legal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+.sm-legal-overlay[hidden] { display: none; }
+.sm-legal-header {
+  flex-shrink: 0;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--sm-border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: #fff;
+  position: relative;
+  padding-top: env(safe-area-inset-top, 0px);
+  height: calc(56px + env(safe-area-inset-top, 0px));
+}
+.sm-legal-back {
+  background: transparent;
+  border: 0;
+  color: var(--sm-dark);
+  font-family: inherit;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 0;
+}
+.sm-legal-back svg { display: block; }
+.sm-legal-back:active { background: #F0ECE6; }
+.sm-legal-title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, calc(-50% + env(safe-area-inset-top, 0px) / 2));
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--sm-dark);
+}
+.sm-legal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 20px calc(40px + env(safe-area-inset-bottom, 0px));
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--sm-dark);
+  -webkit-overflow-scrolling: touch;
+}
+.sm-legal-body h1 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin: 0 0 8px;
+  color: var(--sm-dark);
+}
+.sm-legal-body h2 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin: 22px 0 8px;
+  color: var(--sm-dark);
+}
+.sm-legal-body h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 16px 0 6px;
+  color: var(--sm-dark);
+}
+.sm-legal-body p {
+  margin: 0 0 10px;
+}
+.sm-legal-body ul,
+.sm-legal-body ol {
+  margin: 0 0 12px 20px;
+  padding-left: 4px;
+}
+.sm-legal-body li {
+  margin-bottom: 4px;
+}
+.sm-legal-body strong,
+.sm-legal-body b {
+  color: #2E261D;
+  font-weight: 700;
+}
+.sm-legal-body hr {
+  border: 0;
+  border-top: 1px solid var(--sm-border);
+  margin: 18px 0;
+}
+.sm-legal-body .sm-legal-meta {
+  color: var(--sm-muted);
+  font-size: 0.82rem;
+  margin-bottom: 14px;
+}

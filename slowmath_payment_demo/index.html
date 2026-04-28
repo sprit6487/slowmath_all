@@ -633,6 +633,49 @@
   }
   .info-box b { color: var(--warm-800); }
 
+  /* ── Payment agree (약관 동의 — 결제 시트 안) ── */
+  .pd-agree-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    margin: 4px 0 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: var(--warm-50);
+    font-size: 0.85rem;
+    color: var(--warm-700);
+    cursor: pointer;
+    line-height: 1.4;
+  }
+  .pd-agree-row input[type="checkbox"] {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--app-blue);
+    cursor: pointer;
+  }
+  .pd-agree-row span { flex: 1; }
+  .pd-agree-row em {
+    color: #E05050;
+    font-style: normal;
+    font-weight: 600;
+    margin-left: 2px;
+  }
+  .pd-agree-view {
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--app-blue);
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .pd-agree-view:active { background: var(--app-blue-soft); }
+
 </style>
 </head>
 <body>
@@ -1083,12 +1126,19 @@ function promptPayment() {
           <div class="price">₩2,200</div>
         </div>
       </div>
+      <label class="pd-agree-row">
+        <input type="checkbox" id="pdPayAgree">
+        <span>이용약관 및 환불 정책에 동의합니다 <em>(필수)</em></span>
+        <button type="button" class="pd-agree-view" id="pdAgreeViewBtn">보기</button>
+      </label>
     `,
     buttons: [
       {
         label: '결제하기',
         kind: 'primary',
+        gateByAgree: true,
         onClick: async () => {
+          if (!isPayAgreed()) { showToast('약관 동의가 필요해요'); return; }
           closeSheet();
           await processPayment(selectedPlan, 'success');
         }
@@ -1096,7 +1146,9 @@ function promptPayment() {
       {
         label: '결제 실패 (시연)',
         kind: 'secondary',
+        gateByAgree: true,
         onClick: async () => {
+          if (!isPayAgreed()) { showToast('약관 동의가 필요해요'); return; }
           closeSheet();
           await processPayment(selectedPlan, 'fail');
         }
@@ -1114,6 +1166,53 @@ function promptPayment() {
       }
     ]
   });
+
+  // 약관 "보기" 버튼 — 통합 쉘 안 iframe이면 부모의 약관 오버레이 호출, 단독이면 안내
+  const agreeViewBtn = document.getElementById('pdAgreeViewBtn');
+  if (agreeViewBtn) {
+    agreeViewBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      try {
+        if (window.parent && window.parent !== window && typeof window.parent.openLegalDoc === 'function') {
+          window.parent.openLegalDoc('terms');
+          return;
+        }
+      } catch (err) {}
+      // 단독 페이지 — 간단 안내
+      alert('이용약관 전문은 통합 쉘의 마이 탭 > 정보 > 이용약관에서 확인할 수 있어요.');
+    });
+  }
+
+  // 시트 렌더 후 — 동의 체크박스 ↔ 결제 버튼 비활성/활성 동기화
+  const agreeCb = document.getElementById('pdPayAgree');
+  if (agreeCb) {
+    const sync = () => {
+      const ok = agreeCb.checked;
+      const sheetButtons = document.getElementById('sheetButtons');
+      if (!sheetButtons) return;
+      const btns = sheetButtons.querySelectorAll('button');
+      // 버튼 정의 순서: [0] 결제하기 (primary), [1] 결제 실패 시연 (secondary, gated),
+      // [2] 다음에 할게요 (secondary, NOT gated)
+      if (btns[0]) {
+        btns[0].disabled = !ok;
+        btns[0].style.opacity = ok ? '' : '0.4';
+        btns[0].style.cursor = ok ? '' : 'not-allowed';
+      }
+      if (btns[1]) {
+        btns[1].disabled = !ok;
+        btns[1].style.opacity = ok ? '' : '0.4';
+        btns[1].style.cursor = ok ? '' : 'not-allowed';
+      }
+    };
+    agreeCb.addEventListener('change', sync);
+    sync();
+  }
+}
+
+function isPayAgreed() {
+  const cb = document.getElementById('pdPayAgree');
+  return !!(cb && cb.checked);
 }
 
 async function processPayment(planKey, result) {

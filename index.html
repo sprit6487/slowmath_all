@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#ffffff">
   <title>느린아이 시리즈</title>
-  <link rel="stylesheet" href="./shell/shell.css?v=35">
+  <link rel="stylesheet" href="./shell/shell.css?v=45">
 </head>
 <body class="splash-active tab-series">
 
@@ -85,7 +85,27 @@
               <div class="sm-my-row"><span class="sm-my-lbl">다음 결제일</span><span class="sm-my-val">2026년 5월 15일</span></div>
             </div>
           </div>
+          <div class="sm-my-sec">
+            <div class="sm-my-tit">약관 및 정책</div>
+            <div class="sm-my-card">
+              <button class="sm-my-link" type="button" data-doc="terms">
+                <span class="sm-my-link-lbl">📄 이용약관</span>
+                <span class="sm-my-link-arrow">›</span>
+              </button>
+              <button class="sm-my-link" type="button" data-doc="privacy">
+                <span class="sm-my-link-lbl">🔒 개인정보 처리방침</span>
+                <span class="sm-my-link-arrow">›</span>
+              </button>
+            </div>
+          </div>
+          <div class="sm-my-sec">
+            <div class="sm-my-tit">앱 정보</div>
+            <div class="sm-my-card">
+              <div class="sm-my-row"><span class="sm-my-lbl">앱 버전</span><span class="sm-my-val">1.0.0</span></div>
+            </div>
+          </div>
           <button class="sm-lg-btn" id="sm-my-logout" type="button">로그아웃</button>
+          <button class="sm-withdraw-link" id="sm-my-withdraw" type="button">회원 탈퇴</button>
         </div>
       </div>
 
@@ -126,28 +146,51 @@
         Google로 시작하기
       </button>
     </div>
+    <p class="sm-login-agree">
+      회원가입 시 느린아이의
+      <button type="button" class="sm-login-doc-link" data-doc="terms">이용약관</button>과
+      <button type="button" class="sm-login-doc-link" data-doc="privacy">개인정보 처리방침</button>에
+      동의한 것으로 간주합니다.
+    </p>
   </div>
 
-  <!-- 로그인 모달 (placeholder) -->
-  <div id="sm-modal-login" class="sm-modal-mask">
-    <div class="sm-modal">
-      <h3>로그인이 필요해요</h3>
-      <p>서비스를 이용하려면 로그인이 필요합니다. 현재는 개발용 더미 로그인만 제공됩니다.</p>
-      <div class="btns">
-        <button id="sm-login-cancel" type="button" class="secondary">취소</button>
-        <button id="sm-login-ok" type="button" class="primary">로그인 (임시)</button>
-      </div>
-    </div>
-  </div>
+  <!-- 로그인은 풀스크린 로그인 뷰(#sm-login-view)가 모두 처리. 별도 모달 없음. -->
 
   <!-- 결제 모달 (placeholder) -->
   <div id="sm-modal-payment" class="sm-modal-mask">
     <div class="sm-modal">
       <h3>이용권이 필요해요</h3>
       <p>이 연습을 하려면 이용권 구매가 필요합니다. 정식 출시 시 인앱결제로 연결될 예정입니다.</p>
+      <label class="sm-agree-row sm-agree-single">
+        <input type="checkbox" id="sm-pay-agree">
+        <span>이용약관 및 환불 정책에 동의합니다 <em class="sm-agree-required">(필수)</em></span>
+        <button type="button" class="sm-agree-view" data-doc="terms">보기</button>
+      </label>
       <div class="btns">
         <button id="sm-pay-cancel" type="button" class="secondary">나중에</button>
-        <button id="sm-pay-ok" type="button" class="primary">구매 (임시)</button>
+        <button id="sm-pay-ok" type="button" class="primary" disabled>구매 (임시)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 회원 탈퇴 확인 모달 -->
+  <div id="sm-modal-withdraw" class="sm-modal-mask">
+    <div class="sm-modal">
+      <h3>정말 탈퇴하시겠어요?</h3>
+      <p>회원 탈퇴 시 다음이 모두 삭제되며,<br>복구할 수 없습니다.</p>
+      <div class="sm-withdraw-info">
+        <div class="sm-withdraw-row">
+          <span class="lbl">남은 이용권</span>
+          <span class="val" id="sm-withdraw-ticket">30일 이용권 · 29일 남음</span>
+        </div>
+        <div class="sm-withdraw-row">
+          <span class="lbl">학습 기록</span>
+          <span class="val">전체 삭제</span>
+        </div>
+      </div>
+      <div class="btns">
+        <button id="sm-withdraw-cancel" type="button" class="secondary">취소</button>
+        <button id="sm-withdraw-ok" type="button" class="danger">탈퇴하기</button>
       </div>
     </div>
   </div>
@@ -155,7 +198,20 @@
   <!-- 공유 토스트 (시리즈 탭의 공유 버튼이 성공 시 표시) -->
   <div id="sm-share-toast" class="share-toast"></div>
 
-  <script src="./shell/apps.js?v=35"></script>
-  <script src="./shell/shell.js?v=35"></script>
+  <!-- 약관/처리방침 풀스크린 오버레이 -->
+  <div id="sm-legal-overlay" class="sm-legal-overlay" hidden>
+    <div class="sm-legal-header">
+      <button id="sm-legal-back" type="button" class="sm-legal-back" aria-label="닫기">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6L6 18 M6 6l12 12"/>
+        </svg>
+      </button>
+      <div id="sm-legal-title" class="sm-legal-title">이용약관</div>
+    </div>
+    <div id="sm-legal-body" class="sm-legal-body"></div>
+  </div>
+
+  <script src="./shell/apps.js?v=45"></script>
+  <script src="./shell/shell.js?v=45"></script>
 </body>
 </html>

@@ -14,7 +14,9 @@
 
   // ---------------- 설정 ----------------
   var FLAGS = {
-    auth: false,     // true가 되면 로그인 게이트 활성화
+    // 인증은 풀스크린 로그인 뷰가 자동 처리. 이 플래그는 더 이상 사용하지 않으며
+    // 향후 모달 기반 게이트가 부활할 경우를 위해 남겨둠.
+    auth: false,
     ticket: false    // true가 되면 이용권/결제 게이트 활성화
   };
 
@@ -496,17 +498,12 @@
   }
 
   function runPlayGate() {
-    // 1) 인증 게이트
-    if (FLAGS.auth) {
-      var user = lsGet(LS.user, null);
-      if (!user) { showLoginModal(); return; }
-    }
-    // 2) 이용권 게이트
+    // 인증은 풀스크린 로그인 뷰(updateLoginViewVisibility)가 처리하므로
+    // 여기선 이용권 게이트만 평가
     if (FLAGS.ticket) {
       var tickets = lsGet(LS.tickets, null);
       if (!tickets || !tickets.active) { showPaymentModal(); return; }
     }
-    // 3) 통과 → 게임 시작 허용
     sendToIframe({ source: 'sm-shell', type: 'play-allowed', payload: state.pendingPlayRequest });
     state.pendingPlayRequest = null;
   }
@@ -653,49 +650,252 @@
   }
 
   // ---------------- 모달 (placeholder) ----------------
-  function showLoginModal() {
-    var mask = $('#sm-modal-login');
-    if (mask) mask.classList.add('show');
+  // 로그인 모달의 약관 동의는 카카오/구글 OAuth 동의 화면에 위임 — 자체 체크박스 없음
+  function resetPayAgree() {
+    var cb = document.getElementById('sm-pay-agree');
+    if (cb) cb.checked = false;
+    updatePayOkEnabled();
   }
-  function hideLoginModal() {
-    var mask = $('#sm-modal-login');
-    if (mask) mask.classList.remove('show');
+  function updatePayOkEnabled() {
+    var ok = document.getElementById('sm-pay-ok');
+    if (!ok) return;
+    var cb = document.getElementById('sm-pay-agree');
+    ok.disabled = !(cb && cb.checked);
   }
   function showPaymentModal() {
     var mask = $('#sm-modal-payment');
     if (mask) mask.classList.add('show');
+    resetPayAgree();
   }
   function hidePaymentModal() {
     var mask = $('#sm-modal-payment');
     if (mask) mask.classList.remove('show');
   }
 
+  // ---------------- 약관/처리방침 풀스크린 오버레이 ----------------
+  // 약관 본문 HTML — legal/terms-of-service.md를 수동 변환한 결과.
+  // 약관이 수정되면 legal/terms-of-service.md를 갱신한 뒤 아래 문자열도 함께 갱신해야 함.
+  var LEGAL_DOCS = {
+    terms: {
+      title: '이용약관',
+      html: [
+        '<h1>느린아이 서비스 이용약관</h1>',
+        '<div class="sm-legal-meta"><b>시행일</b>: 2026-04-28<br><b>최종 개정일</b>: 2026-04-28</div>',
+        '<hr>',
+        '<h2>제1조 (목적)</h2>',
+        '<p>본 약관은 「느린아이」(이하 "회사")가 운영하는 학습 서비스 「느린아이」(이하 "서비스")를 이용함에 있어 회사와 회원 사이의 권리·의무 및 책임 사항, 기타 필요한 사항을 규정함을 목적으로 합니다.</p>',
+        '<h2>제2조 (용어의 정의)</h2>',
+        '<p>본 약관에서 사용하는 용어의 정의는 다음과 같습니다.</p>',
+        '<ol>',
+        '<li><strong>서비스</strong>: 회사가 「느린아이」라는 명칭으로 모바일 앱(Android·iOS) 및 웹을 통해 제공하는 교육 콘텐츠 일체를 말합니다.</li>',
+        '<li><strong>회원</strong>: 회사와 이용계약을 체결하고 서비스를 이용하는 개인 또는 그 보호자를 말합니다.</li>',
+        '<li><strong>이용자</strong>: 회원으로 가입한 사람과 그가 사용하도록 허락한 자녀(미성년자)를 포함합니다.</li>',
+        '<li><strong>이용권</strong>: 일정 기간 서비스 또는 특정 학습 콘텐츠를 이용할 수 있는 유료 권한을 말합니다.</li>',
+        '<li><strong>무료 이용권</strong>: 가입 직후 일정 기간(회원가입 후 24시간) 또는 이벤트·공유를 통해 회원에게 제공되는 한시적 무상 이용 권한을 말합니다.</li>',
+        '<li><strong>인앱결제(IAP)</strong>: Google Play 결제 시스템 또는 Apple App Store 결제 시스템을 통해 이루어지는 콘텐츠 구매를 말합니다.</li>',
+        '</ol>',
+        '<h2>제3조 (약관의 게시와 개정)</h2>',
+        '<ol>',
+        '<li>회사는 본 약관의 내용을 회원이 쉽게 알 수 있도록 서비스 초기 화면 및 설정 메뉴에 게시합니다.</li>',
+        '<li>회사는 「약관의 규제에 관한 법률」, 「전자상거래 등에서의 소비자보호에 관한 법률」, 「콘텐츠산업 진흥법」 등 관련 법령을 위배하지 않는 범위에서 본 약관을 개정할 수 있습니다.</li>',
+        '<li>약관을 개정할 경우 회사는 적용일자 및 개정 사유를 명시하여 적용일자 7일 전부터 서비스 내 공지합니다. 다만 회원에게 불리하게 개정하는 경우에는 적용일자 30일 전부터 공지하고, 회원이 사용하는 이메일·앱 푸시 등으로 별도 통지합니다.</li>',
+        '<li>회원이 개정 약관에 동의하지 않을 경우 이용계약을 해지할 수 있으며, 적용일자 이후에도 서비스를 계속 이용한 경우에는 개정 약관에 동의한 것으로 봅니다.</li>',
+        '</ol>',
+        '<h2>제4조 (이용계약의 체결)</h2>',
+        '<ol>',
+        '<li>이용계약은 이용자가 본 약관 및 개인정보 처리방침에 동의하고 회사가 정한 절차에 따라 회원가입을 완료한 시점에 체결됩니다.</li>',
+        '<li>회사는 다음 각 호에 해당하는 신청에 대해서는 승낙을 거부하거나 사후에 이용계약을 해지할 수 있습니다.<ul>',
+        '<li>타인의 명의를 도용한 경우</li>',
+        '<li>허위 정보를 기재한 경우</li>',
+        '<li>사회 질서 또는 미풍양속을 저해할 목적으로 신청한 경우</li>',
+        '<li>기타 회사가 정한 이용신청 요건을 충족하지 못한 경우</li>',
+        '</ul></li>',
+        '<li><strong>미성년자의 이용</strong>: 만 14세 미만의 아동은 법정대리인(부모 등 보호자)의 동의를 받아 회원가입할 수 있으며, 결제 행위는 반드시 법정대리인의 명의 또는 동의 하에 이루어져야 합니다.</li>',
+        '</ol>',
+        '<h2>제5조 (회원의 의무)</h2>',
+        '<ol>',
+        '<li>회원은 본 약관, 회사의 공지사항, 관계 법령을 준수해야 합니다.</li>',
+        '<li>회원은 자신의 계정 정보(이메일, 비밀번호, OAuth 연동 계정 등)를 제3자에게 공개·양도하거나 대여해서는 안 됩니다.</li>',
+        '<li>회원은 다음 행위를 해서는 안 됩니다.<ul>',
+        '<li>서비스를 영리 목적으로 이용하거나 콘텐츠를 무단 복제·배포하는 행위</li>',
+        '<li>서비스 운영을 방해하는 행위(자동화 도구·봇·역공학 시도 등)</li>',
+        '<li>다른 회원의 개인정보를 수집·저장·공개하는 행위</li>',
+        '<li>회사 또는 제3자의 지적재산권을 침해하는 행위</li>',
+        '</ul></li>',
+        '</ol>',
+        '<h2>제6조 (서비스의 제공)</h2>',
+        '<ol>',
+        '<li>회사는 다음과 같은 서비스를 제공합니다.<ul>',
+        '<li>단계별 학습 콘텐츠 (수 개념·연산 등)</li>',
+        '<li>학습 진도·결과 기록 및 통계</li>',
+        '<li>그 밖에 회사가 정하는 부가 서비스</li>',
+        '</ul></li>',
+        '<li>서비스는 연중무휴, 1일 24시간 제공함을 원칙으로 합니다. 다만 정기 점검·시스템 장애·천재지변 등의 사유로 일시 중단될 수 있으며, 이 경우 회사는 사전에 공지합니다.</li>',
+        '<li>회사는 서비스의 일부 또는 전부를 변경·중단할 수 있으며, 변경·중단 시에는 사전에 공지합니다.</li>',
+        '</ol>',
+        '<h2>제7조 (이용권 및 결제)</h2>',
+        '<h3>7.1 이용권의 종류</h3>',
+        '<ol>',
+        '<li><strong>무료 이용권</strong><ul>',
+        '<li>회원가입 후 24시간 동안 서비스 전체를 무상으로 이용할 수 있습니다.</li>',
+        '<li>회사가 별도로 발급하는 이벤트·공유 보상 쿠폰을 통해 한시적 무상 이용이 가능합니다.</li>',
+        '</ul></li>',
+        '<li><strong>유료 이용권 (30일 이용권)</strong><ul>',
+        '<li>가격: 부가세 포함 ₩2,200원 (인앱결제 스토어 환율·정책에 따라 표시 가격은 일부 다를 수 있음)</li>',
+        '<li>기간: 결제 완료 시점부터 30일간 해당 학습 콘텐츠 이용 가능</li>',
+        '<li>결제 수단: Google Play 결제 시스템(Android) 또는 Apple App Store 결제 시스템(iOS)을 통한 1회성 인앱결제</li>',
+        '</ul></li>',
+        '</ol>',
+        '<h3>7.2 결제 절차</h3>',
+        '<ol>',
+        '<li>회원이 서비스 내에서 이용권 구매를 선택하면 Google Play 또는 Apple App Store의 결제 시스템으로 연결됩니다.</li>',
+        '<li>결제는 각 스토어의 정책 및 결제 수단(신용카드, 휴대폰 결제, 기프트 카드 등)에 따라 진행되며, 결제 완료 시점에 이용권이 즉시 활성화됩니다.</li>',
+        '<li>결제 영수증 및 거래 증빙은 각 스토어를 통해 발급되며, 회원은 스토어의 구매 내역에서 확인할 수 있습니다.</li>',
+        '</ol>',
+        '<h2>제8조 (청약 철회 및 환불)</h2>',
+        '<h3>8.1 청약 철회의 원칙</h3>',
+        '<p>「전자상거래 등에서의 소비자보호에 관한 법률」 및 「콘텐츠산업 진흥법」에 따라 회원은 다음과 같이 청약 철회 및 환불을 요청할 수 있습니다.</p>',
+        '<ol>',
+        '<li><strong>결제 후 7일 이내, 콘텐츠 미사용 시</strong>: 전액 환불</li>',
+        '<li><strong>결제 후 7일 이내, 콘텐츠 일부 사용 시</strong>: 같은 법 제17조 제2항 제5호에 따라 가분(可分)되지 않는 디지털 콘텐츠로서 사용·이용으로 가치가 현저히 감소한 경우 환불이 제한될 수 있습니다. 다만 회사는 사용자 보호를 위해 다음 기준을 적용합니다.<ul>',
+        '<li>결제 후 7일 이내 + 누적 이용 기록이 1일 미만인 경우 → 전액 환불</li>',
+        '<li>결제 후 7일 이내 + 누적 이용 기록이 1일 이상인 경우 → 환불 제한</li>',
+        '</ul></li>',
+        '<li><strong>결제 후 7일 이후</strong>: 회사 귀책 사유(서비스 장애로 7일 이상 이용 불가 등)가 있는 경우를 제외하고 환불 제한</li>',
+        '</ol>',
+        '<h3>8.2 환불 절차</h3>',
+        '<ol>',
+        '<li><strong>인앱결제 환불 신청 경로</strong><ul>',
+        '<li><strong>Android (Google Play)</strong>: 본 약관에 따른 환불 요건을 충족하는 경우, 회원은 Google Play의 환불 정책에 따라 직접 또는 회사를 통해 환불 신청할 수 있습니다.</li>',
+        '<li><strong>iOS (Apple App Store)</strong>: Apple의 환불 정책에 따라 reportaproblem.apple.com 또는 회사를 통해 환불 신청할 수 있습니다.</li>',
+        '</ul></li>',
+        '<li><strong>회사를 통한 신청</strong>: 회원은 아래 고객센터 이메일로 결제 영수증, 회원 식별 정보(이메일 또는 회원 ID)를 첨부하여 환불을 요청할 수 있습니다. 회사는 7영업일 이내 검토 후 결과를 회신합니다.</li>',
+        '<li><strong>환불 처리 기한</strong>: 환불 승인 후 실제 결제 수단으로의 환급은 각 스토어 및 카드사·통신사의 처리 기간(통상 3~14영업일)에 따릅니다.</li>',
+        '</ol>',
+        '<h3>8.3 환불이 제한되는 경우</h3>',
+        '<p>다음 각 호의 경우에는 환불이 제한될 수 있습니다.</p>',
+        '<ol>',
+        '<li>회원의 약관 위반(부정 사용·계정 공유 등)으로 이용권이 회수된 경우</li>',
+        '<li>회원이 청약 철회 가능 기간(결제일로부터 7일)을 경과한 경우 (단, 회사 귀책 사유 제외)</li>',
+        '<li>무상 제공된 이용권(무료 이용권·이벤트 쿠폰)을 사용한 경우</li>',
+        '<li>사용자 본인의 단순 변심으로 콘텐츠를 1일 이상 이용한 경우 (제8.1조 제2항 적용)</li>',
+        '</ol>',
+        '<h3>8.4 미성년자 결제</h3>',
+        '<p>만 19세 미만 미성년자가 법정대리인의 동의 없이 결제한 경우, 본인 또는 법정대리인은 결제 사실을 안 날로부터 합리적 기간 내에 결제 취소 및 환불을 요청할 수 있습니다. 회사는 「민법」 제5조에 따라 법정대리인의 동의 여부를 확인한 후 환불 처리합니다.</p>',
+        '<h2>제9조 (이용계약의 해지)</h2>',
+        '<ol>',
+        '<li><strong>회원의 해지</strong>: 회원은 언제든지 서비스 내 설정 메뉴를 통해 이용계약 해지(회원 탈퇴)를 요청할 수 있습니다. 해지 시 보유 중인 잔여 이용권은 본 약관 제8조에 따라 처리됩니다.</li>',
+        '<li><strong>회사의 해지</strong>: 회사는 회원이 본 약관 제5조의 의무를 중대하게 위반한 경우 사전 통지 후 이용계약을 해지할 수 있습니다. 다만 위반의 경중 및 회복 가능성에 따라 일시 이용 정지로 갈음할 수 있습니다.</li>',
+        '<li>이용계약 해지 시 회원이 작성한 학습 기록·통계 등은 개인정보 처리방침에 따라 처리됩니다.</li>',
+        '</ol>',
+        '<h2>제10조 (개인정보 보호)</h2>',
+        '<p>회사는 관계 법령에 따라 회원의 개인정보를 보호하기 위해 노력하며, 자세한 내용은 별도의 「개인정보 처리방침」에 따릅니다.</p>',
+        '<h2>제11조 (지적재산권)</h2>',
+        '<ol>',
+        '<li>서비스 내 모든 콘텐츠(텍스트, 이미지, 음원, 코드, 디자인 등)에 대한 저작권 및 지적재산권은 회사 또는 정당한 권리자에게 있습니다.</li>',
+        '<li>회원은 서비스를 이용함으로써 얻은 정보 중 회사 또는 제공자에게 지적재산권이 귀속된 정보를 회사 또는 제공자의 사전 승낙 없이 복제·전송·출판·배포·방송하거나 제3자에게 이용하게 해서는 안 됩니다.</li>',
+        '</ol>',
+        '<h2>제12조 (면책 조항)</h2>',
+        '<ol>',
+        '<li>회사는 천재지변, 전쟁, 통신 두절, 정전, 해킹 등 불가항력으로 인하여 서비스를 제공할 수 없는 경우 책임을 지지 않습니다.</li>',
+        '<li>회사는 회원의 귀책 사유로 인한 서비스 이용 장애에 대하여 책임을 지지 않습니다.</li>',
+        '<li>회사는 학습 결과 또는 콘텐츠의 효과·진단·치료적 효능을 보장하지 않으며, 본 서비스는 의료적 진단·치료를 대체할 수 없습니다. 발달 진단·치료가 필요한 경우 의료 전문가의 상담을 권장합니다.</li>',
+        '</ol>',
+        '<h2>제13조 (분쟁 해결 및 관할 법원)</h2>',
+        '<ol>',
+        '<li>회사와 회원 사이에 발생한 분쟁은 양 당사자의 협의로 해결함을 원칙으로 합니다.</li>',
+        '<li>협의가 이루어지지 않을 경우, 「전자상거래 등에서의 소비자보호에 관한 법률」 등 관계 법령에 따라 한국소비자원·전자거래분쟁조정위원회 등에 분쟁 조정을 신청할 수 있습니다.</li>',
+        '<li>본 약관 및 서비스 이용과 관련하여 소송이 제기될 경우 「민사소송법」에 따른 관할 법원을 1심 관할 법원으로 합니다.</li>',
+        '</ol>',
+        '<h2>제14조 (고객센터 안내)</h2>',
+        '<ul>',
+        '<li><strong>운영자</strong>: 주식회사 에브리데이썸머 / 오홍석</li>',
+        '<li><strong>이메일</strong>: contact@everydaysummer.net</li>',
+        '<li><strong>사업자등록번호</strong>: 847-87-03993</li>',
+        '<li><strong>주소</strong>: 서울특별시 관악구 남부순환로 1808, 15층 1505호</li>',
+        '</ul>',
+        '<p>서비스 관련 문의·환불 신청은 위 이메일로 접수해주시면 7영업일 이내 회신드립니다.</p>',
+        '<h2>부칙</h2>',
+        '<p>본 약관은 2026-04-28부터 시행합니다.</p>'
+      ].join('')
+    },
+    privacy: {
+      title: '개인정보 처리방침',
+      // TODO: 실제 개인정보 처리방침 작성 후 교체. legal/ 폴더에 privacy-policy.md를
+      // 추가한 뒤 이 위치에 변환된 HTML을 붙여 넣기.
+      html: [
+        '<h2>개인정보 처리방침</h2>',
+        '<p>현재 개인정보 처리방침은 별도로 작성 중입니다. 약관과 함께 정식 출시 전까지 게시될 예정입니다.</p>',
+        '<p>문의: contact@everydaysummer.net</p>'
+      ].join('')
+    }
+  };
+
+  function openLegalDoc(docKey) {
+    var doc = LEGAL_DOCS[docKey];
+    if (!doc) return;
+    var titleEl = document.getElementById('sm-legal-title');
+    var bodyEl = document.getElementById('sm-legal-body');
+    var overlay = document.getElementById('sm-legal-overlay');
+    if (!titleEl || !bodyEl || !overlay) return;
+    titleEl.textContent = doc.title;
+    bodyEl.innerHTML = doc.html;
+    overlay.hidden = false;
+    bodyEl.scrollTop = 0;
+  }
+
+  function closeLegalDoc() {
+    var overlay = document.getElementById('sm-legal-overlay');
+    if (overlay) overlay.hidden = true;
+  }
+
+  // 서브앱 iframe(같은 origin)에서 window.parent.openLegalDoc(...) 으로
+  // 호출할 수 있도록 전역 노출
+  window.openLegalDoc = openLegalDoc;
+  window.closeLegalDoc = closeLegalDoc;
+
+  function wireLegalOverlay() {
+    var back = document.getElementById('sm-legal-back');
+    if (back) back.addEventListener('click', closeLegalDoc);
+
+    // 마이 탭 정보 섹션 링크 (이용약관/처리방침)
+    var links = document.querySelectorAll('.sm-my-link[data-doc]');
+    Array.prototype.forEach.call(links, function (el) {
+      el.addEventListener('click', function () {
+        openLegalDoc(el.getAttribute('data-doc'));
+      });
+    });
+
+    // 모달 안 "보기" 버튼 — 클릭 시 label의 토글이 일어나지 않도록 stopPropagation/preventDefault
+    var viewBtns = document.querySelectorAll('.sm-agree-view[data-doc]');
+    Array.prototype.forEach.call(viewBtns, function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openLegalDoc(el.getAttribute('data-doc'));
+      });
+    });
+
+    // 풀스크린 로그인 뷰의 약관/처리방침 inline 링크
+    var loginDocLinks = document.querySelectorAll('.sm-login-doc-link[data-doc]');
+    Array.prototype.forEach.call(loginDocLinks, function (el) {
+      el.addEventListener('click', function () {
+        openLegalDoc(el.getAttribute('data-doc'));
+      });
+    });
+  }
+
   function wireModals() {
-    // 로그인 모달 — MVP: "로그인(가짜)" 버튼으로 더미 유저 세팅
-    var loginOk = $('#sm-login-ok');
-    if (loginOk) loginOk.addEventListener('click', function () {
-      var info = {
-        id: 'demo',
-        name: '데모 사용자',
-        email: 'sprit6487@gmail.com',
-        provider: 'kakao',
-        at: Date.now()
-      };
-      lsSet(LS.user, info);
-      propagateSubappLogin(info);  // 서브앱 게이트도 함께 통과되도록
-      hideLoginModal();
-      renderMy();
-      if (state.pendingPlayRequest) runPlayGate();
-    });
-    var loginCancel = $('#sm-login-cancel');
-    if (loginCancel) loginCancel.addEventListener('click', function () {
-      hideLoginModal();
-      state.pendingPlayRequest = null;
-    });
+    // 로그인 모달은 제거됨 — 풀스크린 로그인 뷰(#sm-login-view)가 모든 인증 흐름 처리
+
+    // 결제 모달 약관 동의 체크박스
+    var payAgree = document.getElementById('sm-pay-agree');
+    if (payAgree) payAgree.addEventListener('change', updatePayOkEnabled);
 
     // 결제 모달 — MVP: "구매(가짜)" 버튼으로 이용권 활성화
     var payOk = $('#sm-pay-ok');
     if (payOk) payOk.addEventListener('click', function () {
+      if (payOk.disabled) return;
       lsSet(LS.tickets, { active: true, kind: 'demo', at: Date.now() });
       hidePaymentModal();
       renderMy();
@@ -706,6 +906,8 @@
       hidePaymentModal();
       state.pendingPlayRequest = null;
     });
+
+    wireLegalOverlay();
   }
 
   // ---------------- 기록 ----------------
@@ -1292,11 +1494,54 @@
     }
   }
 
+  function showWithdrawModal() {
+    var mask = $('#sm-modal-withdraw');
+    if (mask) mask.classList.add('show');
+  }
+  function hideWithdrawModal() {
+    var mask = $('#sm-modal-withdraw');
+    if (mask) mask.classList.remove('show');
+  }
+  function doWithdraw() {
+    // 회원 탈퇴 — user/tickets/records 모두 삭제 + 로그아웃 정리
+    try { localStorage.removeItem(LS.user); } catch (e) {}
+    try { localStorage.removeItem(LS.tickets); } catch (e) {}
+    try { localStorage.removeItem(LS.records); } catch (e) {}
+    clearAllSubappLogins();
+    hideWithdrawModal();
+    renderMy();
+    renderRecords();
+
+    if (state.iframeEl && state.iframeEl.parentNode) {
+      state.iframeEl.parentNode.removeChild(state.iframeEl);
+    }
+    state.iframeEl = null;
+    state.currentApp = null;
+    state.pendingPlayRequest = null;
+    document.body.classList.remove('game-active');
+
+    var wrap = $('#home-iframe-wrap');
+    var empty = $('#home-empty');
+    if (wrap) { wrap.style.display = 'none'; wrap.innerHTML = ''; }
+    if (empty) empty.style.display = '';
+
+    setTab('series');
+    renderSeries();
+    showToast('회원 탈퇴가 완료되었어요');
+  }
+
   function wireShareAndMy() {
     var shareBtn = $('#sm-share-btn');
     if (shareBtn) shareBtn.addEventListener('click', shellShare);
     var logoutBtn = $('#sm-my-logout');
     if (logoutBtn) logoutBtn.addEventListener('click', doLogout);
+    // 회원 탈퇴
+    var withdrawLink = $('#sm-my-withdraw');
+    if (withdrawLink) withdrawLink.addEventListener('click', showWithdrawModal);
+    var withdrawCancel = $('#sm-withdraw-cancel');
+    if (withdrawCancel) withdrawCancel.addEventListener('click', hideWithdrawModal);
+    var withdrawOk = $('#sm-withdraw-ok');
+    if (withdrawOk) withdrawOk.addEventListener('click', doWithdraw);
     // 로그인 뷰 버튼
     var kakaoBtn = $('#sm-login-kakao');
     if (kakaoBtn) kakaoBtn.addEventListener('click', function () { doShellLogin('kakao'); });
