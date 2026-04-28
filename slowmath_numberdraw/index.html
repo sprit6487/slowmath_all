@@ -217,7 +217,8 @@
         .canvas-wrap { border: 2.5px solid #E8E2DA; border-radius: 20px; overflow: hidden; margin-bottom: 14px; background: #FAFAF8; position: relative; }
         canvas { display: block; touch-action: none; }
 
-        .instr { text-align: center; font-size: .875rem; font-weight: 600; color: #B8AD9E; margin-bottom: 12px; min-height: 22px; }
+        .instr { text-align: center; font-size: 1.05rem; font-weight: 700; color: #4A4035; margin-bottom: 12px; min-height: 22px; }
+        .instr .hl { color: #6BADE8; }
         .action-btns { display: flex; gap: 10px; width: 100%; max-width: 320px; margin: 0 auto; }
         .btn-retry { flex: 1; padding: 13px 0; border-radius: 12px; border: 2.5px solid #E8E2DA; background: white; font-family: 'Noto Sans KR', sans-serif; font-size: .9rem; font-weight: 700; color: #8C8070; cursor: pointer; transition: transform .1s; }
         .btn-retry:active { transform: scale(.97); }
@@ -336,7 +337,6 @@
 body:not(.sm-loggedin) [title="공유하기"],
 body:not(.sm-loggedin) #share-bubble { display: none !important; }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -941,7 +941,7 @@ function startGame() {
         resetGame();
         updateInstr();
         render();
-        speak('숫자 ' + G.num);
+        speak('숫자 ' + G.num + '을 따라 써보세요');
     });
 }
 
@@ -1268,9 +1268,9 @@ function onEnd(e) {
 // ══════════════════════════════════════════════════════════════
 function updateInstr() {
     if (G.mode === 'free') {
-        document.getElementById('instr').textContent = '숫자 ' + G.num + '을(를) 자유롭게 써보세요';
+        document.getElementById('instr').innerHTML = '숫자 <span class="hl">' + G.num + '</span>을(를) 따라 써보세요';
     } else {
-        document.getElementById('instr').textContent = '가이드를 참고하여 숫자를 써보세요';
+        document.getElementById('instr').innerHTML = '숫자 <span class="hl">' + G.num + '</span>을(를) 가이드를 따라 써보세요';
     }
 }
 

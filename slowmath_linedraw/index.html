@@ -370,7 +370,6 @@
 body:not(.sm-loggedin) [title="공유하기"],
 body:not(.sm-loggedin) #share-bubble { display: none !important; }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -591,7 +590,8 @@ function speak(text) {
 // 자주 쓰는 문구 프리워밍 — 첫 재생부터 즉시 응답
 if (window.SM_TTS && window.SM_TTS.prewarm) {
     window.SM_TTS.prewarm([
-        '선을 벗어났어요. 다시 해봐요.'
+        '출발에서 시작하여 골인까지 선을 그으세요',
+        '다시 해봐요'
     ]);
 }
 document.addEventListener('DOMContentLoaded', () => {
@@ -880,6 +880,7 @@ function startGame() {
     document.getElementById('result-wrap').innerHTML = '';
     document.getElementById('result-overlay').classList.remove('active');
     document.getElementById('instr').textContent = '출발에서 시작하여 골인까지 선을 그으세요';
+    speak('출발에서 시작하여 골인까지 선을 그으세요');
     G.turn = 0;
     G.history = [];
     buildProgressDots();

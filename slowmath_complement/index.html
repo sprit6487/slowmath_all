@@ -619,7 +619,6 @@
 body:not(.sm-loggedin) [title="공유하기"],
 body:not(.sm-loggedin) #share-bubble { display: none !important; }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -1230,7 +1229,7 @@ function nextQuiz() {
         correctCount++;
         score += 10 + (combo > 1 ? combo * 2 : 0);
         showFeedback('🎉');
-        speak('정답이에요!');
+        speak('정답이에요 ' + answer);
         if (isWrongNotesPractice) removeWrongNote(num);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display='';
@@ -1239,7 +1238,7 @@ function nextQuiz() {
         combo = 0;
         if (!isWrongNotesPractice) addWrongNote(num);
         showFeedback('😢');
-        speak('다시 해봐요.');
+        speak('다시 해봐요');
         gc.querySelectorAll('.choice-btn').forEach(b => {
           if (parseInt(b.dataset.val) === answer) b.classList.add('correct');
         });
@@ -1441,7 +1440,7 @@ function startPair() {
             const prevCell = gc.querySelector(`[data-idx="${selected}"]`);
             if (prevCell) prevCell.classList.add('wrong-pair');
             showFeedback('🙅');
-            speak('다시 해봐요.');
+            speak('다시 해봐요');
             updateScoreUI();
             setTimeout(() => {
               selected = null;

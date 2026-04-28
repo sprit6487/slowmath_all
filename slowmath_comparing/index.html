@@ -237,7 +237,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 body:not(.sm-loggedin) [title="공유하기"],
 body:not(.sm-loggedin) #share-bubble { display: none !important; }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -1221,7 +1220,7 @@ function pickAnswer(picked, correct, q) {
     }
     fb.textContent = '정답!';
     fb.className = 'feedback correct';
-    speak('정답!');
+    speak('정답이에요');
     currentQ++;
     document.getElementById('next-q-btn').classList.remove('hidden');
   } else {
@@ -1230,7 +1229,7 @@ function pickAnswer(picked, correct, q) {
     if (card) { card.classList.add('card-wrong'); card.onclick = null; }
     fb.textContent = '다시 골라보세요';
     fb.className = 'feedback wrong';
-    speak('다시 골라보세요');
+    speak('다시 해봐요');
   }
 }
 

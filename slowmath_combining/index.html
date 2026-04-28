@@ -478,7 +478,6 @@
 body:not(.sm-loggedin) [title="공유하기"],
 body:not(.sm-loggedin) #share-bubble { display: none !important; }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -1275,7 +1274,7 @@ function setupDragCombine(q, answer) {
           locked = true;
           btn.classList.add('correct');
           combo++; correctCount++;
-          showFeedback('🎉'); speak('정답이에요!');
+          showFeedback('🎉'); speak('정답이에요 ' + answer);
           // 합 원에 답 채우기 (도식 완성)
           const totalEl = document.getElementById('combine-total');
           if (totalEl) {
@@ -1290,7 +1289,7 @@ function setupDragCombine(q, answer) {
           btn.classList.add('wrong'); btn.disabled = true;
           combo = 0;
           if (!isWrongNotesPractice) addWrongNote(`${q.left}-${q.right}-${q.total}`, q);
-          showFeedback('😢'); speak('다시 해봐요.');
+          showFeedback('😢'); speak('다시 해봐요');
         }
       });
     });
@@ -1443,7 +1442,7 @@ function renderNumCombineQuestion() {
         topBox.classList.remove('blank');
         topBox.classList.add('correct-answer');
         combo++; correctCount++;
-        showFeedback('🎉'); speak('정답이에요!');
+        showFeedback('🎉'); speak('정답이에요 ' + answer);
         if (isWrongNotesPractice) removeWrongNote(`${q.left}-${q.right}-${q.total}`);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display='';
@@ -1452,7 +1451,7 @@ function renderNumCombineQuestion() {
         topBox.classList.add('wrong-answer');
         combo = 0;
         if (!isWrongNotesPractice) addWrongNote(`${q.left}-${q.right}-${q.total}`, q);
-        showFeedback('😢'); speak('다시 해봐요.');
+        showFeedback('😢'); speak('다시 해봐요');
         setTimeout(() => topBox.classList.remove('wrong-answer'), 500);
       }
     });
@@ -1515,7 +1514,7 @@ function renderNumCombineCircleQuestion() {
         topBox.classList.remove('blank');
         topBox.classList.add('correct-answer');
         combo++; correctCount++;
-        showFeedback('🎉'); speak('정답이에요!');
+        showFeedback('🎉'); speak('정답이에요 ' + answer);
         if (isWrongNotesPractice) removeWrongNote(`${q.left}-${q.right}-${q.total}`);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display='';
@@ -1524,7 +1523,7 @@ function renderNumCombineCircleQuestion() {
         topBox.classList.add('wrong-answer');
         combo = 0;
         if (!isWrongNotesPractice) addWrongNote(`${q.left}-${q.right}-${q.total}`, q);
-        showFeedback('😢'); speak('다시 해봐요.');
+        showFeedback('😢'); speak('다시 해봐요');
         setTimeout(() => topBox.classList.remove('wrong-answer'), 500);
       }
     });
@@ -1585,7 +1584,7 @@ function renderCircleCombineQuestion() {
           topBox.innerHTML = `<span style="font-size:2rem;font-weight:800;color:var(--app-blue);grid-column:1/-1;text-align:center;">${answer}</span>`;
         }
         combo++; correctCount++;
-        showFeedback('🎉'); speak('정답이에요!');
+        showFeedback('🎉'); speak('정답이에요 ' + answer);
         if (isWrongNotesPractice) removeWrongNote(`${q.left}-${q.right}-${q.total}`);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display='';
@@ -1594,7 +1593,7 @@ function renderCircleCombineQuestion() {
         topBox.classList.add('wrong-answer');
         combo = 0;
         if (!isWrongNotesPractice) addWrongNote(`${q.left}-${q.right}-${q.total}`, q);
-        showFeedback('😢'); speak('다시 해봐요.');
+        showFeedback('😢'); speak('다시 해봐요');
         setTimeout(() => topBox.classList.remove('wrong-answer'), 500);
       }
     });

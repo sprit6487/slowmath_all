@@ -379,7 +379,6 @@
 body:not(.sm-loggedin) [title="공유하기"],
 body:not(.sm-loggedin) #share-bubble { display: none !important; }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -1118,7 +1117,7 @@ function pickAnswer(btn, picked, answer) {
             fb.textContent = '정답! ' + num + ' - 1 = ' + answer;
         }
         fb.className = 'feedback correct';
-        speak('정답! ' + answer);
+        speak('정답이에요 ' + answer);
         currentQ++;
         document.getElementById('next-q-btn').style.display='';
     } else {
@@ -1130,7 +1129,7 @@ function pickAnswer(btn, picked, answer) {
         btn.disabled = true;
         fb.textContent = '다시 골라보세요';
         fb.className = 'feedback wrong';
-        speak('다시 골라보세요');
+        speak('다시 해봐요');
     }
 }
 

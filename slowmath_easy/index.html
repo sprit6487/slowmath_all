@@ -63,6 +63,16 @@
             .eq-op { font-size: 2.5rem; }
         }
 
+        /* ── 문제 디렉션 라벨 ── */
+        .ez-question-label {
+            text-align: center;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #4A4035;
+            margin: 12px 0 4px;
+        }
+        .ez-question-label .hl { color: #6BADE8; }
+
         /* ── 선택지 버튼 ── */
         .option-btn {
             border: 2.5px solid #E8E2DA;
@@ -485,7 +495,6 @@
 body:not(.sm-loggedin) [title="공유하기"],
 body:not(.sm-loggedin) #share-bubble { display: none !important; }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -742,6 +751,9 @@ setTimeout(function() {
             </div>
         </div>
 
+        <!-- 디렉션 -->
+        <div class="ez-question-label">더한 값은 <span class="hl">얼마</span>일까요?</div>
+
         <!-- 수식 -->
         <div class="flex items-center justify-center gap-4 my-6">
             <span id="num1" class="eq-num" style="color:#6BADE8;">0</span>
@@ -959,6 +971,9 @@ setTimeout(function() {
         document.getElementById('progress-fill').style.width = `${(currentQuestion / 10) * 100}%`;
 
         setFeedback('', '');
+
+        // 문제 디렉션 TTS
+        speak(num1 + ' 더하기 ' + num2 + '는 얼마일까요?');
 
         if (inputMode === 'select') {
             document.getElementById('options-grid').classList.remove('hidden');
@@ -1190,14 +1205,14 @@ setTimeout(function() {
             document.querySelectorAll('#keypad-area button').forEach(b => b.disabled = true);
 
             setFeedback('정답입니다!', 'green');
-            speak('정답입니다.');
+            speak('정답이에요 ' + correctAnswer);
             pendingKeypadClear = true;
             document.getElementById('next-q-btn').style.display = '';
         } else {
             setFeedback('아니에요. 다시 해볼까요?', 'red');
             const display = document.getElementById('keypad-display');
             display.className = 'keypad-display wrong-input';
-            speak('아니에요.');
+            speak('다시 해봐요');
             addWrongNote(num1, num2, correctAnswer);
             setTimeout(() => {
                 keypadInput = '';
@@ -1300,11 +1315,6 @@ setTimeout(function() {
         resultView.classList.add('hidden');
         playView.classList.remove('hidden');
         generateQuestion();
-        setTimeout(() => {
-            const descEl = document.getElementById('app-desc');
-            const descText = descEl ? descEl.innerText : '천천히 생각하고 풀어보세요';
-            speak(descText);
-        }, 100);
     }
 
     function checkAnswer(selected, btn) {
@@ -1324,13 +1334,13 @@ setTimeout(function() {
             allButtons.forEach(b => { b.disabled = true; b.style.cursor = 'default'; });
             setFeedback('정답입니다!', 'green');
             btn.classList.add('correct-selected');
-            speak("정답입니다.");
+            speak("정답이에요 " + correctAnswer);
             document.getElementById('next-q-btn').style.display = '';
         } else {
             btn.disabled = true;
             btn.classList.add('wrong-selected');
             setFeedback('아니에요. 다시 해볼까요?', 'red');
-            speak("아니에요.");
+            speak("다시 해봐요");
             addWrongNote(num1, num2, correctAnswer);
         }
     }
@@ -1924,7 +1934,7 @@ if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
                     if (ov) ov.style.color = '#1A7A3A';
                 });
                 setFeedback('정답입니다!', 'green');
-                speak('정답입니다.');
+                speak('정답이에요 ' + correctAnswer);
                 setTimeout(() => { writeMode = 'done'; nextStep(); }, 1200);
             } else {
                 ['write-result-overlay-tens', 'write-result-overlay-ones'].forEach(id => {
@@ -1932,7 +1942,7 @@ if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
                     if (ov) ov.style.color = '#B91C1C';
                 });
                 setFeedback(`${recognizedNumber}? 아니에요. 다시 해볼까요?`, 'red');
-                speak('아니에요.');
+                speak('다시 해봐요');
                 addWrongNote(num1, num2, correctAnswer);
                 setTimeout(() => {
                     writeMode = 'idle';

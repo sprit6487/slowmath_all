@@ -1007,7 +1007,6 @@ body {
 body:not(.sm-loggedin) [title="공유하기"],
 body:not(.sm-loggedin) #share-bubble { display: none !important; }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -1959,7 +1958,7 @@ if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
       feedbackEl.className = 'feedback success';
       vis.forEach(function(e) { e.classList.add('correct'); });
       if (btnEl) btnEl.classList.add('correct-choice');
-      speak('정답이에요');
+      speak('정답이에요 ' + answer);
 
       document.getElementById('correctCount').textContent = correctCount;
       document.getElementById('wrongCount').textContent = wrongCount;
@@ -2096,7 +2095,7 @@ _smGameCompleted=true;
 
     if (pct === 100) speak('완벽해요!');
     else if (pct >= 80) speak('잘했어요!');
-    else speak('다시 해봐요!');
+    else speak('다시 해봐요');
   }
 
   function newRound() {

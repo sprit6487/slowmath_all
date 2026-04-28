@@ -609,7 +609,6 @@
 body:not(.sm-loggedin) [title="공유하기"],
 body:not(.sm-loggedin) #share-bubble { display: none !important; }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -1434,7 +1433,7 @@ function renderPattern() {
         combo++;
         score += 10 + (combo > 1 ? combo * 2 : 0);
         showFeedback('🎉');
-        speak('정답이에요!');
+        speak('정답이에요');
         if (isWrongNotesPractice) removeWrongNote(patternKey);
         updateScoreUI();
 
@@ -1462,7 +1461,7 @@ function renderPattern() {
         combo = 0;
         if (!isWrongNotesPractice) addWrongNote(patternKey);
         showFeedback('😢');
-        speak('다시 해봐요.');
+        speak('다시 해봐요');
         // Let user try again - unlock without advancing
         locked = false;
       }

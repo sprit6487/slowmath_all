@@ -864,7 +864,6 @@
 body:not(.sm-loggedin) [title="공유하기"],
 body:not(.sm-loggedin) #share-bubble { display: none !important; }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -1694,7 +1693,7 @@ function renderFillQuestion() {
         combo++;
         correctCount++;
         showFeedback('🎉');
-        speak('정답이에요!');
+        speak('정답이에요 ' + answer);
         if (isWrongNotesPractice) removeWrongNote(`${q.total}-${q.left}-${q.right}`);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display = '';
@@ -1705,7 +1704,7 @@ function renderFillQuestion() {
         combo = 0;
         if (!isWrongNotesPractice) addWrongNote(`${q.total}-${q.left}-${q.right}`, q);
         showFeedback('😢');
-        speak('다시 해봐요.');
+        speak('다시 해봐요');
         setTimeout(() => blankBox.classList.remove('wrong-answer'), 500);
       }
     });
@@ -1832,7 +1831,7 @@ function renderCircleFillQuestion() {
         combo++;
         correctCount++;
         showFeedback('🎉');
-        speak('정답이에요!');
+        speak('정답이에요 ' + answer);
         if (isWrongNotesPractice) removeWrongNote(`${q.total}-${q.left}-${q.right}`);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display = '';
@@ -1843,7 +1842,7 @@ function renderCircleFillQuestion() {
         combo = 0;
         if (!isWrongNotesPractice) addWrongNote(`${q.total}-${q.left}-${q.right}`, q);
         showFeedback('😢');
-        speak('다시 해봐요.');
+        speak('다시 해봐요');
         setTimeout(() => blankBox.classList.remove('wrong-answer'), 500);
       }
     });
@@ -1962,7 +1961,7 @@ function renderCircleFillNumQuestion() {
         combo++;
         correctCount++;
         showFeedback('🎉');
-        speak('정답이에요!');
+        speak('정답이에요 ' + answer);
         if (isWrongNotesPractice) removeWrongNote(`${q.total}-${q.left}-${q.right}`);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display = '';
@@ -1973,7 +1972,7 @@ function renderCircleFillNumQuestion() {
         combo = 0;
         if (!isWrongNotesPractice) addWrongNote(`${q.total}-${q.left}-${q.right}`, q);
         showFeedback('😢');
-        speak('다시 해봐요.');
+        speak('다시 해봐요');
         setTimeout(() => blankBox.classList.remove('wrong-answer'), 500);
       }
     });
@@ -2133,7 +2132,7 @@ function initDragAndDrop() {
       combo++;
       correctCount++;
       showFeedback('🎉');
-      speak('정답이에요!');
+      speak('정답이에요 ' + q.left + '과 ' + q.right);
       if (isWrongNotesPractice) removeWrongNote(`${q.total}-${q.left}-${q.right}`);
       msgEl.textContent = '정답!';
       msgEl.style.color = 'var(--app-green)';
@@ -2146,7 +2145,7 @@ function initDragAndDrop() {
       combo = 0;
       if (!isWrongNotesPractice) addWrongNote(`${q.total}-${q.left}-${q.right}`, q);
       showFeedback('😢');
-      speak('다시 해봐요.');
+      speak('다시 해봐요');
       msgEl.textContent = `${leftCount}개와 ${rightCount}개 — 다시 해봐요!`;
       msgEl.style.color = 'var(--app-red)';
 

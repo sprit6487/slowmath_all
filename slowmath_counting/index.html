@@ -246,7 +246,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 body:not(.sm-loggedin) [title="공유하기"],
 body:not(.sm-loggedin) #share-bubble { display: none !important; }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -783,9 +782,11 @@ function renderQ() {
 
   const row = document.getElementById('compare-row');
 
+  let promptText = '';
   if (curDisplayType === 'kornum') {
     /* 우리말 → 숫자 */
-    document.getElementById('question-prompt').textContent = '숫자로 어떻게 쓸까요?';
+    promptText = '숫자로 어떻게 쓸까요?';
+    document.getElementById('question-prompt').textContent = promptText;
     document.getElementById('scene-area').innerHTML =
       `<div class="scene-text-question"><span>${formatCounterKorean(q.n, q.unit)}</span>${renderCountIcons(q.n, q.unit)}</div>`;
     row.innerHTML = q.choices.map((c, i) =>
@@ -795,7 +796,8 @@ function renderQ() {
     ).join('');
   } else {
     /* numkor: 숫자 → 우리말 */
-    document.getElementById('question-prompt').textContent = '우리말로 어떻게 셀까요?';
+    promptText = '우리말로 어떻게 셀까요?';
+    document.getElementById('question-prompt').textContent = promptText;
     document.getElementById('scene-area').innerHTML =
       `<div class="scene-text-question"><span>${formatCounterNumeric(q.n, q.unit)}</span>${renderCountIcons(q.n, q.unit)}</div>`;
     row.innerHTML = q.choices.map((c, i) =>
@@ -805,6 +807,9 @@ function renderQ() {
     ).join('');
   }
   row.style.visibility = 'visible';
+
+  // 문제 디렉션 TTS (라벨과 동일 문구)
+  if (promptText) speak(promptText);
 
   if (impulsePrevention) applyImpulse();
 }
@@ -857,14 +862,14 @@ function selectCard(idx) {
     score++;
     fb.textContent = '정답!';
     fb.className = 'feedback correct';
-    if (ttsOn) speak('정답');
+    if (ttsOn) speak('정답이에요 ' + formatCounterKorean(curQ.n, curQ.unit));
     document.getElementById('play-score').textContent = `${score}점`;
     document.getElementById('next-q-btn').classList.remove('hidden');
   } else {
     document.getElementById(`card-${idx}`).classList.add('card-wrong', 'card-locked');
     fb.textContent = '다시 골라보세요';
     fb.className = 'feedback wrong';
-    if (ttsOn) speak('다시 골라보세요');
+    if (ttsOn) speak('다시 해봐요');
   }
 }
 

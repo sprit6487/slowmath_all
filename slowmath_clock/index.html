@@ -243,7 +243,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 body:not(.sm-loggedin) [title="공유하기"],
 body:not(.sm-loggedin) #share-bubble { display: none !important; }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -1038,8 +1037,10 @@ function renderQ() {
 
   const row = document.getElementById('compare-row');
 
+  let promptText = '';
   if (curMode === 'cross_d2a') {
-    document.getElementById('question-prompt').textContent = '같은 시간의 바늘시계는?';
+    promptText = '같은 시간의 바늘시계는?';
+    document.getElementById('question-prompt').textContent = promptText;
     document.getElementById('scene-area').innerHTML = digitalClockSVG(q.h, q.m, false);
     row.innerHTML = q.choices.map((c, i) =>
       `<div class="item-card clock-choice" id="card-${i}" onclick="selectCard(${i})">
@@ -1047,7 +1048,8 @@ function renderQ() {
       </div>`
     ).join('');
   } else if (curMode === 'cross_a2d') {
-    document.getElementById('question-prompt').textContent = '같은 시간의 전자시계는?';
+    promptText = '같은 시간의 전자시계는?';
+    document.getElementById('question-prompt').textContent = promptText;
     document.getElementById('scene-area').innerHTML = clockSVG(q.h, q.m, false);
     row.innerHTML = q.choices.map((c, i) =>
       `<div class="item-card digital-choice" id="card-${i}" onclick="selectCard(${i})">
@@ -1055,7 +1057,8 @@ function renderQ() {
       </div>`
     ).join('');
   } else if (curDisplayType === 'numkor') {
-    document.getElementById('question-prompt').textContent = '같은 시간을 우리말로?';
+    promptText = '같은 시간을 우리말로?';
+    document.getElementById('question-prompt').textContent = promptText;
     document.getElementById('scene-area').innerHTML =
       `<div class="scene-text-question">${formatTimeNumeric(q.h, q.m)}</div>`;
     row.innerHTML = q.choices.map((c, i) =>
@@ -1064,7 +1067,8 @@ function renderQ() {
       </div>`
     ).join('');
   } else if (curDisplayType === 'kornum') {
-    document.getElementById('question-prompt').textContent = '같은 시간을 숫자로?';
+    promptText = '같은 시간을 숫자로?';
+    document.getElementById('question-prompt').textContent = promptText;
     document.getElementById('scene-area').innerHTML =
       `<div class="scene-text-question">${formatTimeKorean(q.h, q.m)}</div>`;
     row.innerHTML = q.choices.map((c, i) =>
@@ -1073,7 +1077,8 @@ function renderQ() {
       </div>`
     ).join('');
   } else {
-    document.getElementById('question-prompt').textContent = '몇 시 몇 분일까요?';
+    promptText = '몇 시 몇 분일까요?';
+    document.getElementById('question-prompt').textContent = promptText;
     document.getElementById('scene-area').innerHTML = curDisplayType === 'digital'
       ? digitalClockSVG(q.h, q.m, false)
       : clockSVG(q.h, q.m, false);
@@ -1084,6 +1089,9 @@ function renderQ() {
     ).join('');
   }
   row.style.visibility = 'visible';
+
+  // 문제 디렉션 TTS (라벨과 동일 문구)
+  if (promptText) speak(promptText);
 
   if (impulsePrevention) applyImpulse();
 }
@@ -1136,14 +1144,14 @@ function selectCard(idx) {
     score++;
     fb.textContent = '정답!';
     fb.className = 'feedback correct';
-    if (ttsOn) speak('정답');
+    if (ttsOn) speak('정답이에요 ' + formatTimeKorean(curQ.h, curQ.m));
     document.getElementById('play-score').textContent = `${score}점`;
     document.getElementById('next-q-btn').classList.remove('hidden');
   } else {
     document.getElementById(`card-${idx}`).classList.add('card-wrong', 'card-locked');
     fb.textContent = '다시 골라보세요';
     fb.className = 'feedback wrong';
-    if (ttsOn) speak('다시 골라보세요');
+    if (ttsOn) speak('다시 해봐요');
   }
 }
 

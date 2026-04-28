@@ -337,7 +337,6 @@ body:not(.sm-loggedin) [title="공유하기"], body:not(.sm-loggedin) .share-bub
 }
 @media (min-width: 1024px) { .app { max-width: 800px; padding: 48px 44px; } .mode-card p:first-child { font-size: 1.2rem !important; } .slot { font-size: 1.4rem; } .num-chip { width: 47px; height: 47px; font-size: 0.98rem; } .quiz-card { max-width: 90px; font-size: 1.9rem; } .quiz-cards-8 .quiz-card { max-width: none; font-size: 1.35rem; } .quiz-chip { width: 88px; height: 88px; font-size: 1.93rem; } }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Overlay ══════ -->
@@ -755,7 +754,7 @@ function speak(text) {
 // 자주 쓰는 문구 프리워밍 — 첫 재생부터 즉시 응답
 if (window.SM_TTS && window.SM_TTS.prewarm) {
   window.SM_TTS.prewarm([
-    '천천히 생각하고 풀어보세요.',
+    '숫자를 순서대로 놓아봐요.',
     '힌트를 보고 나머지를 채워봐요.',
     '다 맞혔어요! 정말 잘했어요.'
   ]);
@@ -1043,7 +1042,7 @@ function startGame(range, start) {
     renderPlayView();
     clearImpulse(); applyImpulse();
     if (window.speechSynthesis) window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
-    setTimeout(() => speak('천천히 생각하고 풀어보세요.'), 300);
+    setTimeout(() => speak('숫자를 순서대로 놓아봐요.'), 300);
   });
 }
 
@@ -1341,7 +1340,7 @@ function onDragEnd(x, y) {
           $('quiz-feedback').textContent = '이 칸은 다른 숫자예요';
           $('quiz-feedback').style.color = '#F07070';
           quizChips[idx].isDragging = false;
-          speak('다시 해봐요.');
+          speak('다시 해봐요');
           setTimeout(() => { quizCards[cardIdx].wrong = false; renderQuizView(); }, 400);
         }
         renderQuizView();
@@ -1393,7 +1392,7 @@ function onDragEnd(x, y) {
           $('play-feedback').textContent = '이 칸은 다른 숫자 자리예요';
           $('play-feedback').style.color = '#F07070';
           chips[idx].isDragging = false;
-          speak('다시 해봐요.');
+          speak('다시 해봐요');
           renderPlayView();
           setTimeout(() => { slots[slotIdx].wrong = false; renderPlayView(); }, 400);
         }

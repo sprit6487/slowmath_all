@@ -278,6 +278,16 @@
             .eq-op { font-size: 2.5rem; }
         }
 
+        /* ── 문제 디렉션 라벨 ── */
+        .cir-question-label {
+            text-align: center;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #4A4035;
+            margin: 12px 0 4px;
+        }
+        .cir-question-label .hl { color: #6BADE8; }
+
         /* ── 충동방지 토글 ── */
         .toggle-track {
             width: 48px; height: 28px;
@@ -462,7 +472,6 @@ body:not(.sm-loggedin) #share-bubble { display: none !important; }
 .wn-btn-start{border:none;background:#F07070;color:white;box-shadow:0 2px 8px rgba(240,112,112,.3);}
 .wn-btn-clear{border:1.5px solid #E8E2DA;background:white;color:#B8AD9E;padding:8px 16px;border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer;margin-top:12px;font-family:inherit;}
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -770,6 +779,9 @@ setTimeout(function() {
             </div>
         </div>
 
+        <!-- 디렉션 -->
+        <div class="cir-question-label" id="cir-question-label">더한 값은 <span class="hl">얼마</span>일까요?</div>
+
         <!-- 수식 + 동그라미 -->
         <div class="flex-1 flex flex-col justify-center">
             <div class="flex items-start justify-center gap-3 mb-8" style="padding:8px 4px 0;">
@@ -819,6 +831,9 @@ setTimeout(function() {
                 </div>
             </div>
         </div>
+
+        <!-- 디렉션 -->
+        <div class="cir-question-label" id="cir-dquestion-label">동그라미를 <span class="hl">색깔별로</span> 옮겨 담아보세요</div>
 
         <!-- 수식 -->
         <div class="flex items-center justify-center gap-3 mb-4 mt-2">
@@ -878,6 +893,9 @@ setTimeout(function() {
                 </div>
             </div>
         </div>
+
+        <!-- 디렉션 -->
+        <div class="cir-question-label" id="cir-fquestion-label">색깔에 맞춰 <span class="hl">동그라미</span>를 채워보세요</div>
 
         <!-- 수식 -->
         <div class="flex items-center justify-center gap-3 mb-3 mt-2">
@@ -1062,6 +1080,9 @@ setTimeout(function() {
         const pans = document.getElementById('pans');
         pans.textContent = '?'; pans.style.color = '#D8D2C8';
 
+        // 문제 디렉션 TTS
+        speak(n1 + ' 더하기 ' + n2 + '는 얼마일까요?');
+
         makeDots('dots1', n1, '#6BADE8');
         makeDots('dots2', n2, '#F0A050');
 
@@ -1155,7 +1176,7 @@ setTimeout(function() {
             fb.textContent = '정답이에요! 🎉';
             fb.style.color = '#5BC886';
             fb.className = 'text-center h-8 text-base font-bold';
-            speak('정답이에요.');
+            speak('정답이에요 ' + ans);
             showAnswerDots(ans);
             const totalQ = questionList.length;
             nextQBtn_action = () => { if (qNum < questionList.length) { qNum++; newQuestion(); } else showResult(); };
@@ -1165,7 +1186,7 @@ setTimeout(function() {
             fb.textContent = '다시 세어봐요!';
             fb.style.color = '#F07070';
             fb.className = 'text-center h-8 text-base font-bold';
-            speak('다시 해봐요.');
+            speak('다시 해봐요');
         }
     }
 
@@ -1179,6 +1200,9 @@ setTimeout(function() {
 
         document.getElementById('dn1').textContent       = n1;
         document.getElementById('dn2').textContent       = n2;
+
+        // 문제 디렉션 TTS
+        speak('동그라미를 색깔에 맞게 옮기고, ' + n1 + ' 더하기 ' + n2 + '는 얼마인지 골라보세요.');
 
         const dans = document.getElementById('dans');
         dans.textContent = '?';
@@ -1250,7 +1274,7 @@ setTimeout(function() {
             fb.textContent = errors.join(' · ') + '를 다시 확인해요';
             fb.style.color = '#F07070';
             fb.className = 'text-center h-8 text-sm font-medium';
-            speak('다시 해봐요.');
+            speak('다시 해봐요');
             if (!ansOk) { btn.disabled = true; btn.style.opacity = '0.4'; }
         }
     }
@@ -1444,6 +1468,9 @@ setTimeout(function() {
 
         document.getElementById('fn1').textContent = n1;
         document.getElementById('fn2').textContent = n2;
+
+        // 문제 디렉션 TTS
+        speak('색깔에 맞춰 동그라미를 채우고, ' + n1 + ' 더하기 ' + n2 + '는 얼마인지 골라보세요.');
         const fans = document.getElementById('fans');
         fans.textContent = '?'; fans.style.color = '#D8D2C8';
 
@@ -1554,7 +1581,7 @@ setTimeout(function() {
             fb.textContent = '다시 세어봐요!';
             fb.style.color = '#F07070';
             fb.className = 'text-center h-8 text-base font-bold';
-            speak('다시 해봐요.');
+            speak('다시 해봐요');
             return;
         }
 
@@ -1580,14 +1607,14 @@ setTimeout(function() {
             fb.textContent = '정답이에요! 🎉';
             fb.style.color = '#5BC886';
             fb.className = 'text-center h-8 text-base font-bold';
-            speak('정답이에요.');
+            speak('정답이에요 ' + ans);
             nextQBtn_action = () => { if (qNum < 10) { qNum++; newFillQuestion(); } else showResult(); };
             document.getElementById('fnext-q-btn').style.display = '';
         } else {
             fb.textContent = '동그라미를 다시 확인해봐요!';
             fb.style.color = '#F07070';
             fb.className = 'text-center h-8 text-base font-bold';
-            speak('다시 해봐요.');
+            speak('다시 해봐요');
         }
     }
 

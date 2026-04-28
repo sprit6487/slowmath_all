@@ -179,7 +179,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 .choice-btn.color-swatch{padding:0;aspect-ratio:1/1;border:none;overflow:hidden;}
 .choice-swatch{width:100%;height:100%;border-radius:12px;}
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash ══════ -->
@@ -888,7 +887,7 @@ function pickAnswer(chosen, q) {
     }
     fb.textContent = '정답!';
     fb.className = 'feedback correct';
-    speak('정답!');
+    speak('정답이에요 ' + correct);
     q.results[currentAnswerIdx] = true;
     currentAnswerIdx++;
     if (currentAnswerIdx < q.colors.length) {
@@ -920,7 +919,7 @@ function pickAnswer(chosen, q) {
     q.results[currentAnswerIdx] = false;
     fb.textContent = '다시 골라보세요';
     fb.className = 'feedback wrong';
-    speak('다시 골라보세요');
+    speak('다시 해봐요');
     // Re-enable all except wrong
     setTimeout(() => {
       document.querySelectorAll('.choice-btn').forEach(b => {

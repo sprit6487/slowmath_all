@@ -12,6 +12,19 @@
 (function () {
   'use strict';
 
+  // (deprecated) Google Cloud TTS 사용 중단 — localStorage 캐시 일회 정리
+  try {
+    if (!localStorage.getItem('sm_tts_cleaned_v1')) {
+      for (var i = localStorage.length - 1; i >= 0; i--) {
+        var k = localStorage.key(i);
+        if (k && (k.indexOf('sm_tts_v1_') === 0 || k.indexOf('sm_tts_v2_') === 0 || k === 'sm_tts_rate_limit')) {
+          localStorage.removeItem(k);
+        }
+      }
+      localStorage.setItem('sm_tts_cleaned_v1', '1');
+    }
+  } catch (e) {}
+
   // ---------------- 설정 ----------------
   var FLAGS = {
     // 인증은 풀스크린 로그인 뷰가 자동 처리. 이 플래그는 더 이상 사용하지 않으며

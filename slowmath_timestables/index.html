@@ -57,6 +57,14 @@
         /* ── 수식 숫자 ── */
         .eq-num { font-size: 3rem; font-weight: 900; line-height: 1; }
         .eq-op { font-size: 2rem; font-weight: 600; color: #C8C0B4; line-height: 1; }
+        .tt-question-label {
+            text-align: center;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #4A4035;
+            margin: 12px 0 4px;
+        }
+        .tt-question-label .hl { color: #6BADE8; }
         @media (min-width: 768px) {
             .eq-num { font-size: 3.5rem; }
             .eq-op { font-size: 2.5rem; }
@@ -346,7 +354,6 @@
         .keypad-btn.confirm { background: #4A4035; border-color: #4A4035; color: white; }
         .keypad-btn.confirm:active:not(:disabled) { background: #2E261D; }
     </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -595,6 +602,9 @@ setTimeout(function() {
                 </div>
             </div>
         </div>
+
+        <!-- 디렉션 -->
+        <div class="tt-question-label">곱한 값은 <span class="hl">얼마</span>일까요?</div>
 
         <!-- 수식 -->
         <div class="flex items-center justify-center gap-4 my-4">
@@ -858,6 +868,9 @@ setTimeout(function() {
         document.getElementById('keypad-area').classList.add('hidden');
         updateKeypadDisplay();
         createOptions();
+
+        // 디렉션 음성 안내
+        speak(num1 + ' 곱하기 ' + num2 + '는 얼마일까요?');
     }
 
     /* ─── 동그라미 렌더링 ─── */
@@ -979,13 +992,13 @@ setTimeout(function() {
             optionsGrid.querySelectorAll('button').forEach(b => { b.disabled = true; });
             setFeedback('정답입니다!', 'green');
             btn.classList.add('correct-selected');
-            speak('정답입니다.');
+            speak('정답이에요 ' + correctAnswer);
             document.getElementById('next-q-btn').style.display = '';
         } else {
             btn.disabled = true;
             btn.classList.add('wrong-selected');
             setFeedback('아니에요. 다시 해볼까요?', 'red');
-            speak('아니에요.');
+            speak('다시 해봐요');
         }
     }
 
@@ -1022,13 +1035,13 @@ setTimeout(function() {
             document.getElementById('keypad-display').className = 'keypad-display correct-input';
             document.querySelectorAll('#keypad-area button').forEach(b => b.disabled = true);
             setFeedback('정답입니다!', 'green');
-            speak('정답입니다.');
+            speak('정답이에요 ' + correctAnswer);
             pendingKeypadClear = true;
             document.getElementById('next-q-btn').style.display = '';
         } else {
             setFeedback('아니에요. 다시 해볼까요?', 'red');
             document.getElementById('keypad-display').className = 'keypad-display wrong-input';
-            speak('아니에요.');
+            speak('다시 해봐요');
             setTimeout(() => {
                 keypadInput = '';
                 updateKeypadDisplay();

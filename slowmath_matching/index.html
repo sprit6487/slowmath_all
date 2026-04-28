@@ -411,7 +411,6 @@
 body:not(.sm-loggedin) [title="공유하기"],
 body:not(.sm-loggedin) #share-bubble { display: none !important; }
 </style>
-<script src="../shell/tts.js"></script></head>
 <body>
 
 <!-- ══════ Splash Screen ══════ -->
@@ -1104,7 +1103,7 @@ function loadFillQuestion() {
     nd.classList.remove('fade-in'); void nd.offsetWidth; nd.classList.add('fade-in');
     renderSourceCircles();
     document.getElementById('source-count').textContent = sourceCircleCount;
-    speak(target + '');
+    speak(target + '만큼 동그라미를 놓아주세요');
 }
 
 function checkFillAnswer() {
@@ -1115,11 +1114,11 @@ function checkFillAnswer() {
         fb.textContent = '정답! ' + target + '개를 정확히 채웠어요';
         fb.className = 'feedback correct';
         document.getElementById('fill-score-label').textContent = score + '점';
-        speak('정답! ' + target + '개');
+        speak('정답이에요 ' + target + '개');
     } else {
         fb.textContent = placedCount + '개를 놓았어요. 정답은 ' + target + '개예요';
         fb.className = 'feedback wrong';
-        speak('오답. 정답은 ' + target + '개');
+        speak('다시 해봐요');
         addWrongNote(target);
     }
     document.getElementById('fill-check-btn').disabled = true;
@@ -1247,7 +1246,7 @@ function pickCountAnswer(btn, picked, target) {
         }
         fb.textContent = '정답! ' + target + '개';
         fb.className = 'feedback correct';
-        speak('정답! ' + target + '개');
+        speak('정답이에요 ' + target + '개');
 
         currentQ++;
         setTimeout(loadCountQuestion, 1500);
@@ -1258,7 +1257,7 @@ function pickCountAnswer(btn, picked, target) {
         btn.disabled = true;
         fb.textContent = '다시 골라보세요';
         fb.className = 'feedback wrong';
-        speak('다시 골라보세요');
+        speak('다시 해봐요');
         addWrongNote(target);
     }
 }
