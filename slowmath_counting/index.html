@@ -862,7 +862,7 @@ function selectCard(idx) {
     score++;
     fb.textContent = '정답!';
     fb.className = 'feedback correct';
-    if (ttsOn) speak('정답이에요. ' + formatCounterKorean(curQ.n, curQ.unit));
+    if (ttsOn) speak(formatCounterKorean(curQ.n, curQ.unit) + '. 정답이에요');
     document.getElementById('play-score').textContent = `${score}점`;
     document.getElementById('next-q-btn').classList.remove('hidden');
   } else {

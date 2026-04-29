@@ -1229,7 +1229,7 @@ function nextQuiz() {
         correctCount++;
         score += 10 + (combo > 1 ? combo * 2 : 0);
         showFeedback('🎉');
-        speak('정답이에요. ' + answer);
+        speak(answer + '. 정답이에요');
         if (isWrongNotesPractice) removeWrongNote(num);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display='';

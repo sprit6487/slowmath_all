@@ -1203,7 +1203,7 @@ setTimeout(function() {
             fb.textContent = '정답이에요! 🎉';
             fb.style.color = '#5BC886';
             fb.className = 'text-center h-8 text-base font-bold';
-            speak('정답이에요. ' + ans);
+            speak(ans + '. 정답이에요');
             showAnswerDots(ans);
             const totalQ = questionList.length;
             nextQBtn_action = () => { if (qNum < questionList.length) { qNum++; newQuestion(); } else showResult(); };
@@ -1309,7 +1309,7 @@ setTimeout(function() {
             fb.textContent = `정답이에요! 🎉 모두 ${ans}개예요`;
             fb.style.color = '#5BC886';
             fb.className = 'text-center h-8 text-base font-bold';
-            speak(`정답이에요. 모두 ${ans}개예요.`);
+            speak(`모두 ${ans}개예요. 정답이에요.`);
             nextQBtn_action = () => { if (qNum < 10) { qNum++; newDragQuestion(); } else showResult(); };
             document.getElementById('dnext-q-btn').style.display = '';
         } else {
@@ -1654,7 +1654,7 @@ setTimeout(function() {
             fb.textContent = '정답이에요! 🎉';
             fb.style.color = '#5BC886';
             fb.className = 'text-center h-8 text-base font-bold';
-            speak('정답이에요. ' + ans);
+            speak(ans + '. 정답이에요');
             nextQBtn_action = () => { if (qNum < 10) { qNum++; newFillQuestion(); } else showResult(); };
             document.getElementById('fnext-q-btn').style.display = '';
         } else {

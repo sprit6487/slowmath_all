@@ -1693,7 +1693,7 @@ function renderFillQuestion() {
         combo++;
         correctCount++;
         showFeedback('🎉');
-        speak('정답이에요. ' + answer);
+        speak(answer + '. 정답이에요');
         if (isWrongNotesPractice) removeWrongNote(`${q.total}-${q.left}-${q.right}`);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display = '';
@@ -1831,7 +1831,7 @@ function renderCircleFillQuestion() {
         combo++;
         correctCount++;
         showFeedback('🎉');
-        speak('정답이에요. ' + answer);
+        speak(answer + '. 정답이에요');
         if (isWrongNotesPractice) removeWrongNote(`${q.total}-${q.left}-${q.right}`);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display = '';
@@ -1961,7 +1961,7 @@ function renderCircleFillNumQuestion() {
         combo++;
         correctCount++;
         showFeedback('🎉');
-        speak('정답이에요. ' + answer);
+        speak(answer + '. 정답이에요');
         if (isWrongNotesPractice) removeWrongNote(`${q.total}-${q.left}-${q.right}`);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display = '';
@@ -2132,7 +2132,7 @@ function initDragAndDrop() {
       combo++;
       correctCount++;
       showFeedback('🎉');
-      speak('정답이에요. ' + q.left + '과 ' + q.right);
+      speak(q.left + '과 ' + q.right + '. 정답이에요');
       if (isWrongNotesPractice) removeWrongNote(`${q.total}-${q.left}-${q.right}`);
       msgEl.textContent = '정답!';
       msgEl.style.color = 'var(--app-green)';

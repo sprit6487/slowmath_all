@@ -887,7 +887,7 @@ function pickAnswer(chosen, q) {
     }
     fb.textContent = '정답!';
     fb.className = 'feedback correct';
-    speak('정답이에요. ' + correct);
+    speak(correct + '. 정답이에요');
     q.results[currentAnswerIdx] = true;
     currentAnswerIdx++;
     if (currentAnswerIdx < q.colors.length) {

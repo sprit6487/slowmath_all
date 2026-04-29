@@ -1205,7 +1205,7 @@ setTimeout(function() {
             document.querySelectorAll('#keypad-area button').forEach(b => b.disabled = true);
 
             setFeedback('정답입니다!', 'green');
-            speak('정답이에요. ' + correctAnswer);
+            speak(correctAnswer + '. 정답이에요');
             pendingKeypadClear = true;
             document.getElementById('next-q-btn').style.display = '';
         } else {
@@ -1334,7 +1334,7 @@ setTimeout(function() {
             allButtons.forEach(b => { b.disabled = true; b.style.cursor = 'default'; });
             setFeedback('정답입니다!', 'green');
             btn.classList.add('correct-selected');
-            speak("정답이에요. " + correctAnswer);
+            speak(correctAnswer + ". 정답이에요");
             document.getElementById('next-q-btn').style.display = '';
         } else {
             btn.disabled = true;
@@ -1934,7 +1934,7 @@ if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
                     if (ov) ov.style.color = '#1A7A3A';
                 });
                 setFeedback('정답입니다!', 'green');
-                speak('정답이에요. ' + correctAnswer);
+                speak(correctAnswer + '. 정답이에요');
                 setTimeout(() => { writeMode = 'done'; nextStep(); }, 1200);
             } else {
                 ['write-result-overlay-tens', 'write-result-overlay-ones'].forEach(id => {
