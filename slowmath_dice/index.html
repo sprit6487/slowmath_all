@@ -1428,14 +1428,35 @@ setTimeout(function() {
   }
 
   // ---- TTS ----
-  function speak(text) {
-    if (!ttsEnabled || !window.speechSynthesis) return;
+  function speak(text, onEnd) {
+    if (!ttsEnabled || !window.speechSynthesis) {
+      if (onEnd) setTimeout(onEnd, 0);
+      return;
+    }
     window.speechSynthesis.cancel();
-    if (!text || text.trim() === '') return;
+    if (!text || text.trim() === '') {
+      if (onEnd) setTimeout(onEnd, 0);
+      return;
+    }
     var u = new SpeechSynthesisUtterance(text);
     u.lang = 'ko-KR';
     u.rate = 0.9;
+    if (onEnd) {
+      var done = false;
+      var fire = function() { if (done) return; done = true; onEnd(); };
+      u.onend = fire;
+      u.onerror = fire;
+    }
     setTimeout(function() { window.speechSynthesis.speak(u); }, 50);
+  }
+  // 1~10을 우리말 수사 + 단위로 발화 (한 개·두 개 …)
+  function nativeCount(n) {
+    var map = ['', '한', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉', '열'];
+    return (map[n] || String(n)) + ' 개';
+  }
+  // 현재 문제가 "몇 개"를 묻는지 — 손가락·카드 모양 수 등 카운트형 질문 판별
+  function isCountQuestion() {
+    return questionEl && /몇\s*개/.test(questionEl.textContent || '');
   }
   // 질문 텍스트 표시 + TTS 한 번에 처리
   function setQuestion(html) {
@@ -1958,7 +1979,13 @@ if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
       feedbackEl.className = 'feedback success';
       vis.forEach(function(e) { e.classList.add('correct'); });
       if (btnEl) btnEl.classList.add('correct-choice');
-      speak(answer + '. 정답이에요');
+      var advanceFired = false;
+      var advance = null;
+      speak((isCountQuestion() ? nativeCount(answer) : answer) + '. 정답이에요', function() {
+        if (advanceFired || !advance) return;
+        advanceFired = true;
+        advance();
+      });
 
       document.getElementById('correctCount').textContent = correctCount;
       document.getElementById('wrongCount').textContent = wrongCount;
@@ -1971,9 +1998,12 @@ if(_smGameCompleted){_smGameCompleted=false;setTimeout(_showRecoPopup,350);}
 
       var isLastRound = currentRound >= TOTAL_ROUNDS;
       if (isLastRound) {
-        setTimeout(function() { showResult(); }, 600);
+        advance = function() { showResult(); };
+        // 발화가 빠르게 끝나거나 TTS 꺼진 경우에도 최소 600ms 대기
+        setTimeout(function() { if (!advanceFired) { advanceFired = true; advance(); } }, 1800);
       } else if (inputMode === 'choice') {
-        setTimeout(function() { newRound(); }, 600);
+        advance = function() { newRound(); };
+        setTimeout(function() { if (!advanceFired) { advanceFired = true; advance(); } }, 1800);
       } else {
         nextBtn.classList.remove('hidden');
         if (currentRound >= TOTAL_ROUNDS) nextBtn.textContent = '결과 보기';
