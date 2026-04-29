@@ -990,6 +990,12 @@ function speak(text) {
   u.lang = 'ko-KR'; u.rate = 0.9;
   setTimeout(() => window.speechSynthesis.speak(u), 50);
 }
+
+// 1~10을 우리말 수사 + 단위로 발화: 한 개, 두 개, ..., 열 개
+function nativeCount(n) {
+  const map = ['', '한', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉', '열'];
+  return (map[n] || String(n)) + ' 개';
+}
 // 자주 쓰는 문구 프리워밍 — 첫 재생부터 즉시 응답
 if (window.SM_TTS && window.SM_TTS.prewarm) {
   window.SM_TTS.prewarm([
@@ -1274,7 +1280,7 @@ function setupDragCombine(q, answer) {
           locked = true;
           btn.classList.add('correct');
           combo++; correctCount++;
-          showFeedback('🎉'); speak(answer + '. 정답이에요');
+          showFeedback('🎉'); speak(nativeCount(answer) + '. 정답이에요');
           // 합 원에 답 채우기 (도식 완성)
           const totalEl = document.getElementById('combine-total');
           if (totalEl) {
@@ -1442,7 +1448,7 @@ function renderNumCombineQuestion() {
         topBox.classList.remove('blank');
         topBox.classList.add('correct-answer');
         combo++; correctCount++;
-        showFeedback('🎉'); speak(answer + '. 정답이에요');
+        showFeedback('🎉'); speak(nativeCount(answer) + '. 정답이에요');
         if (isWrongNotesPractice) removeWrongNote(`${q.left}-${q.right}-${q.total}`);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display='';
@@ -1584,7 +1590,7 @@ function renderCircleCombineQuestion() {
           topBox.innerHTML = `<span style="font-size:2rem;font-weight:800;color:var(--app-blue);grid-column:1/-1;text-align:center;">${answer}</span>`;
         }
         combo++; correctCount++;
-        showFeedback('🎉'); speak(answer + '. 정답이에요');
+        showFeedback('🎉'); speak(nativeCount(answer) + '. 정답이에요');
         if (isWrongNotesPractice) removeWrongNote(`${q.left}-${q.right}-${q.total}`);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display='';

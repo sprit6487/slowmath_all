@@ -1422,6 +1422,12 @@ function speak(text) {
   setTimeout(() => window.speechSynthesis.speak(u), 50);
 }
 
+// 1~10을 우리말 수사 + 단위로 발화: 한 개, 두 개, ..., 열 개
+function nativeCount(n) {
+  const map = ['', '한', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉', '열'];
+  return (map[n] || String(n)) + ' 개';
+}
+
 // ===== Navigation =====
 function goHome() {
   if (impulseTimer) { clearInterval(impulseTimer); impulseTimer = null; }
@@ -1831,7 +1837,7 @@ function renderCircleFillQuestion() {
         combo++;
         correctCount++;
         showFeedback('🎉');
-        speak(answer + '. 정답이에요');
+        speak(nativeCount(answer) + '. 정답이에요');
         if (isWrongNotesPractice) removeWrongNote(`${q.total}-${q.left}-${q.right}`);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display = '';
@@ -1961,7 +1967,7 @@ function renderCircleFillNumQuestion() {
         combo++;
         correctCount++;
         showFeedback('🎉');
-        speak(answer + '. 정답이에요');
+        speak(nativeCount(answer) + '. 정답이에요');
         if (isWrongNotesPractice) removeWrongNote(`${q.total}-${q.left}-${q.right}`);
         updateScoreUI();
         document.getElementById('next-q-btn').style.display = '';
@@ -2132,7 +2138,7 @@ function initDragAndDrop() {
       combo++;
       correctCount++;
       showFeedback('🎉');
-      speak(q.left + '과 ' + q.right + '. 정답이에요');
+      speak(nativeCount(q.left) + ', ' + nativeCount(q.right) + '. 정답이에요');
       if (isWrongNotesPractice) removeWrongNote(`${q.total}-${q.left}-${q.right}`);
       msgEl.textContent = '정답!';
       msgEl.style.color = 'var(--app-green)';

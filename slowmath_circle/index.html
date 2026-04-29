@@ -1082,7 +1082,7 @@ setTimeout(function() {
         pans.textContent = '?'; pans.style.color = '#D8D2C8';
 
         // 문제 디렉션 TTS
-        speak(n1 + ' 더하기 ' + n2 + '는 얼마일까요?');
+        speak(n1 + ' 더하기 ' + n2 + topicJosa(n2) + ' 얼마일까요?');
 
         makeDots('dots1', n1, '#6BADE8');
         makeDots('dots2', n2, '#F0A050');
@@ -1230,7 +1230,7 @@ setTimeout(function() {
         document.getElementById('dn2').textContent       = n2;
 
         // 문제 디렉션 TTS
-        speak('동그라미를 색깔에 맞게 옮기고, ' + n1 + ' 더하기 ' + n2 + '는 얼마인지 골라보세요.');
+        speak('동그라미를 색깔별로 옮겨 담아보세요.');
 
         const dans = document.getElementById('dans');
         dans.textContent = '?';
@@ -1517,7 +1517,7 @@ setTimeout(function() {
         document.getElementById('fn2').textContent = n2;
 
         // 문제 디렉션 TTS
-        speak('색깔에 맞춰 동그라미를 채우고, ' + n1 + ' 더하기 ' + n2 + '는 얼마인지 골라보세요.');
+        speak('색깔에 맞춰 동그라미를 채우고, ' + n1 + ' 더하기 ' + n2 + topicJosa(n2) + ' 얼마인지 골라보세요.');
         const fans = document.getElementById('fans');
         fans.textContent = '?'; fans.style.color = '#D8D2C8';
 
@@ -1709,7 +1709,6 @@ _smGameCompleted=true;
         document.getElementById('start-view').classList.add('hidden');
         document.getElementById('result-view').classList.add('hidden');
         if (window.speechSynthesis) speechSynthesis.speak(new SpeechSynthesisUtterance(''));
-        setTimeout(() => speak('천천히 생각하고 풀어보세요.'), 100);
         if (mode === 'select') {
             document.getElementById('score').textContent = 0;
             document.getElementById('play-view').classList.remove('hidden');
@@ -1836,6 +1835,11 @@ _smGameCompleted=true;
         const u = new SpeechSynthesisUtterance(text);
         u.lang = 'ko-KR'; u.rate = 0.9;
         setTimeout(() => window.speechSynthesis.speak(u), 50);
+    }
+    // 1~10의 우리말 한자수에 붙는 은/는 보조사 — 받침 유무 기준
+    function topicJosa(n) {
+        // 받침 있음(은): 일·삼·육·칠·팔·십, 받침 없음(는): 이·사·오·구
+        return [null, '은','는','은','는','는','은','은','은','는','은'][n] || '는';
     }
     // 자주 쓰는 문구 프리워밍 — 첫 재생부터 즉시 응답
     if (window.SM_TTS && window.SM_TTS.prewarm) {
