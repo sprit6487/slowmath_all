@@ -1296,7 +1296,7 @@
       if (filtered.length === 0) {
         el.innerHTML = '<div class="sm-tg-title">학습 추이</div><div class="sm-tg-empty">이 기간에 기록이 없어요</div>';
       } else {
-        el.innerHTML = '<div class="sm-tg-title">학습 추이</div><div class="sm-tg-chart">' + buildBarsSvg(filtered) + '</div>' + buildPeriodSummary(filtered);
+        el.innerHTML = '<div class="sm-tg-title">학습 추이</div><div class="sm-tg-chart">' + buildBarsSvg(filtered) + '</div><div class="sm-tg-legend"><span class="sm-tg-lg sm-tg-lg-b">문제 수</span><span class="sm-tg-lg sm-tg-lg-l">정답률</span></div>' + buildPeriodSummary(filtered);
       }
     }
 
@@ -1337,12 +1337,18 @@
     var chartH = H - topM - bot;
     var midY = topM + chartH * 0.5;
     var refLine = '<line x1="' + pad + '" y1="' + midY.toFixed(1) + '" x2="' + (W - pad) + '" y2="' + midY.toFixed(1) + '" stroke="#E0DAD2" stroke-width="0.7" stroke-dasharray="2,3"/>';
-    var bars = '', labels = '';
+    var bars = '', labels = '', line = '', dots = '';
+    var prevX = null, prevY = null;
     monthData.forEach(function (v, i) {
       var cx = pad + step * (i + 0.5);
       var probH = ((v.totalProblems || 0) / maxP) * chartH;
       var by = topM + (chartH - probH);
       bars += '<rect x="' + (cx - barW / 2).toFixed(1) + '" y="' + by.toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + probH.toFixed(1) + '" rx="2.5" fill="#6BADE8" opacity="0.85"/>';
+      var rate = (v.totalProblems || 0) > 0 ? (v.totalCorrect || 0) / v.totalProblems : 0;
+      var ry = topM + (1 - rate) * chartH;
+      if (prevX !== null) line += '<line x1="' + prevX.toFixed(1) + '" y1="' + prevY.toFixed(1) + '" x2="' + cx.toFixed(1) + '" y2="' + ry.toFixed(1) + '" stroke="#5BC886" stroke-width="1.8" stroke-linecap="round"/>';
+      dots += '<circle cx="' + cx.toFixed(1) + '" cy="' + ry.toFixed(1) + '" r="3.5" fill="#5BC886" stroke="white" stroke-width="1.5"/>';
+      prevX = cx; prevY = ry;
       var showLbl = (n <= 10) || (i % Math.ceil(n / 10) === 0) || (i === n - 1);
       if (showLbl) {
         var day = parseInt((v.date || '').split('-')[2], 10) || 0;
@@ -1354,10 +1360,12 @@
     var axisY = topM + chartH + 0.5;
     var axis = '<line x1="' + pad + '" y1="' + axisY + '" x2="' + (W - pad) + '" y2="' + axisY + '" stroke="#E0DAD2" stroke-width="1"/>';
     var maxLbl = '<text x="' + pad + '" y="' + (topM - 2) + '" font-size="8" fill="#B8AD9E" font-weight="600">최대 ' + maxP + '문제</text>';
+    var accLbl100 = '<text x="' + (W - pad) + '" y="' + (topM - 2) + '" font-size="8" fill="#5BC886" font-weight="700" text-anchor="end">정답률 100%</text>';
+    var accLbl50 = '<text x="' + (W - pad) + '" y="' + (midY - 2).toFixed(1) + '" font-size="7" fill="#B8AD9E" font-weight="600" text-anchor="end">50%</text>';
     var midPVal = maxP / 2;
     var midPStr = (midPVal === Math.floor(midPVal)) ? String(midPVal) : midPVal.toFixed(1);
     var midLbl = '<text x="' + pad + '" y="' + (midY - 2).toFixed(1) + '" font-size="7" fill="#B8AD9E" font-weight="600">' + midPStr + '문제</text>';
-    return '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">' + refLine + axis + maxLbl + midLbl + bars + labels + '</svg>';
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">' + refLine + axis + maxLbl + accLbl100 + accLbl50 + midLbl + bars + line + dots + labels + '</svg>';
   }
 
   function buildPeriodSummary(filtered) {
@@ -1490,12 +1498,18 @@
     var chartH = H - top - bot;
     var midY = top + chartH * 0.5;
     var refLine = '<line x1="' + pad + '" y1="' + midY.toFixed(1) + '" x2="' + (W - pad) + '" y2="' + midY.toFixed(1) + '" stroke="#E0DAD2" stroke-width="0.7" stroke-dasharray="2,3"/>';
-    var bars = '', labels = '';
+    var bars = '', labels = '', line = '', dots = '';
+    var prevX = null, prevY = null;
     monthData.forEach(function (v, i) {
       var cx = pad + step * (i + 0.5);
       var probH = ((v.totalProblems || 0) / maxP) * chartH;
       var by = top + (chartH - probH);
       bars += '<rect x="' + (cx - barW / 2).toFixed(1) + '" y="' + by.toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + probH.toFixed(1) + '" rx="2.5" fill="#6BADE8" opacity="0.85"/>';
+      var rate = (v.totalProblems || 0) > 0 ? (v.totalCorrect || 0) / v.totalProblems : 0;
+      var ry = top + (1 - rate) * chartH;
+      if (prevX !== null) line += '<line x1="' + prevX.toFixed(1) + '" y1="' + prevY.toFixed(1) + '" x2="' + cx.toFixed(1) + '" y2="' + ry.toFixed(1) + '" stroke="#5BC886" stroke-width="1.8" stroke-linecap="round"/>';
+      dots += '<circle cx="' + cx.toFixed(1) + '" cy="' + ry.toFixed(1) + '" r="3.5" fill="#5BC886" stroke="white" stroke-width="1.5"/>';
+      prevX = cx; prevY = ry;
       var day = parseInt((v.date || '').split('-')[2], 10) || 0;
       var showLbl = (n <= 10) || (i % Math.ceil(n / 10) === 0) || (i === n - 1);
       if (showLbl) {
@@ -1505,14 +1519,16 @@
     var axisY = top + chartH + 0.5;
     var axis = '<line x1="' + pad + '" y1="' + axisY + '" x2="' + (W - pad) + '" y2="' + axisY + '" stroke="#E0DAD2" stroke-width="1"/>';
     var maxLbl = '<text x="' + pad + '" y="' + (top - 2) + '" font-size="8" fill="#B8AD9E" font-weight="600">최대 ' + maxP + '문제</text>';
+    var accLbl100 = '<text x="' + (W - pad) + '" y="' + (top - 2) + '" font-size="8" fill="#5BC886" font-weight="700" text-anchor="end">정답률 100%</text>';
+    var accLbl50 = '<text x="' + (W - pad) + '" y="' + (midY - 2).toFixed(1) + '" font-size="7" fill="#B8AD9E" font-weight="600" text-anchor="end">50%</text>';
     var midPVal = maxP / 2;
     var midPStr = (midPVal === Math.floor(midPVal)) ? String(midPVal) : midPVal.toFixed(1);
     var midLbl = '<text x="' + pad + '" y="' + (midY - 2).toFixed(1) + '" font-size="7" fill="#B8AD9E" font-weight="600">' + midPStr + '문제</text>';
-    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="월별 문제 수 추이">' + refLine + axis + maxLbl + midLbl + bars + labels + '</svg>';
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="월별 문제 수·정답률 추이">' + refLine + axis + maxLbl + accLbl100 + accLbl50 + midLbl + bars + line + dots + labels + '</svg>';
     var avgP = Math.round(totalP / monthData.length);
     var acc = totalP > 0 ? Math.round(totalC / totalP * 100) : 0;
     var summary = '<div class="sm-tg-sum">일평균 <b>' + avgP + '</b>문제 · 정답률 <b>' + acc + '</b>%</div>';
-    el.innerHTML = '<div class="sm-tg-title">이달의 학습 추이</div><div class="sm-tg-chart">' + svg + '</div>' + summary;
+    el.innerHTML = '<div class="sm-tg-title">이달의 학습 추이</div><div class="sm-tg-chart">' + svg + '</div><div class="sm-tg-legend"><span class="sm-tg-lg sm-tg-lg-b">문제 수</span><span class="sm-tg-lg sm-tg-lg-l">정답률</span></div>' + summary;
   }
 
   // 월 이동 (inline onclick="window._smShellCN(±1)")
