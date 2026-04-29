@@ -446,6 +446,9 @@
     }
     .btn-clear:active { transform: scale(.97); background: #F5F1EB; }
 
+    .btn-pass { color: #B8AD9E; font-size: 0.875rem; font-weight: 500; text-decoration: underline; background: none; border: none; cursor: pointer; padding: 8px 0; transition: color 0.15s; }
+    .btn-pass:hover { color: #6B5F50; }
+
     /* ── Result overlay ── */
     .result-overlay {
         display: flex; position: absolute;
@@ -689,6 +692,9 @@ setTimeout(function() {
         <p class="game-hint" id="game-hint">점과 점 사이에 선을 그으세요</p>
         <div style="display:flex; justify-content:center; gap:10px; margin-top:4px;">
             <button class="btn-clear" id="btn-clear" onclick="clearAll()" style="display:none;">✕ 전체 지우기</button>
+        </div>
+        <div style="display:flex; justify-content:center; margin-top:4px;">
+            <button id="pass-btn" onclick="passQuestion()" class="btn-pass">이 문제 패스하기</button>
         </div>
         <!-- Result Overlay (game-view 내부) -->
         <div class="result-overlay" id="result-overlay">
@@ -1510,6 +1516,17 @@ function retryGame() {
 }
 function nextGame() {
     closeResult();
+    if (currentProblem >= TOTAL_PROBLEMS) {
+        showComplete();
+    } else {
+        startGame();
+    }
+}
+
+function passQuestion() {
+    // 결과 오버레이가 떠 있는 상태(이미 채점 후)면 동작 안함
+    if (document.getElementById('result-overlay').classList.contains('active')) return;
+    speak('패스합니다.');
     if (currentProblem >= TOTAL_PROBLEMS) {
         showComplete();
     } else {

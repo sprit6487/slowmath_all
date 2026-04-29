@@ -392,6 +392,9 @@
   .submit-btn { background: var(--app-blue); color: #fff; }
   .new-btn { background: var(--app-orange); color: #fff; }
 
+  .btn-pass { color: #B8AD9E; font-size: 0.875rem; font-weight: 500; text-decoration: underline; background: none; border: none; cursor: pointer; padding: 8px 0; transition: color 0.15s; }
+  .btn-pass:hover { color: #6B5F50; }
+
   /* Result */
   .result-msg {
     font-size: 1.1rem; font-weight: 700; margin-top: 12px; min-height: 1.6rem; text-align: center;
@@ -1136,6 +1139,11 @@ function updateProgress() {
   else fill.style.background = 'var(--app-green)';
 }
 
+function passQuestion() {
+  speak('패스합니다.');
+  nextQuestion();
+}
+
 function nextQuestion() {
   questionNum++;
 
@@ -1214,6 +1222,9 @@ function renderGame() {
 
   // Result message
   html += `<div class="result-msg" id="resultMsg"></div>`;
+
+  // Pass button
+  html += `<button id="pass-btn" class="btn-pass" onclick="passQuestion()">이 문제 패스하기</button>`;
 
   gc.innerHTML = html;
 

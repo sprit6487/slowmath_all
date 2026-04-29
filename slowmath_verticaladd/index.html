@@ -44,6 +44,8 @@
         .feedback.wrong { color: #F07070; }
         .btn-next-q { display: block; width: 100%; max-width: 360px; margin: 8px auto 0; padding: 14px 0; border-radius: 16px; border: none; background: #4A4035; color: white; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; box-shadow: 0 2px 8px rgba(74,64,53,0.15); }
         .btn-next-q:active { transform: scale(0.98); background: #2E261D; }
+        .btn-pass { color: #B8AD9E; font-size: 0.875rem; font-weight: 500; text-decoration: underline; background: none; border: none; cursor: pointer; padding: 8px 0; transition: color 0.15s; }
+        .btn-pass:hover { color: #6B5F50; }
 
         /* ── Login View ── */
         .login-view {
@@ -710,6 +712,7 @@ setTimeout(function() {
         <div class="options-grid" id="options"></div>
         <div class="feedback" id="feedback"></div>
         <button class="btn-next-q" id="next-q-btn" style="display:none;" onclick="onNextQ()">다음 문제 →</button>
+        <button id="pass-btn" onclick="passQuestion()" class="btn-pass">이 문제 패스하기</button>
     </div>
 
     <!-- ══════════ 결과 ══════════ -->
@@ -1044,6 +1047,15 @@ function startGame(modeId) {
 
 /* ══════════ 문제 로드 ══════════ */
 function onNextQ() {
+  document.getElementById('next-q-btn').style.display = 'none';
+  loadQuestion();
+}
+
+function passQuestion() {
+  if (busy) return;
+  busy = true;
+  speak('패스합니다.');
+  currentQ++;
   document.getElementById('next-q-btn').style.display = 'none';
   loadQuestion();
 }

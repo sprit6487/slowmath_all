@@ -429,6 +429,8 @@
     @media (min-width:768px) { .splash-logo svg{width:160px;height:134px} .splash-title{font-size:2.5rem} .splash-subtitle{font-size:1.0625rem} }
   .btn-next-q { display: block; width: 100%; max-width: 360px; margin: 12px auto 0; padding: 14px 0; border-radius: 16px; border: none; background: #4A4035; color: white; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; box-shadow: 0 2px 8px rgba(74,64,53,0.15); }
   .btn-next-q:active { transform: scale(0.98); background: #2E261D; }
+  .btn-pass { color: #B8AD9E; font-size: 0.875rem; font-weight: 500; text-decoration: underline; background: none; border: none; cursor: pointer; padding: 8px 0; transition: color 0.15s; }
+  .btn-pass:hover { color: #6B5F50; }
   .complete-overlay { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 40px 0; }
   .complete-emoji { font-size: 56px; }
   .complete-msg { font-size: 1.25rem; font-weight: 900; color: #4A4035; }
@@ -812,6 +814,7 @@ setTimeout(function() {
         <!-- 피드백 -->
         <div id="feedback" class="text-center h-8 text-base font-bold" style="color:#4A4035;"></div>
         <button class="btn-next-q" id="next-q-btn" style="display:none;" onclick="onNextQ()">다음 문제 →</button>
+        <button class="btn-pass" onclick="passQuestion()">이 문제 패스하기</button>
     </div>
 
     <!-- ══════════════ 쌓기 화면 ══════════════ -->
@@ -874,6 +877,7 @@ setTimeout(function() {
         <!-- 피드백 -->
         <div id="dfeedback" class="text-center h-8 text-base font-bold"></div>
         <button class="btn-next-q" id="dnext-q-btn" style="display:none;" onclick="onDNextQ()">다음 문제 →</button>
+        <button class="btn-pass" onclick="passQuestion()">이 문제 패스하기</button>
     </div>
 
     <!-- ══════════════ 채우기 화면 ══════════════ -->
@@ -927,6 +931,7 @@ setTimeout(function() {
         <!-- 피드백 -->
         <div id="ffeedback" class="text-center h-8 text-base font-bold"></div>
         <button class="btn-next-q" id="fnext-q-btn" style="display:none;" onclick="onFNextQ()">다음 문제 →</button>
+        <button class="btn-pass" onclick="passQuestion()">이 문제 패스하기</button>
     </div>
 
     <!-- ══════════════ 오답노트 화면 ══════════════ -->
@@ -1678,6 +1683,24 @@ setTimeout(function() {
     function onNextQ() { document.getElementById('next-q-btn').style.display='none'; if(nextQBtn_action){nextQBtn_action();nextQBtn_action=null;} }
     function onDNextQ() { document.getElementById('dnext-q-btn').style.display='none'; if(nextQBtn_action){nextQBtn_action();nextQBtn_action=null;} }
     function onFNextQ() { document.getElementById('fnext-q-btn').style.display='none'; if(nextQBtn_action){nextQBtn_action();nextQBtn_action=null;} }
+
+    function passQuestion() {
+        if (busy) return;
+        busy = true;
+        if (impulseTimer) { clearInterval(impulseTimer); impulseTimer = null; }
+        speak && speak('패스합니다.');
+        nextQBtn_action = null;
+        document.getElementById('next-q-btn').style.display='none';
+        document.getElementById('dnext-q-btn').style.display='none';
+        document.getElementById('fnext-q-btn').style.display='none';
+        if (gameMode === 'select') {
+            if (qNum < questionList.length) { qNum++; newQuestion(); } else showResult();
+        } else if (gameMode === 'drag') {
+            if (qNum < 10) { qNum++; newDragQuestion(); } else showResult();
+        } else if (gameMode === 'fill') {
+            if (qNum < 10) { qNum++; newFillQuestion(); } else showResult();
+        }
+    }
 
     // ── 공통 ──
     function showResult() {

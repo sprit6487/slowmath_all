@@ -202,6 +202,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100dv
 
 .btn-next-q{display:block;width:100%;max-width:360px;margin:6px auto 0;padding:14px 0;border-radius:16px;border:none;background:#4A4035;color:#fff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(74,64,53,.15);transition:background .15s,transform .1s;}
 .btn-next-q:active{transform:scale(.98);background:#2E261D;}
+.btn-pass{color:#B8AD9E;font-size:0.875rem;font-weight:500;text-decoration:underline;background:none;border:none;cursor:pointer;padding:8px 0;transition:color 0.15s;}
+.btn-pass:hover{color:#6B5F50;}
 
 .reveal-btn{display:block;width:100%;max-width:320px;margin:0 auto 12px;padding:14px 0;border-radius:14px;border:2px solid #C4AA82;background:#FAF5EE;color:#7B6545;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;}
 .reveal-btn:active{background:#F0E6D6;transform:scale(.98);}
@@ -564,6 +566,7 @@ setTimeout(function() {
     <div class="feedback" id="feedback"></div>
     <div id="impulse-area"></div>
     <button class="btn-next-q hidden" id="next-q-btn" onclick="onNextQ()">다음 문제 →</button>
+    <button id="pass-btn" onclick="passQuestion()" class="btn-pass">이 문제 패스하기</button>
   </div>
 </div>
 
@@ -1157,6 +1160,15 @@ function selectCard(idx) {
 }
 
 function onNextQ() {
+  qIdx++;
+  renderQ();
+}
+
+function passQuestion() {
+  if (locked) return;
+  locked = true;
+  speak && speak('패스합니다.');
+  document.getElementById('next-q-btn').classList.add('hidden');
   qIdx++;
   renderQ();
 }

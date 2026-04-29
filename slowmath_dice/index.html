@@ -789,6 +789,19 @@ body {
   background: #2E261D;
 }
 
+.btn-pass {
+  color: #B8AD9E;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 0;
+  transition: color 0.15s;
+}
+.btn-pass:hover { color: #6B5F50; }
+
 /* =========================================
    Responsive
    ========================================= */
@@ -1305,6 +1318,7 @@ setTimeout(function() {
       </div>
 
       <button class="btn-next hidden" id="nextBtn">다음 문제 →</button>
+      <button id="pass-btn" class="btn-pass" onclick="dicePassQuestion()">이 문제 패스하기</button>
 
       <!-- Result Area -->
       <div class="result-area hidden" id="resultArea">
@@ -2246,6 +2260,15 @@ _smGameCompleted=true;
     if (currentRound >= TOTAL_ROUNDS) { showResult(); }
     else { newRound(); }
   });
+
+  window.dicePassQuestion = function() {
+    if (answered) return;
+    answered = true;
+    clearImpulseTimer();
+    speak('패스합니다.');
+    if (currentRound >= TOTAL_ROUNDS) { showResult(); }
+    else { newRound(); }
+  };
 
   document.getElementById('retryBtn').addEventListener('click', startGame);
   document.getElementById('resultHomeBtn').addEventListener('click', showMenu);

@@ -39,7 +39,7 @@
         /* ── 공통 ── */
         .progress-track { height: 8px; border-radius: 99px; background: #F0ECE6; overflow: hidden; }
         .progress-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #6BADE8, #5BC886); transition: width 0.5s ease; }
-        .feedback { text-align: center; font-size: 1.1rem; font-weight: 700; padding: 12px 0; min-height: 48px; }
+        .feedback { text-align: center; font-size: 1.1rem; font-weight: 700; padding: 6px 0; min-height: 28px; }
         .feedback.correct { color: #5BC886; }
         .feedback.wrong { color: #F07070; }
 
@@ -322,7 +322,7 @@
         .divider { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
         .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #E8E2DA; }
         .divider span { font-size: 0.8rem; font-weight: 600; color: #B8AD9E; white-space: nowrap; }
-        .source-area { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; justify-items: center; padding: 12px 0; margin-bottom: 16px; }
+        .source-area { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; justify-items: center; padding: 8px 0; margin-bottom: 4px; }
         .source-circle { width: 100%; max-width: 36px; aspect-ratio: 1; border-radius: 50%; background: #F0A050; cursor: grab; touch-action: none; box-shadow: 0 2px 6px rgba(240,160,80,0.3); transition: transform 0.1s, opacity 0.15s; }
         .source-circle:active { cursor: grabbing; transform: scale(1.12); }
         .source-circle.used { opacity: 0; pointer-events: none; transform: scale(0); transition: all 0.3s ease; }
@@ -330,6 +330,8 @@
         .check-btn { width: 100%; padding: 16px 0; border-radius: 16px; border: none; background: linear-gradient(135deg, #6BADE8, #5BC886); color: white; font-family: 'Noto Sans KR', sans-serif; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform 0.1s, opacity 0.15s; }
         .check-btn:active { transform: scale(0.97); }
         .check-btn:disabled { opacity: 0.45; cursor: default; }
+        .btn-pass { color: #B8AD9E; font-size: 0.875rem; font-weight: 500; text-decoration: underline; background: none; border: none; cursor: pointer; padding: 8px 0; transition: color 0.15s; }
+        .btn-pass:hover { color: #6B5F50; }
 
         /* ── 세기 모드 ── */
         .count-dots-area { min-height: 160px; border: 2.5px solid #E8E2DA; border-radius: 20px; background: #FDFCFA; padding: 16px; display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; align-content: start; justify-items: start; margin-bottom: 24px; }
@@ -701,6 +703,7 @@ setTimeout(function() {
         <div class="source-area" id="source-area"></div>
         <div class="feedback" id="fill-feedback"></div>
         <button class="check-btn" id="fill-check-btn" onclick="checkFillAnswer()" disabled>확인하기</button>
+        <button id="fill-pass-btn" onclick="passQuestion()" class="btn-pass">이 문제 패스하기</button>
     </div>
 
     <!-- ══════════ 세기 게임 ══════════ -->
@@ -722,6 +725,7 @@ setTimeout(function() {
         <div id="count-impulse-area"></div>
         <div class="options-grid" id="count-options"></div>
         <div class="feedback" id="count-feedback"></div>
+        <button id="count-pass-btn" onclick="passQuestion()" class="btn-pass">이 문제 패스하기</button>
     </div>
 
     <!-- ══════════ 결과 ══════════ -->
@@ -863,11 +867,20 @@ function toggleTTS() {
     if (!ttsEnabled && window.speechSynthesis) speechSynthesis.cancel();
     saveSettings();
 }
-function speak(text) {
-    if (!ttsEnabled || !window.speechSynthesis) return;
+function speak(text, onEnd) {
+    if (!ttsEnabled || !window.speechSynthesis) {
+        if (onEnd) setTimeout(onEnd, 0);
+        return;
+    }
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'ko-KR'; u.rate = 0.9;
+    if (onEnd) {
+        let done = false;
+        const fire = () => { if (done) return; done = true; onEnd(); };
+        u.onend = fire;
+        u.onerror = fire;
+    }
     setTimeout(() => speechSynthesis.speak(u), 50);
 }
 // 자주 쓰는 문구 프리워밍 — 첫 재생부터 즉시 응답
@@ -1088,6 +1101,25 @@ function placeCircle(idx) {
     document.getElementById('fill-check-btn').disabled = false;
 }
 
+function passQuestion() {
+    if (gameMode === 'count') {
+        if (countBusy) return;
+        countBusy = true;
+        speak('패스합니다.');
+        currentQ++;
+        loadCountQuestion();
+    } else {
+        // fill mode
+        const checkBtn = document.getElementById('fill-check-btn');
+        if (checkBtn && checkBtn.dataset.passed === '1') return;
+        if (checkBtn) checkBtn.dataset.passed = '1';
+        speak('패스합니다.');
+        currentQ++;
+        if (checkBtn) checkBtn.dataset.passed = '';
+        loadFillQuestion();
+    }
+}
+
 function loadFillQuestion() {
     if (currentQ >= TOTAL) { showResult(); return; }
     const target = questions[currentQ];
@@ -1109,21 +1141,27 @@ function loadFillQuestion() {
 function checkFillAnswer() {
     const target = questions[currentQ];
     const fb = document.getElementById('fill-feedback');
+    let advanced = false;
+    const advance = () => { if (advanced) return; advanced = true; loadFillQuestion(); };
     if (placedCount === target) {
         score++;
         fb.textContent = '정답! ' + target + '개를 정확히 채웠어요';
         fb.className = 'feedback correct';
         document.getElementById('fill-score-label').textContent = score + '점';
-        speak(target + '개. 정답이에요');
+        speak(target + '개. 정답이에요', advance);
+        document.getElementById('fill-check-btn').disabled = true;
+        currentQ++;
+        // 안전망: 발화가 끝나지 않거나 TTS 꺼진 경우 최대 2.5초 후 강제 진행
+        setTimeout(advance, 2500);
     } else {
         fb.textContent = placedCount + '개를 놓았어요. 정답은 ' + target + '개예요';
         fb.className = 'feedback wrong';
         speak('다시 해봐요');
         addWrongNote(target);
+        document.getElementById('fill-check-btn').disabled = true;
+        currentQ++;
+        setTimeout(advance, 1500);
     }
-    document.getElementById('fill-check-btn').disabled = true;
-    currentQ++;
-    setTimeout(loadFillQuestion, 1500);
 }
 
 /* ════════════════════════════════════════════
@@ -1246,10 +1284,13 @@ function pickCountAnswer(btn, picked, target) {
         }
         fb.textContent = '정답! ' + target + '개';
         fb.className = 'feedback correct';
-        speak(target + '개. 정답이에요');
+        let advanced = false;
+        const advance = () => { if (advanced) return; advanced = true; loadCountQuestion(); };
+        speak(target + '개. 정답이에요', advance);
 
         currentQ++;
-        setTimeout(loadCountQuestion, 1500);
+        // 안전망: 발화 onend 누락 또는 TTS 꺼진 경우 최대 2.5초 후 강제 진행
+        setTimeout(advance, 2500);
     } else {
         /* 오답: 해당 보기만 비활성화, 다시 고를 수 있음 */
         countFirstAttemptWrong = true;

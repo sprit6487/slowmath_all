@@ -531,6 +531,8 @@
 
   .btn-next-q { display: block; width: 100%; max-width: 360px; margin: 10px auto 0; padding: 12px 0; border-radius: 14px; border: none; background: var(--warm-700); color: white; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; box-shadow: 0 2px 8px rgba(74,64,53,0.15); }
   .btn-next-q:active { transform: scale(0.98); background: var(--warm-800); }
+  .btn-pass { color: #B8AD9E; font-size: 0.875rem; font-weight: 500; text-decoration: underline; background: none; border: none; cursor: pointer; padding: 8px 0; transition: color 0.15s; }
+  .btn-pass:hover { color: #6B5F50; }
 
   /* Feedback */
   .feedback-float {
@@ -914,6 +916,7 @@ setTimeout(function() {
   <span class="combo-badge" id="combo-badge"></span>
   <div class="game-container" id="game-container"></div>
   <button class="btn-next-q" id="next-q-btn" style="display:none;" onclick="onNextQ()">다음 문제 →</button>
+  <button id="pass-btn" onclick="passQuestion()" class="btn-pass">이 문제 패스하기</button>
 </div>
 
 </div><!-- /.app -->
@@ -1037,6 +1040,9 @@ function speak(text) {
   u.rate = 0.9;
   setTimeout(() => window.speechSynthesis.speak(u), 50);
 }
+// 0~10을 한자수 한글로 변환 — TTS가 숫자 리터럴을 어색하게 읽는 문제 회피
+const SINO_KO = ['영','일','이','삼','사','오','육','칠','팔','구','십'];
+function sinoKo(n) { return (n >= 0 && n <= 10) ? SINO_KO[n] : String(n); }
 // 자주 쓰는 문구 프리워밍 — 첫 재생부터 즉시 응답
 if (window.SM_TTS && window.SM_TTS.prewarm) {
   window.SM_TTS.prewarm([
@@ -1180,7 +1186,7 @@ function nextQuiz() {
     <div class="impulse-msg" id="impulse-msg"></div>
   `;
 
-  speak(`${num}에서 어떤 수를 더하면 10이 될까요?`);
+  speak(`${sinoKo(num)}에서 어떤 수를 더하면 십이 될까요?`);
 
   const grid = document.getElementById('choices-grid');
   const msgEl = document.getElementById('impulse-msg');
@@ -1330,6 +1336,35 @@ function setupOrangeDrag() {
 function onNextQ() {
   document.getElementById('next-q-btn').style.display = 'none';
   nextQuiz();
+}
+
+function passQuestion() {
+  if (locked) return;
+  locked = true;
+  if (impulseTimer) { clearInterval(impulseTimer); impulseTimer = null; }
+  speak('패스합니다.');
+  if (currentMode && currentMode.startsWith('quiz')) {
+    document.getElementById('next-q-btn').style.display = 'none';
+    nextQuiz();
+  } else {
+    // pair 모드: 한 화면에 여러 짝이 있으므로 강제로 다음 라운드(=완료) 처리
+    questionNum = (quizNumbers && quizNumbers.length) ? (quizNumbers.length + 1) : 999;
+    document.getElementById('next-q-btn').style.display = 'none';
+    // pair 모드에서는 완료 화면으로 이동
+    _smGameCompleted = true;
+    const gc = document.getElementById('game-container');
+    gc.innerHTML = `
+      <div class="complete-overlay" style="position:relative;margin-top:40px;">
+        <div class="complete-emoji">👏</div>
+        <div class="complete-msg">패스했어요</div>
+        <div class="complete-sub">다른 문제도 도전해봐요!</div>
+        <button class="next-btn" id="pass-retry">다시 하기</button>
+        <button class="next-btn" id="pass-home" style="margin-top:8px;background:var(--warm-200);color:var(--warm-700);">홈으로</button>
+      </div>
+    `;
+    document.getElementById('pass-retry').addEventListener('click', () => startGame(currentMode, pairCount));
+    document.getElementById('pass-home').addEventListener('click', goHome);
+  }
 }
 
 // ===== Pair Mode =====
