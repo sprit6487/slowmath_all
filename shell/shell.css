@@ -1609,6 +1609,18 @@ body.game-active .home-iframe-wrap { bottom: 0 !important; }
   color: var(--sm-dark);
   -webkit-overflow-scrolling: touch;
 }
+/* 외부 페이지 iframe으로 렌더할 때 — 패딩 제거하고 iframe이 전체를 채우도록 */
+.sm-legal-body--iframe {
+  padding: 0;
+  overflow: hidden;
+}
+.sm-legal-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  background: #F7F4F0;
+}
 .sm-legal-body h1 {
   font-size: 1.3rem;
   font-weight: 800;

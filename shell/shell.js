@@ -964,16 +964,28 @@
     }
   };
 
-  // 약관·처리방침은 slowkids.net의 공식 페이지를 외부 링크로 연다
-  // (앱스토어 심사 통과·약관 개정 동기화·SEO 일원화 목적)
+  // 약관·처리방침은 slowkids.net의 공식 페이지를 인앱 풀스크린에서 iframe으로 띄운다
+  // (앱스토어 심사 URL과 일원화 + 약관 개정 시 한 곳만 수정 + 앱 내 이탈 없이 열람)
   var LEGAL_URLS = {
     terms: 'https://slowkids.net/terms',
     privacy: 'https://slowkids.net/privacy'
   };
+  var LEGAL_TITLES = {
+    terms: '이용약관',
+    privacy: '개인정보 처리방침'
+  };
   function openLegalDoc(docKey) {
     var url = LEGAL_URLS[docKey];
     if (!url) return;
-    window.open(url, '_blank', 'noopener,noreferrer');
+    var titleEl = document.getElementById('sm-legal-title');
+    var bodyEl = document.getElementById('sm-legal-body');
+    var overlay = document.getElementById('sm-legal-overlay');
+    if (!titleEl || !bodyEl || !overlay) return;
+    titleEl.textContent = LEGAL_TITLES[docKey] || '';
+    bodyEl.classList.add('sm-legal-body--iframe');
+    bodyEl.innerHTML = '<iframe class="sm-legal-iframe" src="' + url +
+      '" title="' + (LEGAL_TITLES[docKey] || '') + '" loading="eager"></iframe>';
+    overlay.hidden = false;
   }
 
   function closeLegalDoc() {
